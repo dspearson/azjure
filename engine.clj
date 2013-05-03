@@ -1,8 +1,8 @@
 (def test-state
   (vector 0x00 0x01 0x02 0x03
           0x04 0x05 0x06 0x07
-          0x08 0x09 0x10 0x1a
-          0x1b 0x1c 0x1d 0x1e))
+          0x08 0x09 0x0a 0x0b
+          0x0c 0x0d 0x0e 0x0f))
 
 (def test-key-128 
   (vector 0x2b 0x7e 0x15 0x16
@@ -81,12 +81,28 @@
           (bit-shift-left (nth vec 2) 8)
           (nth vec 3)))
 
-;; Rotates a 32-bit word left, placing the leftmost bits
-;; in the rightmost bit positions.
-;; e.g. 0x12ab1f3b becomes 0xab1f3b12
-(defn rotate-word [word]
-  (bit-or (bit-and (bit-shift-left word 8) 0xFFFFFFFF)
-          (bit-shift-right (bit-and word 0xFF000000) 24)))
+(defn word-byte [word]
+  (conj []
+        (bit-and 0xff (bit-shift-right word 24))
+        (bit-and 0xff (bit-shift-right word 16))
+        (bit-and 0xff (bit-shift-right word 8))
+        (bit-and 0xff word)))
+
+;; Rotates a 32-bit word left shift bytes, placing the 
+;; leftmost byte(s) in the rightmost byte positions.
+;;  
+;; (rotate-word-left 0x12ab1f3b 1) returns 0xab1f3b12
+;; (rotate-word-left 0x12ab1f3b 2) returns 0x1f3b12ab
+;; (rotate-word-left 0x12ab1f3b 3) returns 0x3b12ab1f
+(defn rotate-word-left [word shift]
+  (let [sft (mod shift 4)
+        lshift (* 8 sft)
+        rshift (- 32 lshift)
+        mask (bit-and (bit-shift-left 0xffffffff rshift) 0xFFFFFFFF)]
+    (if (= 0 sft)
+      word
+      (bit-or (bit-and (bit-shift-left word lshift) 0xFFFFFFFF)
+              (bit-shift-right (bit-and word mask) rshift)))))
 
 ;; Get a byte value out of the Sbox vector
 ;; shift argument should be a multiple of 8
@@ -117,7 +133,7 @@
             (if (= (mod idx nk) 0)
               (bit-xor
                (bit-xor 
-                (sub-word (rotate-word temp))
+                (sub-word (rotate-word-left temp 1))
                 (nth rcon (/ idx nk)))
                prev)
               (if (and (> nk 6) (= (mod idx nk) 4))
@@ -132,5 +148,61 @@
           (into [] (map #(bit-word %) (partition 4 key)))
           (range nk (* nb (+ nr 1))))))
 
+(defn transpose [matrix]
+  (apply mapv vector matrix))
+
 (defn add-round-key [state ks]
-  (map bit-xor state ks))        
+  (map bit-xor state ks))
+
+(defn- print-state [label state]
+  (print label)
+  (println (map #(Long/toHexString %) state)))
+
+(defn- to-matrix [state]
+  (mapv #(word-byte %) state))
+
+(defn- to-words [matrix]
+  (mapv #(bit-word %) matrix))
+
+(defn shift-rows [state]
+  (let [_ (print-state "State:      " state) 
+        words (to-words (transpose (to-matrix state)))
+        _ (print-state "Transposed: " words)
+        rotated (map #(rotate-word-left %1 %2) words (range 4))
+        _ (print-state "Rotated:    " rotated)
+        nwords (to-words (transpose (to-matrix rotated)))
+        _ (print-state "Transposed: " nwords)
+        _ (println)]
+    nwords))
+
+(defn mix-columns [state]
+  state)
+
+(defn sub-bytes [state]
+  (map #(sub-word %) state))
+
+(defn encrypt-block [ks nr]
+ (fn [state round]
+   (let [next (+ round 1)
+         lower (* round 4)
+         upper (* next 4)
+         km (subvec ks lower upper)]
+     (if (= round 0)
+       (add-round-key state km)
+       (if (< (- nr 1) round)
+         (add-round-key 
+          (mix-columns
+           (shift-rows 
+            (sub-bytes state))) km)
+         (add-round-key 
+          (shift-rows 
+           (sub-bytes state)) km))))))
+
+(defn test-encrypt-block [key state]
+  (let [nb 4
+        nk (/ (count key) nb)
+        nr (+ nk 6)
+        ek (expand-key key)]
+    (map #(Long/toHexString %)
+         (reduce #((encrypt-block ek nr) %1 %2)
+                 state (range nr)))))
