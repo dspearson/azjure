@@ -1,23 +1,32 @@
-(def test-key-128 (vector 0x2b 0x7e 0x15 0x16
-                          0x28 0xae 0xd2 0xa6
-                          0xab 0xf7 0x15 0x88 
-                          0x09 0xcf 0x4f 0x3c))
+(def test-state
+  (vector 0x00 0x01 0x02 0x03
+          0x04 0x05 0x06 0x07
+          0x08 0x09 0x10 0x1a
+          0x1b 0x1c 0x1d 0x1e))
 
-(def test-key-192 (vector 0x8e 0x73 0xb0 0xf7 
-                          0xda 0x0e 0x64 0x52
-                          0xc8 0x10 0xf3 0x2b 
-                          0x80 0x90 0x79 0xe5
-                          0x62 0xf8 0xea 0xd2
-                          0x52 0x2c 0x6b 0x7b))
+(def test-key-128 
+  (vector 0x2b 0x7e 0x15 0x16
+          0x28 0xae 0xd2 0xa6
+          0xab 0xf7 0x15 0x88 
+          0x09 0xcf 0x4f 0x3c))
 
-(def test-key-256 (vector 0x60 0x3d 0xeb 0x10
-                          0x15 0xca 0x71 0xbe
-                          0x2b 0x73 0xae 0xf0
-                          0x85 0x7d 0x77 0x81
-                          0x1f 0x35 0x2c 0x07
-                          0x3b 0x61 0x08 0xd7
-                          0x2d 0x98 0x10 0xa3
-                          0x09 0x14 0xdf 0xf4))
+(def test-key-192 
+  (vector 0x8e 0x73 0xb0 0xf7 
+          0xda 0x0e 0x64 0x52
+          0xc8 0x10 0xf3 0x2b 
+          0x80 0x90 0x79 0xe5
+          0x62 0xf8 0xea 0xd2
+          0x52 0x2c 0x6b 0x7b))
+
+(def test-key-256 
+  (vector 0x60 0x3d 0xeb 0x10
+          0x15 0xca 0x71 0xbe
+          0x2b 0x73 0xae 0xf0
+          0x85 0x7d 0x77 0x81
+          0x1f 0x35 0x2c 0x07
+          0x3b 0x61 0x08 0xd7
+          0x2d 0x98 0x10 0xa3
+          0x09 0x14 0xdf 0xf4))
 
 (def Sbox
   (vector 0x63 0x7c 0x77 0x7b 0xf2 0x6b 0x6f 0xc5
@@ -53,56 +62,75 @@
           0x8c 0xa1 0x89 0x0d 0xbf 0xe6 0x42 0x68
           0x41 0x99 0x2d 0x0f 0xb0 0x54 0xbb 0x16))
 
-(def rcon (vector 0x00000000 0x01000000 0x02000000 0x04000000
-                  0x08000000 0x10000000 0x20000000 0x40000000 
-                  0x80000000 0x1b000000 0x36000000 0x6c000000
-                  0xd8000000 0xab000000 0x4d000000 0x9a000000
-                  0x2f000000 0x5e000000 0xbc000000 0x63000000
-                  0xc6000000 0x97000000 0x35000000 0x6a000000
-                  0xd4000000 0xb3000000 0x7d000000 0xfa000000
-                  0xef000000 0xc5000000 0x91000000))
+(def rcon 
+  (vector 0x00000000 0x01000000 0x02000000 0x04000000
+          0x08000000 0x10000000 0x20000000 0x40000000 
+          0x80000000 0x1b000000 0x36000000 0x6c000000
+          0xd8000000 0xab000000 0x4d000000 0x9a000000
+          0x2f000000 0x5e000000 0xbc000000 0x63000000
+          0xc6000000 0x97000000 0x35000000 0x6a000000
+          0xd4000000 0xb3000000 0x7d000000 0xfa000000
+          0xef000000 0xc5000000 0x91000000))
 
-(def expanded-key (atom []))
-
+;; Takes a vector of 4 bytes (32 bits) and creates
+;; one 32-bit word composed of the 4 bytes
+;; e.g. [0x12 0xab 0x1f 0x3b] becomes 0x12ab1f3b
 (defn bit-word [vec]
   (bit-or (bit-shift-left (nth vec 0) 24)
           (bit-shift-left (nth vec 1) 16)
           (bit-shift-left (nth vec 2) 8)
           (nth vec 3)))
 
+;; Rotates a 32-bit word left, placing the leftmost bits
+;; in the rightmost bit positions.
+;; e.g. 0x12ab1f3b becomes 0xab1f3b12
 (defn rotate-word [word]
   (bit-or (bit-and (bit-shift-left word 8) 0xFFFFFFFF)
           (bit-shift-right (bit-and word 0xFF000000) 24)))
 
+;; Get a byte value out of the Sbox vector
+;; shift argument should be a multiple of 8
 (defn get-in-sbox [word shift]
   (if (= 0 shift)
     (nth Sbox (bit-and word 0xff))
     (bit-shift-left 
      (nth Sbox (bit-and (bit-shift-right word shift) 0xff)) shift)))
 
+;; Substitues each byte (most significant first) in a word
+;; with a new byte from the Sbox
 (defn sub-word [word]
   (bit-or
-   (get-in-sbox word 0)
-   (get-in-sbox word 8)
+   (get-in-sbox word 24)
    (get-in-sbox word 16)
-   (get-in-sbox word 24)))
+   (get-in-sbox word 8)
+   (get-in-sbox word 0)))
 
 (defn get-last-nk [vec nk]
   (subvec vec (- (count vec) nk)))
 
-(defn next-word [vec idx nk]
-  (let [end (get-last-nk vec nk)]
-    (if (= (mod idx nk) 0)
-      (bit-xor
-       (bit-xor 
-        (sub-word (rotate-word (last end)))
-        (nth rcon (/ idx nk)))
-       (first end))
-      (if (and (> nk 6) (= (mod idx nk) 4))
-        (bit-xor
-         (sub-word (last end))
-         (first end))
-        (bit-xor (last end) (first end))))))
+(defn next-word [nk]
+  (fn [vec idx]
+    (let [tail (get-last-nk vec nk)
+          temp (last tail)
+          prev (first tail)]
+      (conj vec
+            (if (= (mod idx nk) 0)
+              (bit-xor
+               (bit-xor 
+                (sub-word (rotate-word temp))
+                (nth rcon (/ idx nk)))
+               prev)
+              (if (and (> nk 6) (= (mod idx nk) 4))
+                (bit-xor (sub-word temp) prev)
+                (bit-xor temp prev)))))))
 
-(defn init-expanded-key [vec]
-  (reset! expanded-key (into [] (map #(bit-word %) (partition 4 vec)))))
+(defn expand-key [key]
+  (let [nb 4
+        nk (/ (count key) nb)
+        nr (+ nk 6)]
+    (reduce #((next-word nk) %1 %2)
+          (into [] (map #(bit-word %) (partition 4 key)))
+          (range nk (* nb (+ nr 1))))))
+
+(defn add-round-key [state ks]
+  (map bit-xor state ks))        
