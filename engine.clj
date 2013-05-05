@@ -149,6 +149,9 @@
           (bit-shift-left (nth vec 2) 8)
           (nth vec 3)))
 
+;; Takes a word (32 bits, 4 bytes) and creates
+;; a vector of the 4 bytes individually.
+;; e.g. 0x12ab1f3b becomes [0x12 0xab 0x1f 0x3b]
 (defn word-byte [word]
   (conj []
         (bit-and 0xff (bit-shift-right word 24))
