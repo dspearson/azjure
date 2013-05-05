@@ -1,3 +1,7 @@
+;; ## AES Encryption Engine
+(ns ^{:author "Jason Ozias"}
+     com.ozias.net.crypt.aesengine)
+
 (def test-state
   (vector 0x00 0x11 0x22 0x33
           0x44 0x55 0x66 0x77
