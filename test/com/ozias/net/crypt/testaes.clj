@@ -2,13 +2,32 @@
 (ns ^{:author "Jason Ozias"}
      com.ozias.net.crypt.testaes
      (:require 
-      [com.ozias.net.crypt.aes :refer [encrypt-block]]))
+      [com.ozias.net.crypt.aes
+       :refer [encrypt-block decrypt-block]]))
 
 (def test-state
-  (vector 0x00 0x11 0x22 0x33
-          0x44 0x55 0x66 0x77
-          0x88 0x99 0xaa 0xbb
-          0xcc 0xdd 0xee 0xff))
+  (vector 0x00112233
+          0x44556677
+          0x8899aabb
+          0xccddeeff))
+
+(def test-decrypt-state-128
+  (vector 0x69c4e0d8
+          0x6a7b0430 
+          0xd8cdb780
+          0x70b4c55a))
+
+(def test-decrypt-state-192
+  (vector 0xdda97ca4
+          0x864cdfe0
+          0x6eaf70a0
+          0xec0d7191))
+
+(def test-decrypt-state-256
+  (vector 0x8ea2b7ca
+          0x516745bf
+          0xeafc4990 
+          0x4b496089))
 
 (def test-key-128 
   (vector 0x00 0x01 0x02 0x03
@@ -49,3 +68,39 @@
 (defn test-all-encrypt-block []
   (map #(encrypt-block test-state %) 
        (vector test-key-128 test-key-192 test-key-256)))
+
+(defn test-decrypt-block [state key]
+  (decrypt-block state key))
+
+(defn test-128-decrypt-block []
+  (decrypt-block test-decrypt-state-128 test-key-128))
+
+(defn test-192-decrypt-block []
+  (decrypt-block test-decrypt-state-192 test-key-192))
+
+(defn test-256-decrypt-block []
+  (decrypt-block test-decrypt-state-256 test-key-256))
+
+(defn test-all-decrypt-block []
+  (map #(decrypt-block %1 %2) 
+       (vector test-decrypt-state-128
+               test-decrypt-state-192
+               test-decrypt-state-256)
+       (vector test-key-128
+               test-key-192
+               test-key-256)))
+
+(defn both [key]
+  (fn []
+    (mapv #(Long/toHexString %) 
+          (decrypt-block
+           (encrypt-block test-state key) key))))
+
+(defn test-128-both []
+  ((both test-key-128)))
+
+(defn test-192-both []
+  ((both test-key-192)))
+
+(defn test-256-both []
+  ((both test-key-256)))
