@@ -669,14 +669,16 @@
 
 ;; ### process-block
 ;; This is the entry point into the algorithm
+;;
 ;; 1. <em>state<em>: A 4-word vector representing a block.
 ;; 2. <em>key<em>: A 4,6, or 8-word vector representing a 
 ;; 128, 192, or 256 bit key.
 ;; 3. <em>enc<em>: true if you are encrypting the block, false
 ;; if you are decrypting the block.
+;;
+;; Evaluates to a vector of 4 words.
 (defn process-block [state key enc]
-  (let [nb 4
-        nk (count key)
+  (let [nk (count key)
         nr (+ nk 6)
         ek (ekmemo key)
         encfn (if enc cipher inv-cipher)
