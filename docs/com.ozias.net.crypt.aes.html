@@ -3378,7 +3378,13 @@ and InvMixColumns cipher steps.</p>
           0x37 0x39 0x2b 0x25 0x0f 0x01 0x13 0x1d
           0x47 0x49 0x5b 0x55 0x7f 0x71 0x63 0x6d 
           0xd7 0xd9 0xcb 0xc5 0xef 0xe1 0xf3 0xfd
-          0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d))</pre></td></tr><tr><td class="docs"><h3>bytes-word</h3>
+          0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d))</pre></td></tr><tr><td class="docs"><h3>print-state</h3>
+
+<p>Used for printing state.  Remove.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- print-state [label state]
+  (print label)
+  (println (map #(Long/toHexString %) state))
+  state)</pre></td></tr><tr><td class="docs"><h3>bytes-word</h3>
 
 <p>Takes a vector of 4 bytes and creates
 one 32-bit word composed of the 4 bytes.</p>
@@ -3413,15 +3419,44 @@ the 4 bytes individually.</p>
 
 <p>This is the inverse of byte-words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- word-bytes [word]
-  (mapv #(bit-and 0xff (bit-shift-right word %)) (range 24 -1 -8)))</pre></td></tr><tr><td class="docs">
+  (mapv #(bit-and 0xff (bit-shift-right word %)) (range 24 -1 -8)))</pre></td></tr><tr><td class="docs"><h3>mask</h3>
+
+<p>Calculates the word (4 bytes) mask for a given byte shift.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- mask [shift]
-  (bit-and (bit-shift-left 0xFFFFFFFF shift) 0xFFFFFFFF))</pre></td></tr><tr><td class="docs">
+  (bit-and (bit-shift-left 0xFFFFFFFF shift) 0xFFFFFFFF))</pre></td></tr><tr><td class="docs"><h3>mmask</h3>
+
+<p>Memoization of the mask function.</p>
 </td><td class="codes"><pre class="brush: clojure">(def mmask (memoize mask))</pre></td></tr><tr><td class="docs"><h3>rotate-word</h3>
+
+<p>Rotate a word with the given left and right shift.
+If <em>lsfhit</em> is larger, the word will be rotated left.
+If <em>rshift</em> is larger, the word will be rotated right.
+Valid values for lshfit and rshift</p>
+
+<ol>
+<li>0 32</li>
+<li>8 24</li>
+<li>16 16</li>
+<li>24 8</li>
+<li>32 0</li>
+</ol>
+
+<p>Note that if either argument is 0, this means no shift will
+happen and the function evaluates to the given word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- rotate-word [word lshift rshift]
   (if (or (= lshift 0) (= rshift 0))
     word
     (bit-or (bit-and (bit-shift-left word lshift) (mmask lshift))
-            (bit-shift-right (bit-and word (mmask rshift)) rshift))))</pre></td></tr><tr><td class="docs"><h3>rotate-word-left</h3>
+            (bit-shift-right (bit-and word (mmask rshift)) rshift))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- mod-shift [shift]
+  (mod shift 4))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def mmod-shift (memoize mod-shift))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- shift-in-bits [shift]
+  (* 8 shift))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def mshift-in-bits (memoize shift-in-bits))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- inv-shift-in-bits [shift]
+  (- 32 (mshift-in-bits shift)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def minv-shift-in-bits (memoize inv-shift-in-bits))</pre></td></tr><tr><td class="docs"><h3>rotate-word-left</h3>
 
 <p>Rotates a 32-bit word left by <em>shift</em> bytes,
 placing the leftmost byte(s) in the rightmost byte positions.</p>
@@ -3453,18 +3488,50 @@ placing the leftmost byte(s) in the rightmost byte positions.</p>
   <p>0x3b12ab1f</p>
 </blockquote>
 </td><td class="codes"><pre class="brush: clojure">(defn- rotate-word-left [word shift]
-  (let [sft (mod shift 4)
-        lshift (* 8 sft)
-        rshift (- 32 lshift)]
+  (let [sft (mmod-shift shift)
+        lshift (mshift-in-bits sft)
+        rshift (minv-shift-in-bits sft)]
     (rotate-word word lshift rshift)))</pre></td></tr><tr><td class="docs"><h3>rotate-word-right</h3>
+
+<p>Rotates a 32-bit word right by <em>shift</em> bytes,
+placing the rightmost byte(s) in the leftmost byte positions.</p>
+
+<pre><code>(rotate-word-right 0x12ab1f3b 1)
+</code></pre>
+
+<p>evaluates to</p>
+
+<blockquote>
+  <p>0x3b12ab1f</p>
+</blockquote>
+
+<pre><code>(rotate-word-right 0x12ab1f3b 2)
+</code></pre>
+
+<p>evaluates to</p>
+
+<blockquote>
+  <p>0x1f3b12ab</p>
+</blockquote>
+
+<pre><code>(rotate-word-right 0x12ab1f3b 3)
+</code></pre>
+
+<p>evalutates to</p>
+
+<blockquote>
+  <p>0xab1f3b12</p>
+</blockquote>
 </td><td class="codes"><pre class="brush: clojure">(defn- rotate-word-right [word shift]
-  (let [sft (mod shift 4)
-        rshift (* 8 sft)
-        lshift (- 32 rshift)]
+  (let [sft (mmod-shift shift)
+        rshift (mshift-in-bits sft)
+        lshift (minv-shift-in-bits sft)]
     (rotate-word word lshift rshift)))</pre></td></tr><tr><td class="docs"><h3>get-in-sbox</h3>
 
 <p>Get a byte value out of the sbox (normal or inverse) vector
 shift argument should be a multiple of 8</p>
+
+<p>Evaluates to a function over the given sbox (Sbox or invSbox).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- get-in-sbox [sbox] 
   (fn [word shift]
     (if (= 0 shift)
@@ -3489,40 +3556,77 @@ shift argument should be a multiple of 8</p>
    label 
    (map #(subfn %) state))))</pre></td></tr><tr><td class="docs"><h3>get-last-nk</h3>
 
-<p>Get the last Nk items from a vector (Nk is the key length
-in words).</p>
+<p>Get the last <em>Nk</em> items from a vector.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- get-last-nk [vec nk]
   (subvec vec (- (count vec) nk)))</pre></td></tr><tr><td class="docs"><h3>next-word</h3>
+
+<p>Calculates the next word during key expansion.</p>
+
+<ul>
+<li>Get the head and tail elements from the <em>Nk</em>
+length tail vector of the key expansion.</li>
+<li>If the current index mod <em>Nk</em> is 0</li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Rotate the tail word left.</li>
+  <li>Lookup the substitution word from the Sbox.</li>
+  <li>XOR with a value from rcon.</li>
+  <li>XOR with the head word.</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>If the key size is 8 and the current index mod <em>Nk</em> is 4</li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Lookup the substition word for tail in the sbox.</li>
+  <li>XOR with the head word.</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>Else, XOR tail and head</li>
+</ul>
+
+<p>Evalutates to a function over the given <em>Nk</em> key length.
+The function takes the current state of the key expansion and
+the index of the next word to be calculated.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- next-word [nk]
   (fn [vec idx]
-    (let [tail (get-last-nk vec nk)
-          temp (last tail)
-          prev (first tail)]
+    (let [tailvec (get-last-nk vec nk)
+          tail (last tailvec)
+          head (first tailvec)]
       (conj vec
             (if (= (mod idx nk) 0)
               (bit-xor
                (bit-xor 
-                (sub-word (rotate-word-left temp 1))
+                (sub-word (rotate-word-left tail 1))
                 (nth rcon (/ idx nk)))
-               prev)
+               head)
               (if (and (&gt; nk 6) (= (mod idx nk) 4))
-                (bit-xor (sub-word temp) prev)
-                (bit-xor temp prev)))))))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
+                (bit-xor (sub-word tail) head)
+                (bit-xor tail head)))))))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
 
 <p>The expand key takes a vector of <em>Nk</em> words that represent
 a key of 128, 192, or 256 bits.</p>
+
+<ul>
+<li>Evaluates to a 44 word vector for a 128-bit key.</li>
+<li>Evaluates to a 52 word vector for a 192-bit key.</li>
+<li>Evaluates to a 60 word vector for a 256-bit key.</li>
+</ul>
 </td><td class="codes"><pre class="brush: clojure">(defn- expand-key [key]
   (let [nb 4
         nk (count key)
         nr (+ nk 6)]
-    (reduce #((next-word nk) %1 %2) key (range nk (* nb (+ nr 1))))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def ekmemo (memoize expand-key))</pre></td></tr><tr><td class="docs"><h3>print-state</h3>
+    (reduce #((next-word nk) %1 %2) key (range nk (* nb (+ nr 1))))))</pre></td></tr><tr><td class="docs"><h3>mexpand-key</h3>
 
-<p>Used for debugging.  Remove.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- print-state [label state]
-  (print label)
-  (println (map #(Long/toHexString %) state))
-  state)</pre></td></tr><tr><td class="docs"><h3>transpose</h3>
+<p>expand-key memoization</p>
+</td><td class="codes"><pre class="brush: clojure">(def mexpand-key (memoize expand-key))</pre></td></tr><tr><td class="docs"><h3>transpose</h3>
 
 <p>Transpose a vector of vectors.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- transpose [matrix]
@@ -3540,6 +3644,15 @@ between the state and the key material.</p>
 <p>Converts a vector of 4x4 byte vectors into a vector of 4 words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- to-words [matrix]
   (mapv #(bytes-word %) matrix))</pre></td></tr><tr><td class="docs"><h3>shift-rows</h3>
+
+<p>Shift the last three rows in the state matrix by 1, 2, and 3 bytes
+left for encoding, right for decoding.</p>
+
+<ol>
+<li>Converts the state (a vector of columns) into a vector of rows.</li>
+<li>The rows are then shifted 0, 1, 2, or 3 bytes.</li>
+<li>The vector of rows is then converted back into a vector of columns.</li>
+</ol>
 </td><td class="codes"><pre class="brush: clojure">(defn- shift-rows [state inv]
   (let [words (to-words (transpose (to-matrix state)))
         rotatefn (if inv rotate-word-right rotate-word-left)
@@ -3689,11 +3802,12 @@ in the state.</p>
 <li><em>enc<em>: true if you are encrypting the block, false
 if you are decrypting the block.</li>
 </ol>
+
+<p>Evaluates to a vector of 4 words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn process-block [state key enc]
-  (let [nb 4
-        nk (count key)
+  (let [nk (count key)
         nr (+ nk 6)
-        ek (ekmemo key)
+        ek (mexpand-key key)
         encfn (if enc cipher inv-cipher)
         rv (if enc (range (+ nr 1)) (range nr -1 -1))]
     (into [] (reduce #((encfn ek nr) %1 %2) state rv))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;

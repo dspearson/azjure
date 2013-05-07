@@ -354,6 +354,13 @@
           0xd7 0xd9 0xcb 0xc5 0xef 0xe1 0xf3 0xfd
           0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d))
 
+;; ### print-state
+;; Used for printing state.  Remove.
+(defn- print-state [label state]
+  (print label)
+  (println (map #(Long/toHexString %) state))
+  state)
+
 ;; ### bytes-word
 ;; Takes a vector of 4 bytes and creates
 ;; one 32-bit word composed of the 4 bytes.
@@ -383,17 +390,49 @@
 (defn- word-bytes [word]
   (mapv #(bit-and 0xff (bit-shift-right word %)) (range 24 -1 -8)))
 
+;; ### mask
+;; Calculates the word (4 bytes) mask for a given byte shift.
 (defn- mask [shift]
   (bit-and (bit-shift-left 0xFFFFFFFF shift) 0xFFFFFFFF))
 
+;; ### mmask
+;; Memoization of the mask function.
 (def mmask (memoize mask))
 
 ;; ### rotate-word
+;; Rotate a word with the given left and right shift.
+;; If <em>lsfhit</em> is larger, the word will be rotated left.
+;; If <em>rshift</em> is larger, the word will be rotated right.
+;; Valid values for lshfit and rshift
+;;
+;; 1. 0 32
+;; 2. 8 24
+;; 3. 16 16
+;; 4. 24 8
+;; 5. 32 0
+;;
+;; Note that if either argument is 0, this means no shift will
+;; happen and the function evaluates to the given word.
 (defn- rotate-word [word lshift rshift]
   (if (or (= lshift 0) (= rshift 0))
     word
     (bit-or (bit-and (bit-shift-left word lshift) (mmask lshift))
             (bit-shift-right (bit-and word (mmask rshift)) rshift))))
+
+(defn- mod-shift [shift]
+  (mod shift 4))
+
+(def mmod-shift (memoize mod-shift))
+
+(defn- shift-in-bits [shift]
+  (* 8 shift))
+
+(def mshift-in-bits (memoize shift-in-bits))
+
+(defn- inv-shift-in-bits [shift]
+  (- 32 (mshift-in-bits shift)))
+
+(def minv-shift-in-bits (memoize inv-shift-in-bits))
 
 ;; ### rotate-word-left
 ;; Rotates a 32-bit word left by <em>shift</em> bytes,
@@ -416,21 +455,42 @@
 ;; evalutates to
 ;; > 0x3b12ab1f
 (defn- rotate-word-left [word shift]
-  (let [sft (mod shift 4)
-        lshift (* 8 sft)
-        rshift (- 32 lshift)]
+  (let [sft (mmod-shift shift)
+        lshift (mshift-in-bits sft)
+        rshift (minv-shift-in-bits sft)]
     (rotate-word word lshift rshift)))
 
 ;; ### rotate-word-right
+;; Rotates a 32-bit word right by <em>shift</em> bytes,
+;; placing the rightmost byte(s) in the leftmost byte positions.
+;;  
+;;     (rotate-word-right 0x12ab1f3b 1)
+;;
+;; evaluates to
+;;
+;; > 0x3b12ab1f
+;;
+;;     (rotate-word-right 0x12ab1f3b 2)
+;;
+;; evaluates to
+;;
+;; > 0x1f3b12ab
+;;
+;;     (rotate-word-right 0x12ab1f3b 3)
+;;
+;; evalutates to
+;; > 0xab1f3b12
 (defn- rotate-word-right [word shift]
-  (let [sft (mod shift 4)
-        rshift (* 8 sft)
-        lshift (- 32 rshift)]
+  (let [sft (mmod-shift shift)
+        rshift (mshift-in-bits sft)
+        lshift (minv-shift-in-bits sft)]
     (rotate-word word lshift rshift)))
 
 ;; ### get-in-sbox
 ;; Get a byte value out of the sbox (normal or inverse) vector
 ;; shift argument should be a multiple of 8
+;; 
+;; Evaluates to a function over the given sbox (Sbox or invSbox).
 (defn- get-in-sbox [sbox] 
   (fn [word shift]
     (if (= 0 shift)
@@ -460,45 +520,65 @@
    (map #(subfn %) state))))
 
 ;; ### get-last-nk
-;; Get the last Nk items from a vector (Nk is the key length
-;; in words).
+;; Get the last <em>Nk</em> items from a vector.
 (defn- get-last-nk [vec nk]
   (subvec vec (- (count vec) nk)))
 
 ;; ### next-word
+;; Calculates the next word during key expansion.
+;;
+;; * Get the head and tail elements from the <em>Nk</em>
+;; length tail vector of the key expansion.
+;; * If the current index mod <em>Nk</em> is 0
+;;
+;; >* Rotate the tail word left.
+;; >* Lookup the substitution word from the Sbox.
+;; >* XOR with a value from rcon.
+;; >* XOR with the head word.
+;;
+;; * If the key size is 8 and the current index mod <em>Nk</em> is 4
+;;
+;; >* Lookup the substition word for tail in the sbox.
+;; >* XOR with the head word.
+;;
+;; * Else, XOR tail and head
+;;
+;; Evalutates to a function over the given <em>Nk</em> key length.
+;; The function takes the current state of the key expansion and
+;; the index of the next word to be calculated.
 (defn- next-word [nk]
   (fn [vec idx]
-    (let [tail (get-last-nk vec nk)
-          temp (last tail)
-          prev (first tail)]
+    (let [tailvec (get-last-nk vec nk)
+          tail (last tailvec)
+          head (first tailvec)]
       (conj vec
             (if (= (mod idx nk) 0)
               (bit-xor
                (bit-xor 
-                (sub-word (rotate-word-left temp 1))
+                (sub-word (rotate-word-left tail 1))
                 (nth rcon (/ idx nk)))
-               prev)
+               head)
               (if (and (> nk 6) (= (mod idx nk) 4))
-                (bit-xor (sub-word temp) prev)
-                (bit-xor temp prev)))))))
+                (bit-xor (sub-word tail) head)
+                (bit-xor tail head)))))))
 
 ;; ### expand-key
 ;; The expand key takes a vector of <em>Nk</em> words that represent
 ;; a key of 128, 192, or 256 bits.
+;; 
+;; * Evaluates to a 44 word vector for a 128-bit key.
+;; * Evaluates to a 52 word vector for a 192-bit key.
+;; * Evaluates to a 60 word vector for a 256-bit key.
+;;
 (defn- expand-key [key]
   (let [nb 4
         nk (count key)
         nr (+ nk 6)]
     (reduce #((next-word nk) %1 %2) key (range nk (* nb (+ nr 1))))))
 
-(def ekmemo (memoize expand-key))
-
-;; ### print-state
-;; Used for debugging.  Remove.
-(defn- print-state [label state]
-  (print label)
-  (println (map #(Long/toHexString %) state))
-  state)
+;; ### mexpand-key
+;; expand-key memoization
+(def mexpand-key (memoize expand-key))
 
 ;; ### transpose
 ;; Transpose a vector of vectors.
@@ -522,6 +602,13 @@
   (mapv #(bytes-word %) matrix))
 
 ;; ### shift-rows
+;; Shift the last three rows in the state matrix by 1, 2, and 3 bytes
+;; left for encoding, right for decoding.
+;;
+;; 1. Converts the state (a vector of columns) into a vector of rows.
+;; 2. The rows are then shifted 0, 1, 2, or 3 bytes.
+;; 3. The vector of rows is then converted back into a vector of columns.
+;;
 (defn- shift-rows [state inv]
   (let [words (to-words (transpose (to-matrix state)))
         rotatefn (if inv rotate-word-right rotate-word-left)
@@ -680,7 +767,7 @@
 (defn process-block [state key enc]
   (let [nk (count key)
         nr (+ nk 6)
-        ek (ekmemo key)
+        ek (mexpand-key key)
         encfn (if enc cipher inv-cipher)
         rv (if enc (range (+ nr 1)) (range nr -1 -1))]
     (into [] (reduce #((encfn ek nr) %1 %2) state rv))))
