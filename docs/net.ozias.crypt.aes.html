@@ -3028,7 +3028,7 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>com.ozias.net/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#com.ozias.net.crypt.aes" name="com.ozias.net.crypt.aes"><h1 class="project-name">com.ozias.net.crypt.aes</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>AES Encryption/Decryption Engine</h1>
+</script><title>com.ozias.net/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.aes" name="net.ozias.crypt.aes"><h1 class="project-name">net.ozias.crypt.aes</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>AES Encryption/Decryption Engine</h1>
 
 <p>Defined to meet spec at <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf</a></p>
 
@@ -3063,7 +3063,7 @@ AES specification.  You will see nk, nb and nr in the code.</p>
 </tr>
 </table>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-     com.ozias.net.crypt.aes)</pre></td></tr><tr><td class="docs"><h3>Sbox</h3>
+     net.ozias.crypt.aes)</pre></td></tr><tr><td class="docs"><h3>Sbox</h3>
 
 <p>Substitution box used during encryption as a vector of 256 bytes.</p>
 
@@ -3447,15 +3447,27 @@ happen and the function evaluates to the given word.</p>
   (if (or (= lshift 0) (= rshift 0))
     word
     (bit-or (bit-and (bit-shift-left word lshift) (mmask lshift))
-            (bit-shift-right (bit-and word (mmask rshift)) rshift))))</pre></td></tr><tr><td class="docs">
+            (bit-shift-right (bit-and word (mmask rshift)) rshift))))</pre></td></tr><tr><td class="docs"><h3>mod-shift</h3>
+
+<p>Shift mod 4 for word length shifting.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- mod-shift [shift]
-  (mod shift 4))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def mmod-shift (memoize mod-shift))</pre></td></tr><tr><td class="docs">
+  (mod shift 4))</pre></td></tr><tr><td class="docs"><h3>mmod-shift</h3>
+
+<p>Memoization of mod-shift</p>
+</td><td class="codes"><pre class="brush: clojure">(def mmod-shift (memoize mod-shift))</pre></td></tr><tr><td class="docs"><h3>shift-in-bits</h3>
+
+<p>Converts a byte shift to bits.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- shift-in-bits [shift]
-  (* 8 shift))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def mshift-in-bits (memoize shift-in-bits))</pre></td></tr><tr><td class="docs">
+  (* 8 shift))</pre></td></tr><tr><td class="docs"><h3>mshift-in-bits</h3>
+
+<p>Memoization of shift-in-bits.</p>
+</td><td class="codes"><pre class="brush: clojure">(def mshift-in-bits (memoize shift-in-bits))</pre></td></tr><tr><td class="docs"><h3>inv-shift-in-bits</h3>
+
+<p>Inverse on a word of shift in bits.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- inv-shift-in-bits [shift]
-  (- 32 (mshift-in-bits shift)))</pre></td></tr><tr><td class="docs">
+  (- 32 (mshift-in-bits shift)))</pre></td></tr><tr><td class="docs"><h3>minv-shift-in-bits</h3>
+
+<p>Memoization of inv-shift-in-bits.</p>
 </td><td class="codes"><pre class="brush: clojure">(def minv-shift-in-bits (memoize inv-shift-in-bits))</pre></td></tr><tr><td class="docs"><h3>rotate-word-left</h3>
 
 <p>Rotates a 32-bit word left by <em>shift</em> bytes,

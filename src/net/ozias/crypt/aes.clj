@@ -31,7 +31,7 @@
 ;; </tr>
 ;; </table>
 (ns ^{:author "Jason Ozias"}
-     com.ozias.net.crypt.aes)
+     net.ozias.crypt.aes)
 
 ;; ### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -419,19 +419,31 @@
     (bit-or (bit-and (bit-shift-left word lshift) (mmask lshift))
             (bit-shift-right (bit-and word (mmask rshift)) rshift))))
 
+;; ### mod-shift
+;; Shift mod 4 for word length shifting.
 (defn- mod-shift [shift]
   (mod shift 4))
 
+;; ### mmod-shift
+;; Memoization of mod-shift
 (def mmod-shift (memoize mod-shift))
 
+;; ### shift-in-bits
+;; Converts a byte shift to bits.
 (defn- shift-in-bits [shift]
   (* 8 shift))
 
+;; ### mshift-in-bits
+;; Memoization of shift-in-bits.
 (def mshift-in-bits (memoize shift-in-bits))
 
+;; ### inv-shift-in-bits
+;; Inverse on a word of shift in bits.
 (defn- inv-shift-in-bits [shift]
   (- 32 (mshift-in-bits shift)))
 
+;; ### minv-shift-in-bits
+;; Memoization of inv-shift-in-bits.
 (def minv-shift-in-bits (memoize inv-shift-in-bits))
 
 ;; ### rotate-word-left
