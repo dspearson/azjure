@@ -3,7 +3,7 @@
      com.ozias.net.crypt.testaes
      (:require 
       [com.ozias.net.crypt.aes
-       :refer [encrypt-block decrypt-block]]))
+       :refer [process-block]]))
 
 (def test-state
   (vector 0x00112233
@@ -30,59 +30,59 @@
           0x4b496089))
 
 (def test-key-128 
-  (vector 0x00 0x01 0x02 0x03
-          0x04 0x05 0x06 0x07
-          0x08 0x09 0x0a 0x0b
-          0x0c 0x0d 0x0e 0x0f))
+  (vector 0x00010203
+          0x04050607
+          0x08090a0b
+          0x0c0d0e0f))
 
 (def test-key-192 
-  (vector 0x00 0x01 0x02 0x03
-          0x04 0x05 0x06 0x07
-          0x08 0x09 0x0a 0x0b
-          0x0c 0x0d 0x0e 0x0f
-          0x10 0x11 0x12 0x13
-          0x14 0x15 0x16 0x17))
+  (vector 0x00010203
+          0x04050607
+          0x08090a0b
+          0x0c0d0e0f
+          0x10111213
+          0x14151617))
 
 (def test-key-256 
-  (vector 0x00 0x01 0x02 0x03
-          0x04 0x05 0x06 0x07
-          0x08 0x09 0x0a 0x0b
-          0x0c 0x0d 0x0e 0x0f
-          0x10 0x11 0x12 0x13
-          0x14 0x15 0x16 0x17
-          0x18 0x19 0x1a 0x1b
-          0x1c 0x1d 0x1e 0x1f))
+  (vector 0x00010203
+          0x04050607
+          0x08090a0b
+          0x0c0d0e0f
+          0x10111213
+          0x14151617
+          0x18191a1b
+          0x1c1d1e1f))
 
 (defn test-encrypt-block [state key]
-  (encrypt-block state key))
+  (process-block state key true))
 
 (defn test-128-encrypt-block []
-  (encrypt-block test-state test-key-128))
+  (process-block test-state test-key-128 true))
 
 (defn test-192-encrypt-block []
-  (encrypt-block test-state test-key-192))
+  (process-block test-state test-key-192 true))
 
 (defn test-256-encrypt-block []
-  (encrypt-block test-state test-key-256))
+  (process-block test-state test-key-256 true))
 
 (defn test-all-encrypt-block []
-  (map #(encrypt-block test-state %) 
+  (map #(process-block test-state % true) 
        (vector test-key-128 test-key-192 test-key-256)))
 
 (defn test-decrypt-block [state key]
-  (decrypt-block state key))
+  (process-block state key false))
 
 (defn test-128-decrypt-block []
-  (decrypt-block test-decrypt-state-128 test-key-128))
+  (process-block test-decrypt-state-128 test-key-128 false))
 
 (defn test-192-decrypt-block []
-  (decrypt-block test-decrypt-state-192 test-key-192))
+  (process-block test-decrypt-state-192 test-key-192 false))
 
 (defn test-256-decrypt-block []
-  (decrypt-block test-decrypt-state-256 test-key-256))
+  (process-block test-decrypt-state-256 test-key-256 false))
 
 (defn test-all-decrypt-block []
-  (map #(decrypt-block %1 %2) 
+  (map #(process-block %1 %2 false) 
        (vector test-decrypt-state-128
                test-decrypt-state-192
                test-decrypt-state-256)
@@ -93,8 +93,8 @@
 (defn both [key]
   (fn []
     (mapv #(Long/toHexString %) 
-          (decrypt-block
-           (encrypt-block test-state key) key))))
+          (process-block
+           (process-block test-state key true) key false))))
 
 (defn test-128-both []
   ((both test-key-128)))
