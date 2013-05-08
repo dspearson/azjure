@@ -1,20 +1,19 @@
 (ns ^{:author "Jason Ozias"}
     net.ozias.crypt.mode.cbc
-    (:require 
-     [net.ozias.crypt.blockcipher.aes
-      :refer [process-block]]))
+    (:require [net.ozias.crypt.cipher.aes :refer (->Aes)]
+              [net.ozias.crypt.cipher.blockcipher :refer [encrypt-block decrypt-block]]))
 
-(defn- encrypt-block [iv key] 
+(defn- encrypt-plaintext [cipher iv key] 
   (fn [ciphertext block]
     (let [civ (if (empty? ciphertext) 
                 iv 
                 (subvec ciphertext (- (count ciphertext) 4)))]
       (reduce conj 
-              ciphertext 
-              (process-block 
-               (mapv #(bit-xor %1 %2) block civ) key true)))))
+              ciphertext
+              (encrypt-block cipher
+               (mapv #(bit-xor %1 %2) block civ) key)))))
 
-(defn- decrypt-block [ciphertext iv key]
+(defn- decrypt-ciphertext [cipher ciphertext iv key]
   (fn [plaintext idx]
     (let [lower (* 4 idx)
           upper (+ 4 lower)
@@ -25,13 +24,12 @@
       (reduce conj 
               plaintext 
               (mapv #(bit-xor %1 %2) 
-                    (process-block block key false)
-                    civ)))))
+                    (decrypt-block cipher block key) civ)))))
 
 (defn process-blocks [blocks key iv enc]
   (if enc
-    (reduce #((encrypt-block iv key) %1 %2) 
+    (reduce #((encrypt-plaintext (->Aes) iv key) %1 %2) 
             [] (partition 4 blocks))
-    (reduce #((decrypt-block blocks iv key) %1 %2)
+    (reduce #((decrypt-ciphertext (->Aes) blocks iv key) %1 %2)
             [] 
             (range (/ (count blocks) 4)))))

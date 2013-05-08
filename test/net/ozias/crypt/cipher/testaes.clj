@@ -1,8 +1,8 @@
 ;; ## Test AES Encryption Engine
 (ns ^{:author "Jason Ozias"}
-     net.ozias.crypt.blockcipher.testaes
+     net.ozias.crypt.cipher.testaes
      (:require 
-      [net.ozias.crypt.blockcipher.aes
+      [net.ozias.crypt.cipher.aes
        :refer [process-block]]))
 
 (def test-state

@@ -4,6 +4,7 @@
   :license {:name "GPLv3"
             :url "http://www.gnu.org/licenses/gpl.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.3"]]}}
   :aliases {"build" ["install"]}
   :jvm-opts ["-Xmx500m"]
   :plugins [[lein-marginalia "0.7.1"]]

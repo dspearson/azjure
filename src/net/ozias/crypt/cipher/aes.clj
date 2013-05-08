@@ -31,7 +31,8 @@
 ;; </tr>
 ;; </table>
 (ns ^{:author "Jason Ozias"}
-     net.ozias.crypt.blockcipher.aes)
+     net.ozias.crypt.cipher.aes
+     (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
 
 ;; ### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -754,10 +755,19 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of 4 words.
-(defn process-block [state key enc]
+(defn process-block [block key enc]
   (let [nk (count key)
         nr (+ nk 6)
         ek (mexpand-key key)
         encfn (if enc cipher inv-cipher)
         rv (if enc (range (+ nr 1)) (range nr -1 -1))]
-    (into [] (reduce #((encfn ek nr) %1 %2) state rv))))
+    (into [] (reduce #((encfn ek nr) %1 %2) block rv))))
+
+;; ### Aes
+;; Extend the BlockCipher protocol through the Aes record type.
+(defrecord Aes []
+  BlockCipher
+  (encrypt-block [_ block key]
+    (process-block block key true))
+  (decrypt-block [_ block key]
+    (process-block block key false)))
