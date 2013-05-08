@@ -31,7 +31,7 @@
 ;; </tr>
 ;; </table>
 (ns ^{:author "Jason Ozias"}
-     net.ozias.crypt.aes)
+     net.ozias.crypt.blockcipher.aes)
 
 ;; ### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -354,13 +354,6 @@
           0xd7 0xd9 0xcb 0xc5 0xef 0xe1 0xf3 0xfd
           0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d))
 
-;; ### print-state
-;; Used for printing state.  Remove.
-(defn- print-state [label state]
-  (print label)
-  (println (map #(Long/toHexString %) state))
-  state)
-
 ;; ### bytes-word
 ;; Takes a vector of 4 bytes and creates
 ;; one 32-bit word composed of the 4 bytes.
@@ -525,11 +518,8 @@
 
 ;; ### sub-bytes
 (defn- sub-bytes [state inv]
-  (let [subfn (if inv inv-sub-word sub-word)
-        label (if inv "State (ISB): " "State (SB):  ")]
-  (print-state 
-   label 
-   (map #(subfn %) state))))
+  (let [subfn (if inv inv-sub-word sub-word)]
+   (map #(subfn %) state)))
 
 ;; ### get-last-nk
 ;; Get the last <em>Nk</em> items from a vector.
@@ -601,7 +591,7 @@
 ;; Performs finite field addition (XOR)
 ;; between the state and the key material.
 (defn- add-round-key [state km]
-  (print-state "State (ARK): " (map bit-xor state km)))
+  (map bit-xor state km))
 
 ;; ### to-matrix
 ;; Converts a vector of 4 words into a vector of 4x4 byte vectors.
@@ -624,11 +614,8 @@
 (defn- shift-rows [state inv]
   (let [words (to-words (transpose (to-matrix state)))
         rotatefn (if inv rotate-word-right rotate-word-left)
-        rotated (map #(rotatefn %1 %2) words (range 4))
-        label (if inv "State (ISR): " "State (SR):  ")]
-    (print-state
-     label
-     (to-words (transpose (to-matrix rotated))))))
+        rotated (map #(rotatefn %1 %2) words (range 4))]
+    (to-words (transpose (to-matrix rotated)))))
   
 ;; ### mix-column
 ;; The output word
@@ -716,21 +703,15 @@
 ;; Otherwise, applies the inv-mix-column to each word
 ;; in the state.
 (defn- mix-columns [state inv]
-  (let [mixfn (if inv inv-mix-column mix-column)
-        label (if inv "State (IMC): " "State (MC):  ")]
-  (print-state
-   label
-   (map #(bytes-word %) 
-        (map #(mixfn %) 
-             (map #(word-bytes %) state))))))
+  (let [mixfn (if inv inv-mix-column mix-column)]
+    (map #(bytes-word %) 
+         (map #(mixfn %) 
+              (map #(word-bytes %) state)))))
 
 ;; ### cipher
 (defn- cipher [ks nr]
  (fn [state round]
-   (let [_ (if (> round 0) (println))
-         _ (println (str "Round:       " round))
-         _ (print-state "State:       " state)
-         next (+ round 1)
+   (let [next (+ round 1)
          lower (* round 4)
          upper (* next 4)
          km (subvec ks lower upper)]
@@ -748,10 +729,7 @@
 ;; ### inv-cipher
 (defn- inv-cipher [ks nr]
   (fn [state round]
-    (let [_ (if (< round nr) (println))
-          _ (println (str "Round:       " round))
-          _ (print-state "State:       " state)
-          next (+ round 1)
+    (let [next (+ round 1)
           lower (* round 4)
           upper (* next 4)
           km (subvec ks lower upper)]
