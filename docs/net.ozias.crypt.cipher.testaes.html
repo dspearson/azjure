@@ -3034,23 +3034,9 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
      net.ozias.crypt.cipher.testaes
      (:require [clojure.test :refer :all]
+               [net.ozias.crypt.testkeys :refer :all]
                [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
-               [net.ozias.crypt.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>key-128</h3>
-
-<p>A sample 128-bit key as a vector of 4 32-bit words
-as defined in Appendix C.1 in 
-<a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def key-128 [0x00010203 0x04050607 0x08090a0b 0x0c0d0e0f])</pre></td></tr><tr><td class="docs"><h3>key-192</h3>
-
-<p>A sample 192-bit key as a vector of 6 32-bit words.
-as defined in Appendix C.2 in 
-<a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def key-192 (into key-128 [0x10111213 0x14151617]))</pre></td></tr><tr><td class="docs"><h3>key-256</h3>
-
-<p>A sampel 256-bit key as a vector of 8 32-bit words.
-as defined in Appendix C.3 in 
-<a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def key-256 (into key-192 [0x18191a1b 0x1c1d1e1f]))</pre></td></tr><tr><td class="docs"><h3>pt-block</h3>
+               [net.ozias.crypt.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>pt-block</h3>
 
 <p>A sample plaintext block as a vector of 4 32-bit words
 as defined in Appendix C.1, C.2, and C.3 in 
@@ -3076,16 +3062,16 @@ as a vector of 4 32-bit words as defined in Appendix C.3 in
 </td><td class="codes"><pre class="brush: clojure">(def aes (-&gt;Aes))</pre></td></tr><tr><td class="docs"><h2>encrypt-block</h2>
 
 <p>Encrypt the given block with the given key via AES.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn encrypt-block [block key]
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [block key]
   (bc/encrypt-block aes block key))</pre></td></tr><tr><td class="docs"><h2>decrypt-block</h2>
 
 <p>Decrypt the given block with the given key via AES.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn decrypt-block [block key]
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [block key]
   (bc/decrypt-block aes block key))</pre></td></tr><tr><td class="docs"><h2>enc-decrypt-block</h2>
 
 <p>Encrypt the given block with enckey, 
 then decrypt the output of the encrypt with the deckey.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn enc-dec-block [block enckey deckey]
+</td><td class="codes"><pre class="brush: clojure">(defn- enc-dec-block [block enckey deckey]
   (decrypt-block (encrypt-block block enckey) deckey))</pre></td></tr><tr><td class="docs"><h2>is-eq</h2>
 
 <p>is equal</p>
@@ -3104,10 +3090,10 @@ then decrypt the output of the encrypt with the deckey.</p>
 <pre><code>(is (not (= expected test)))
 </code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defn is-neq [expected test]
-  (is (not (= expected test))))</pre></td></tr><tr><td class="docs"><h2>testAes</h2>
+  (is (not (= expected test))))</pre></td></tr><tr><td class="docs"><h2>testAES</h2>
 
 <p>Test the AES cipher</p>
-</td><td class="codes"><pre class="brush: clojure">(deftest testAes
+</td><td class="codes"><pre class="brush: clojure">(deftest testAES
   (testing &quot;Blocksize&quot;
     (is-eq 128 (bc/blocksize aes)))
   (testing &quot;AES Encryption&quot;

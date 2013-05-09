@@ -3028,20 +3028,25 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.cipher.blockcipher" name="net.ozias.crypt.cipher.blockcipher"><h1 class="project-name">net.ozias.crypt.cipher.blockcipher</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>BlockCipher Protocol</h1>
+</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.cipher.blockcipher" name="net.ozias.crypt.cipher.blockcipher"><h1 class="project-name">net.ozias.crypt.cipher.blockcipher</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>BlockCipher Protocol</h2>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  net.ozias.crypt.cipher.blockcipher)</pre></td></tr><tr><td class="docs"><h2>BlockCipher</h2>
+  net.ozias.crypt.cipher.blockcipher)</pre></td></tr><tr><td class="docs"><h3>BlockCipher</h3>
 
 <p>This protocol defines three functions</p>
 
-<ol>
-<li>encrypt-block: This function takes the block to be encrypted and
-the key that should be used to encrypt the block.</li>
-<li>decrypt-block: This function takes the block to be encrypted and
-the key that should be used to encrypt the block.</li>
-<li>blocksize: This function should evaluate to the blocksize (in bits)
-supported by the implementation.</li>
-</ol>
+<h4>encrypt-block</h4>
+
+<p>This function takes the block to be encrypted and
+the key that should be used to encrypt the block.</p>
+
+<h4>decrypt-block</h4>
+
+<p>This function takes the block to be decrypted and
+the key that should be used to decrypt the block.</p>
+
+<h4>blocksize</h4>
+
+<p>This function should evaluate to the blocksize in bits</p>
 </td><td class="codes"><pre class="brush: clojure">(defprotocol BlockCipher
   (encrypt-block [_ block key])
   (decrypt-block [_ block key])
