@@ -1,9 +1,8 @@
 ;; ## Test AES Encryption Engine
 (ns ^{:author "Jason Ozias"}
      net.ozias.crypt.cipher.testaes
-     (:require 
-      [net.ozias.crypt.cipher.aes
-       :refer [process-block]]))
+     (:require [net.ozias.crypt.cipher.aes :refer (->Aes)]
+               [net.ozias.crypt.cipher.blockcipher :as bc]))
 
 (def test-state
   (vector 0x00112233
@@ -53,36 +52,41 @@
           0x18191a1b
           0x1c1d1e1f))
 
+(def aes (->Aes))
+
+(defn test-blocksize []
+  (bc/blocksize aes))
+
 (defn test-encrypt-block [state key]
-  (process-block state key true))
+  (mapv #(Long/toHexString %) (bc/encrypt-block aes state key)))
 
 (defn test-128-encrypt-block []
-  (process-block test-state test-key-128 true))
+  (test-encrypt-block test-state test-key-128))
 
 (defn test-192-encrypt-block []
-  (process-block test-state test-key-192 true))
+  (test-encrypt-block test-state test-key-192))
 
 (defn test-256-encrypt-block []
-  (process-block test-state test-key-256 true))
+  (test-encrypt-block test-state test-key-256))
 
 (defn test-all-encrypt-block []
-  (map #(process-block test-state % true) 
+  (map #(test-encrypt-block test-state %) 
        (vector test-key-128 test-key-192 test-key-256)))
 
 (defn test-decrypt-block [state key]
-  (process-block state key false))
+  (mapv #(Long/toHexString %) (bc/decrypt-block aes state key)))
 
 (defn test-128-decrypt-block []
-  (process-block test-decrypt-state-128 test-key-128 false))
+  (test-decrypt-block test-decrypt-state-128 test-key-128))
 
 (defn test-192-decrypt-block []
-  (process-block test-decrypt-state-192 test-key-192 false))
+  (test-decrypt-block test-decrypt-state-192 test-key-192))
 
 (defn test-256-decrypt-block []
-  (process-block test-decrypt-state-256 test-key-256 false))
+  (test-decrypt-block test-decrypt-state-256 test-key-256))
 
 (defn test-all-decrypt-block []
-  (map #(process-block %1 %2 false) 
+  (map #(test-decrypt-block %1 %2) 
        (vector test-decrypt-state-128
                test-decrypt-state-192
                test-decrypt-state-256)
@@ -90,17 +94,16 @@
                test-key-192
                test-key-256)))
 
-(defn both [key]
+(defn encrypt-decrypt [key]
   (fn []
     (mapv #(Long/toHexString %) 
-          (process-block
-           (process-block test-state key true) key false))))
+          (bc/decrypt-block aes (bc/encrypt-block aes test-state key) key))))
 
 (defn test-128-both []
-  ((both test-key-128)))
+  ((encrypt-decrypt test-key-128)))
 
 (defn test-192-both []
-  ((both test-key-192)))
+  ((encrypt-decrypt test-key-192)))
 
 (defn test-256-both []
-  ((both test-key-256)))
+  ((encrypt-decrypt test-key-256)))

@@ -1,8 +1,10 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.testcbc
-  (:require 
-   [net.ozias.crypt.mode.cbc
-    :refer [process-blocks]]))
+  (:require [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
+            [net.ozias.crypt.cipher.aes :refer (->Aes)]
+            [net.ozias.crypt.cipher.twofish :refer (->Twofish)]
+            [net.ozias.crypt.cipher.blockcipher :as bc]
+            [net.ozias.crypt.mode.modeofoperation :as mode]))
 
 ;; My name as UTF-8 (11 bytes)
 ;; repeated 16 times to make 11 blocks
@@ -19,7 +21,7 @@
           0x61736f6e 0x204f7a69 0x61734a61 0x736f6e20
           0x4f7a6961 0x734a6173 0x6f6e204f 0x7a696173))
 
-(def test-decrypt-msg
+(def test-decrypt-msg-128
   (vector 0x87a3f4f9 0x51c2e601 0x8295e40d 0xb6278619
           0x096026c7 0x72e928ba 0x085997d2 0xd05fe365
           0x9c907d01 0x6f61d49e 0x7146b7e0 0x4bb810ef
@@ -38,6 +40,14 @@
           0x08090a0b
           0x0c0d0e0f))
 
+(def test-key-192
+  (vector 0x00010203
+          0x04050607
+          0x08090a0b
+          0x0c0d0e0f
+          0x10111213
+          0x14151617))
+
 (def test-iv
   (vector 0x0f0e0d0c
           0x0b0a0908
@@ -46,9 +56,8 @@
 
 (defn test-encrypt-blocks []
   (mapv #(Long/toHexString %) 
-        (process-blocks test-msg test-key-128 test-iv true)))
+        (mode/encrypt-blocks (->CipherBlockChaining) (->Aes) test-iv test-msg test-key-128)))
 
 (defn test-decrypt-blocks []
-  (mapv 
-   #(Long/toHexString %)
-   (process-blocks test-decrypt-msg test-key-128 test-iv false)))
+  (mapv #(Long/toHexString %)
+        (mode/decrypt-blocks (->CipherBlockChaining) (->Aes) test-iv test-decrypt-msg-128 test-key-128)))

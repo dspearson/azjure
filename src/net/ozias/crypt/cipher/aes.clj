@@ -770,4 +770,6 @@
   (encrypt-block [_ block key]
     (process-block block key true))
   (decrypt-block [_ block key]
-    (process-block block key false)))
+    (process-block block key false))
+  (blocksize [_]
+    128))

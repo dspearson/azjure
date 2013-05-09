@@ -2,4 +2,5 @@
 
 (defprotocol BlockCipher
   (encrypt-block [_ block key])
-  (decrypt-block [_ block key]))
+  (decrypt-block [_ block key])
+  (blocksize [_]))
