@@ -151,6 +151,21 @@
    0x85cbfe4e 0x8ae88dd8 0x7aaaf9b0 0x4cf9aa7e 0x1948c25c 0x02fb8a8c 0x01c36ae4 0xd6ebe1f9
    0x90d4f869 0xa65cdea0 0x3f09252d 0xc208e69f 0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])
 
+(defn to-hex [v]
+  (mapv #(Long/toHexString %) v))
+
+(defn print-state []
+  (println "parr")
+  (println (to-hex @parr))
+  (println "sbox0")
+  (println (to-hex @sbox0))
+  (println "sbox1")
+  (println (to-hex @sbox1))
+  (println "sbox2")
+  (println (to-hex @sbox2))
+  (println "sbox3")
+  (println (to-hex @sbox3)))
+
 (defn filter-exclude [r ex] 
    "Take all indices execpted ex" 
     (filter #(not (ex %)) (range r))) 
@@ -174,6 +189,24 @@
     (nth @sbox2 (get-byte 2 word)))
    (nth @sbox3 (get-byte 1 word))))
 
+(defn round [[left right] idx]
+  (let [_ (print "Round: ")
+        _ (print idx)
+        _ (print ", Left: ")
+        _ (print left)
+        _ (print ", Right: ")
+        _ (print right)
+        l (bit-xor left (nth @parr idx))
+        r (bit-xor (feistel l) right)
+        _ (print " L: ")
+        _ (print l)
+        _ (print ", R: ")
+        _ (println r)]
+  [r l]))
+
+(defn cipher [[left right]]
+  (reduce #(round %1 %2) [0 0] (range 0 16)))
+
 (defn feistel-both [[left right] idx]
   (let [pi (nth @parr idx)
         pj (nth @parr (+ 1 idx))]
@@ -195,18 +228,31 @@
 (defn encrypt-table [[left right :as both] table]
   (reduce #((encrypt-words table) %1 %2) both (range 0 (count @table) 2)))
 
+(defn init-parr [key]
+  (reset! parr parr_init)
+  (reset! parr (mapv #(bit-xor %1 %2) @parr (take 18 (cycle key)))))
+
+(defn init []
+  (let [_ (reset! parr parr_init)
+        _ (reset! sbox0 sbox0_init)
+        _ (reset! sbox1 sbox1_init)
+        _ (reset! sbox2 sbox2_init)
+        _ (reset! sbox3 sbox3_init)]))
+
 (defn apply-key [key]
   (let [_ (reset! parr parr_init)
         _ (reset! sbox0 sbox0_init)
         _ (reset! sbox1 sbox1_init)
         _ (reset! sbox2 sbox2_init)
-        _ (reset! sbox3 sbox3_init)]
+        _ (reset! sbox3 sbox3_init)
+        _ (print-state)]
     (reset! parr (mapv #(bit-xor %1 %2) @parr (take 18 (cycle key))))
-    (encrypt-table [0 0] parr)
-    (encrypt-table (subvec @parr (- (count @parr) 2)) sbox0)
-    (encrypt-table (subvec @sbox0 (- (count @sbox0) 2)) sbox1)
-    (encrypt-table (subvec @sbox1 (- (count @sbox1) 2)) sbox2)
-    (encrypt-table (subvec @sbox2 (- (count @sbox2) 2)) sbox3)))
+    ;;(encrypt-table [0 0] parr)
+    ;;(encrypt-table (subvec @parr (- (count @parr) 2)) sbox0)
+    ;;(encrypt-table (subvec @sbox0 (- (count @sbox0) 2)) sbox1)
+    ;;(encrypt-table (subvec @sbox1 (- (count @sbox1) 2)) sbox2)
+    ;;(encrypt-table (subvec @sbox2 (- (count @sbox2) 2)) sbox3))
+))
 
 (defrecord Blowfish []
   BlockCipher
