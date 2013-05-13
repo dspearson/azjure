@@ -748,13 +748,13 @@
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
-;; 1. <em>state<em>: A 4-word vector representing a block.
+;; 1. <em>block<em>: A 4-word vector representing a block.
 ;; 2. <em>key<em>: A 4,6, or 8-word vector representing a 
 ;; 128, 192, or 256 bit key.
 ;; 3. <em>enc<em>: true if you are encrypting the block, false
 ;; if you are decrypting the block.
 ;;
-;; Evaluates to a vector of 4 words.
+;; Evaluates to a vector of four 32-bit words.
 (defn- process-block [block key enc]
   (let [nk (count key)
         nr (+ nk 6)
