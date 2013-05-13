@@ -151,22 +151,11 @@
    0x85cbfe4e 0x8ae88dd8 0x7aaaf9b0 0x4cf9aa7e 0x1948c25c 0x02fb8a8c 0x01c36ae4 0xd6ebe1f9
    0x90d4f869 0xa65cdea0 0x3f09252d 0xc208e69f 0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])
 
-(defn to-hex [v]
-  (let [s (if (seq v) v (vector v))
-        _ (println s)]
-    (mapv #(Long/toHexString %) s)))
+(defn s-to-hex [s]
+  (Long/toHexString s))
 
-(defn print-state []
-  (println "parr")
-  (println (to-hex @parr))
-  (println "sbox0")
-  (println (to-hex @sbox0))
-  (println "sbox1")
-  (println (to-hex @sbox1))
-  (println "sbox2")
-  (println (to-hex @sbox2))
-  (println "sbox3")
-  (println (to-hex @sbox3)))
+(defn to-hex [v]
+  (mapv #(Long/toHexString %) v))
 
 (defn filter-exclude [r ex] 
    "Take all indices execpted ex" 
@@ -192,69 +181,64 @@
    (nth @sbox3 (get-byte 1 word))))
 
 (defn round [[left right] idx]
-  (let [_ (print "Round: ")
-        _ (print idx)
-        _ (print ", Left: ")
-        _ (print left)
-        _ (print ", Right: ")
-        _ (print right)
+  (let [
+        ;;_ (print "Round: ")
+        ;;_ (println idx)
+        ;;_ (print "Li: ")
+        ;;_ (print (to-hex (vector left)))
+        ;;_ (print ", Ri: ")
+        ;;_ (print (to-hex (vector right)))
+        ;;_ (print ", parr[i]: ")
+        ;;_ (print (to-hex (vector (nth @parr idx))))
         l (bit-xor left (nth @parr idx))
         r (bit-xor (feistel l) right)
-        _ (print " L: ")
-        _ (print l)
-        _ (print ", R: ")
-        _ (println r)]
+        ;;_ (print " Ln: ")
+        ;;_ (print (to-hex (vector l)))
+        ;;_ (print ", Rn: ")
+        ;;_ (println (to-hex (vector r)))
+        ]
   [r l]))
 
-(defn cipher [[left right]]
-  (reduce #(round %1 %2) [0 0] (range 0 16)))
+(defn cipher [[left right :as both]]
+  (let [rounds (reduce #(round %1 %2) both (range 0 16))]
+    [(bit-xor (nth rounds 1) (nth @parr 17)) (bit-xor (nth rounds 0) (nth @parr 16))]))
 
-(defn feistel-both [[left right] idx]
-  (let [pi (nth @parr idx)
-        pj (nth @parr (+ 1 idx))]
-  [(bit-xor (bit-xor (feistel right) pj) left) (bit-xor (bit-xor (feistel left) pi) right)]))
-
-(defn xor-left [[left right]]
-  [(bit-xor (nth @parr 0) left) right])
-
-(defn xor-right [[left right]]
-  [left (bit-xor (nth @parr 17) right)])
+(defn decipher [[left right :as both]]
+  (let [rounds (reduce #(round %1 %2) both (range 17 1 -1))]
+    [(bit-xor (nth rounds 1) (nth @parr 0)) (bit-xor (nth rounds 0) (nth @parr 1))]))
 
 (defn encrypt-words [table]
   (fn [[left right :as both] idx]
-    (let [lr (xor-right (reduce feistel-both (xor-left both) (range 1 16 2)))
-          nidx (+ idx 1)]
-      (reset! table (assoc (assoc @table idx (nth lr 0)) nidx (nth lr 1)))
-      (into [] (reverse lr)))))
+    (let [
+          ;;_ (print "Encrypt Words Round: ")
+          ;;_ (println idx)
+          enc (cipher both)
+          ;;_ (print "Cipher: ")
+          ;;_ (println (to-hex enc))
+          ;;_ (println)
+          ]
+      (reset! table (assoc (assoc @table idx (nth enc 0)) (inc idx) (nth enc 1)))
+      enc)))
 
 (defn encrypt-table [[left right :as both] table]
   (reduce #((encrypt-words table) %1 %2) both (range 0 (count @table) 2)))
 
-(defn init-parr [key]
-  (reset! parr parr_init)
-  (reset! parr (mapv #(bit-xor %1 %2) @parr (take 18 (cycle key)))))
-
-(defn init []
+(defn generate-subkeys [key]
   (let [_ (reset! parr parr_init)
         _ (reset! sbox0 sbox0_init)
         _ (reset! sbox1 sbox1_init)
         _ (reset! sbox2 sbox2_init)
-        _ (reset! sbox3 sbox3_init)]))
-
-(defn apply-key [key]
-  (let [_ (reset! parr parr_init)
-        _ (reset! sbox0 sbox0_init)
-        _ (reset! sbox1 sbox1_init)
-        _ (reset! sbox2 sbox2_init)
-        _ (reset! sbox3 sbox3_init)
-        _ (print-state)]
+        _ (reset! sbox3 sbox3_init)]
     (reset! parr (mapv #(bit-xor %1 %2) @parr (take 18 (cycle key))))
-    ;;(encrypt-table [0 0] parr)
-    ;;(encrypt-table (subvec @parr (- (count @parr) 2)) sbox0)
-    ;;(encrypt-table (subvec @sbox0 (- (count @sbox0) 2)) sbox1)
-    ;;(encrypt-table (subvec @sbox1 (- (count @sbox1) 2)) sbox2)
-    ;;(encrypt-table (subvec @sbox2 (- (count @sbox2) 2)) sbox3))
-))
+    (reduce #(encrypt-table %1 %2) [0 0] (vector parr sbox0 sbox1 sbox2 sbox3))))
+
+(defn encrypt [block key]
+  (let [_ (generate-subkeys key)]
+    (cipher block)))
+
+(defn decrypt [block key]
+  (let [_ (generate-subkeys key)]
+    (decipher block)))
 
 (defrecord Blowfish []
   BlockCipher
