@@ -7,6 +7,7 @@
             [net.ozias.crypt.testivs :refer :all]
             [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
             [net.ozias.crypt.cipher.aes :refer (->Aes)]
+            [net.ozias.crypt.cipher.blowfish :refer (->Blowfish)]
             [net.ozias.crypt.cipher.twofish :refer (->Twofish)]
             [net.ozias.crypt.cipher.blockcipher :as bc]
             [net.ozias.crypt.mode.modeofoperation :as mode]))
@@ -25,6 +26,22 @@
              0x7a696173 0x4a61736f 0x6e204f7a 0x6961734a
              0x61736f6e 0x204f7a69 0x61734a61 0x736f6e20
              0x4f7a6961 0x734a6173 0x6f6e204f 0x7a696173])
+
+;; ### bf-msg
+;; The plaintext message defined at 
+;; [http://www.schneier.com/code/vectors.txt](http://www.schneier.com/code/vectors.txt) for
+;; Chained Block Cipher mode testing.
+(def bf-msg 
+  [0x37363534 0x33323120 0x4e6f7720 0x69732074
+   0x68652074 0x696d6520 0x666f7220 0x00000000])
+
+;; ### bf-ct-128-msg
+;; A sample ciphertext message that is the result of encrypting
+;; <em>bf-msg</em> with Blowfish and bf-key-128.
+;; Defined at [http://www.schneier.com/code/vectors.txt](http://www.schneier.com/code/vectors.txt)
+(def bf-ct-128-msg 
+  [0x6b77b4d6 0x3006dee6 0x05b156e2 0x74039793 
+   0x58deb9e7 0x154616d9 0x59f1652b 0xd5ff92cc])
 
 ;; ### ct-128-msg
 ;; A sample ciphertext message that is the result of encrypting
@@ -80,6 +97,9 @@
 ;; ### AES
 ;; Setup the Aes record for use in tests
 (def AES (->Aes))
+;; ### Blowfish
+;; Setup the Blowfish record for use in tests
+(def Blowfish (->Blowfish))
 ;; ### Twofish
 ;; Setup the Twofish record for use in tests
 (def Twofish (->Twofish))
@@ -111,6 +131,7 @@
         (is (= ct-256-msg (encrypt-blocks AES iv-128 pt-msg key-256))))
       (testing "Different IV, Same 256-bit Key"
         (is (not (= ct-256-msg (encrypt-blocks AES iv-128-1 pt-msg key-256))))))
+    (testing "Blowfish")
     (testing "Twofish"))
   (testing "Decryption"
     (testing "AES"
@@ -126,4 +147,5 @@
         (is (= pt-msg (decrypt-blocks AES iv-128 ct-256-msg key-256))))
       (testing "Different IV, Same 256-bit Key"
         (is (not (= pt-msg (decrypt-blocks AES iv-128-1 ct-256-msg key-256))))))
+    (testing "Blowfish")
     (testing "Twofish")))

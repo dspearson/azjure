@@ -23,3 +23,8 @@
 ;; as defined in Appendix C.3 in 
 ;; [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
 (def key-256 (into key-192 [0x18191a1b 0x1c1d1e1f]))
+
+;; ### bf-key-128
+;; A sample 128-bit key as a vector of 4 32-bit words
+;; as defined [http://www.schneier.com/code/vectors.txt](http://www.schneier.com/code/vectors.txt)
+(def bf-key-128 [0x01234567 0x89ABCDEF 0xF0E1D2C3 0xB4A59687])
