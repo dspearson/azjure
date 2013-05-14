@@ -4,7 +4,7 @@
 ;; bytes of value <em>N</em>
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.padding.pkcs7pad
-  (:require [net.ozias.crypt.libbyte :refer (bytes-word)]
+  (:require [net.ozias.crypt.libbyte :refer :all]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -22,6 +22,17 @@
         rempad (reduce conj unpadded (take rem (cycle [rem])))]
     (mapv #(bytes-word %) (partition bytes-per-word rempad))))
 
+;; ### unpad-blocks
+;; Unpad the given vector of words.
+;;
+;; Evaluates to a byte array.
+;;
+;; This is the inverse of pad-bytes.
+(defn- unpad-blocks [padded cipher]
+  (let [pl (last-byte (last padded))
+        flat (reduce into (mapv #(word-bytes %) padded))]
+    (byte-array (map byte (subvec flat 0 (- (count flat) pl))))))
+
 ;; ### PKCS7pad
 ;; Extend the Pad protocol through the PKCS7pad record type.
 (defrecord PKCS7pad []
@@ -29,4 +40,4 @@
   (pad [_ unpadded cipher]
     (pad-bytes (vec unpadded) cipher))
   (unpad [_ padded cipher]
-    padded))
+    (unpad-blocks padded cipher)))
