@@ -131,7 +131,8 @@
         (is (= ct-256-msg (encrypt-blocks AES iv-128 pt-msg key-256))))
       (testing "Different IV, Same 256-bit Key"
         (is (not (= ct-256-msg (encrypt-blocks AES iv-128-1 pt-msg key-256))))))
-    (testing "Blowfish")
+    (testing "Blowfish"
+      (is (= bf-ct-128-msg (encrypt-blocks Blowfish bf-iv-64 bf-msg bf-key-128))))
     (testing "Twofish"))
   (testing "Decryption"
     (testing "AES"
@@ -147,5 +148,6 @@
         (is (= pt-msg (decrypt-blocks AES iv-128 ct-256-msg key-256))))
       (testing "Different IV, Same 256-bit Key"
         (is (not (= pt-msg (decrypt-blocks AES iv-128-1 ct-256-msg key-256))))))
-    (testing "Blowfish")
+    (testing "Blowfish"
+      (is (= bf-msg (decrypt-blocks Blowfish bf-iv-64 bf-ct-128-msg bf-key-128))))
     (testing "Twofish")))
