@@ -1,5 +1,5 @@
 (defproject net.ozias.crypt/azjure "0.1.0-SNAPSHOT"
-  :description "Encryption in Clojure"
+  :description "Encryption Library in Clojure"
   :url "http://www.ozias.net"
   :license {:name "GPLv3"
             :url "http://www.gnu.org/licenses/gpl.html"}

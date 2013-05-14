@@ -1,5 +1,5 @@
 ;; # Test Cipher Block Chaining Mode
-;; Test suite for the CBC mode for encrypting multiple blocks.
+;; Test suite for the CBC mode of encrypting multiple blocks.
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.testcbc
   (:require [clojure.test :refer :all]

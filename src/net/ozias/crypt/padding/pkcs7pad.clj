@@ -1,8 +1,9 @@
-;; ## Zeropad
+;; ## PKCS7pad
 ;; Padding implementation that will pad a byte array to
-;; the proper length given a block cipher with zeros
+;; the proper length given a block cipher with <em>N</em>
+;; bytes of value <em>N</em>
 (ns ^{:author "Jason Ozias"}
-  net.ozias.crypt.padding.zeropad
+  net.ozias.crypt.padding.pkcs7pad
   (:require [net.ozias.crypt.libbyte :refer (bytes-word)]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
@@ -17,14 +18,13 @@
   (let [words-per-block (/ (bc/blocksize cipher) 32)
         bytes-per-block (/ (bc/blocksize cipher) 8)
         bytes-per-word (/ bytes-per-block words-per-block)
-        l (count unpadded)
-        rem (remaining l bytes-per-block)
-        zeropad (reduce conj unpadded (take rem (cycle [0])))]
-    (mapv #(bytes-word %) (partition bytes-per-word zeropad))))
+        rem (remaining (count unpadded) bytes-per-block)
+        rempad (reduce conj unpadded (take rem (cycle [rem])))]
+    (mapv #(bytes-word %) (partition bytes-per-word rempad))))
 
-;; ### Zeropad
-;; Extend the Pad protocol through the Zeropad record type.
-(defrecord Zeropad []
+;; ### PKCS7pad
+;; Extend the Pad protocol through the PKCS7pad record type.
+(defrecord PKCS7pad []
   Pad
   (pad [_ unpadded cipher]
     (pad-bytes (vec unpadded) cipher))

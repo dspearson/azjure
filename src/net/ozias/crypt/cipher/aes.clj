@@ -1,15 +1,15 @@
 ;; ## AES Cipher
-;; Defined to meet spec at [http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
+;; Defined to meet spec at [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
 ;;
 ;; The following table defines the valid values
-;; of <em>Nk</em>, <em>Nb</em>, and <em>Nr</em> for the 
+;; of <em>N<sub>k</sub></em>, <em>N<sub>b</sub></em>, and <em>N<sub>r</sub></em> for the 
 ;; AES specification.  You will see nk, nb and nr in the code.
 ;; <table style="border-collapse:collapse;">
 ;; <tr>
 ;; <td style="border: 1px solid black;">&nbsp;</td>
-;; <td style="border: 1px solid black;">Key Length<br/><em>(Nk words)</em></td>
-;; <td style="border: 1px solid black;">Block Size<br/><em>(Nb words)</em></td>
-;; <td style="border: 1px solid black;">Number of<br/>Rounds <em>(Nr)</em></td>
+;; <td style="border: 1px solid black;">Key Length<br/><em>(N<sub>k</sub> words)</em></td>
+;; <td style="border: 1px solid black;">Block Size<br/><em>(N<sub>b</sub> words)</em></td>
+;; <td style="border: 1px solid black;">Number of<br/>Rounds <em>(N<sub>r</sub>)</em></td>
 ;; </tr>
 ;; <tr>
 ;; <td style="border: 1px solid black;">AES-128</td>
@@ -32,7 +32,8 @@
 ;; </table>
 (ns ^{:author "Jason Ozias"}
      net.ozias.crypt.cipher.aes
-     (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
+     (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
+               [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
 
 ;; #### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -355,35 +356,6 @@
    0xd7 0xd9 0xcb 0xc5 0xef 0xe1 0xf3 0xfd
    0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d])
 
-;; ### bytes-word
-;; Takes a vector of 4 bytes and creates
-;; one 32-bit word composed of the 4 bytes.
-;;
-;;     (bytes-word [0x12 0xab 0x1f 0x3b])
-;;
-;; evaluates to
-;; > 0x12ab1f3b
-;;
-;; This is the inverse of word-bytes.
-(defn- bytes-word [vec]
-  (apply bit-or 
-         (map #(bit-shift-left (nth vec %1) %2) 
-              (range 4) 
-              (range 24 -1 -8))))
-
-;; ### word-bytes
-;; Takes a 32-bit word and creates a vector of 
-;; the 4 bytes individually.
-;;
-;;     (word-bytes 0x12ab1f3b)
-;;
-;; evaluates to
-;; > [0x12 0xab 0x1f 0x3b]
-;;
-;; This is the inverse of byte-words.
-(defn- word-bytes [word]
-  (mapv #(bit-and 0xff (bit-shift-right word %)) (range 24 -1 -8)))
-
 ;; ### mask
 ;; Calculates the word (4 bytes) mask for a given byte shift.
 (defn- mask [shift]
@@ -518,35 +490,39 @@
          (map #((get-in-sbox invSbox) word %) (range 0 32 8))))
 
 ;; ### sub-bytes
+;; Maps sub-word or inv-sub-word over the given word to
+;; substitute or inverse subsitute all the bytes.  <em>inv</em>
+;; should be false for encryption S-box substitution, false
+;; for decryption inverse S-box substitution.
 (defn- sub-bytes [state inv]
   (let [subfn (if inv inv-sub-word sub-word)]
    (map #(subfn %) state)))
 
 ;; ### get-last-nk
-;; Get the last <em>Nk</em> items from a vector.
+;; Get the last <em>N<sub>k</sub></em> items from a vector.
 (defn- get-last-nk [vec nk]
   (subvec vec (- (count vec) nk)))
 
 ;; ### next-word
 ;; Calculates the next word during key expansion.
 ;;
-;; * Get the head and tail elements from the <em>Nk</em>
+;; * Get the head and tail elements from the <em>N<sub>k</sub></em>
 ;; length tail vector of the key expansion.
-;; * If the current index mod <em>Nk</em> is 0
+;; * If the current index mod <em>N<sub>k</sub></em> is 0
 ;;
 ;; >* Rotate the tail word left.
 ;; >* Lookup the substitution word from the Sbox.
 ;; >* XOR with a value from rcon.
 ;; >* XOR with the head word.
 ;;
-;; * If the key size is 8 and the current index mod <em>Nk</em> is 4
+;; * If the key size is 8 and the current index mod <em>N<sub>k</sub></em> is 4
 ;;
 ;; >* Lookup the substition word for tail in the sbox.
 ;; >* XOR with the head word.
 ;;
 ;; * Else, XOR tail and head
 ;;
-;; Evalutates to a function over the given <em>Nk</em> key length.
+;; Evalutates to a function over the given <em>N<sub>k</sub></em> key length.
 ;; The function takes the current state of the key expansion and
 ;; the index of the next word to be calculated.
 (defn- next-word [nk]
@@ -566,7 +542,7 @@
                 (bit-xor tail head)))))))
 
 ;; ### expand-key
-;; The expand key takes a vector of <em>Nk</em> words that represent
+;; The expand key takes a vector of <em>N<sub>k</sub></em> words that represent
 ;; a key of 128, 192, or 256 bits.
 ;; 
 ;; * Evaluates to a 44 word vector for a 128-bit key.
@@ -710,6 +686,30 @@
               (map #(word-bytes %) state)))))
 
 ;; ### cipher
+;; The AES cipher.
+;;
+;; * Get the lower and upper bounds for the key
+;; schedule.
+;; * Grab the key material out of the key schedule.
+;; * If the current round is 0
+;;
+;; >* Add the key material to the state
+;;
+;; * If the current round is less than <em>N<sub>r</sub></em>
+;;
+;; >* Do S-box substitution on the state
+;; >* Shift the state rows
+;; >* Mix the state columns
+;; >* Add the key material to the state
+;;
+;; * Else the current round is equal to <em>N<sub>r</sub></em>
+;;
+;; >* Do S-box substitution on the state
+;; >* Shift the state rows
+;; >* Add the key material to the state
+;;
+;; Evalutates to a function over the given key and number of rounds.
+;; The function takes the state and the current round number.
 (defn- cipher [ks nr]
  (fn [state round]
    (let [next (+ round 1)
@@ -728,6 +728,30 @@
            (sub-bytes state false) false) km))))))
 
 ;; ### inv-cipher
+;; The AES inverse cipher.
+;;
+;; * Get the lower and upper bounds for the key
+;; schedule.
+;; * Grab the key material out of the key schedule.
+;; * If the current round is equal to <em>N<sub>r</sub></em>
+;;
+;; >* Add the key material to the state
+;;
+;; * If the current round is greater than 0
+;;
+;; >* Shift the state rows
+;; >* Do S-box substitution on the state
+;; >* Add the key material to the state
+;; >* Mix the state columns
+;;
+;; * Else the current round is equal to 0
+;;
+;; >* Shift the state rows
+;; >* Do S-box substitution on the state
+;; >* Add the key material to the state
+;;
+;; Evalutates to a function over the given key and number of rounds.
+;; The function takes the state and the current round number.
 (defn- inv-cipher [ks nr]
   (fn [state round]
     (let [next (+ round 1)
@@ -748,10 +772,10 @@
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
-;; 1. <em>block<em>: A 4-word vector representing a block.
-;; 2. <em>key<em>: A 4,6, or 8-word vector representing a 
+;; 1. <em>block</em>: A 4-word vector representing a block.
+;; 2. <em>key</em>: A 4,6, or 8-word vector representing a 
 ;; 128, 192, or 256 bit key.
-;; 3. <em>enc<em>: true if you are encrypting the block, false
+;; 3. <em>enc</em>: true if you are encrypting the block, false
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.

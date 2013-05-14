@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="Encryption in Clojure" name="description" /><style type="text/css">/**
+<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="Encryption Library in Clojure" name="description" /><style type="text/css">/**
  * SyntaxHighlighter
  * http://alexgorbatchev.com/SyntaxHighlighter
  *
@@ -3030,18 +3030,18 @@ net.brehaut.ClojureTools = (function (SH) {
 })(SyntaxHighlighter);
 </script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.cipher.aes" name="net.ozias.crypt.cipher.aes"><h1 class="project-name">net.ozias.crypt.cipher.aes</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>AES Cipher</h2>
 
-<p>Defined to meet spec at <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf</a></p>
+<p>Defined to meet spec at <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 
 <p>The following table defines the valid values
-of <em>Nk</em>, <em>Nb</em>, and <em>Nr</em> for the 
+of <em>N<sub>k</sub></em>, <em>N<sub>b</sub></em>, and <em>N<sub>r</sub></em> for the 
 AES specification.  You will see nk, nb and nr in the code.</p>
 
 <table style="border-collapse:collapse;">
 <tr>
 <td style="border: 1px solid black;">&nbsp;</td>
-<td style="border: 1px solid black;">Key Length<br/><em>(Nk words)</em></td>
-<td style="border: 1px solid black;">Block Size<br/><em>(Nb words)</em></td>
-<td style="border: 1px solid black;">Number of<br/>Rounds <em>(Nr)</em></td>
+<td style="border: 1px solid black;">Key Length<br/><em>(N<sub>k</sub> words)</em></td>
+<td style="border: 1px solid black;">Block Size<br/><em>(N<sub>b</sub> words)</em></td>
+<td style="border: 1px solid black;">Number of<br/>Rounds <em>(N<sub>r</sub>)</em></td>
 </tr>
 <tr>
 <td style="border: 1px solid black;">AES-128</td>
@@ -3064,7 +3064,8 @@ AES specification.  You will see nk, nb and nr in the code.</p>
 </table>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
      net.ozias.crypt.cipher.aes
-     (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))</pre></td></tr><tr><td class="docs"><h4>Sbox</h4>
+     (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
+               [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))</pre></td></tr><tr><td class="docs"><h4>Sbox</h4>
 
 <p>Substitution box used during encryption as a vector of 256 bytes.</p>
 
@@ -3379,42 +3380,7 @@ and InvMixColumns cipher steps.</p>
    0x37 0x39 0x2b 0x25 0x0f 0x01 0x13 0x1d
    0x47 0x49 0x5b 0x55 0x7f 0x71 0x63 0x6d 
    0xd7 0xd9 0xcb 0xc5 0xef 0xe1 0xf3 0xfd
-   0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d])</pre></td></tr><tr><td class="docs"><h3>bytes-word</h3>
-
-<p>Takes a vector of 4 bytes and creates
-one 32-bit word composed of the 4 bytes.</p>
-
-<pre><code>(bytes-word [0x12 0xab 0x1f 0x3b])
-</code></pre>
-
-<p>evaluates to</p>
-
-<blockquote>
-  <p>0x12ab1f3b</p>
-</blockquote>
-
-<p>This is the inverse of word-bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- bytes-word [vec]
-  (apply bit-or 
-         (map #(bit-shift-left (nth vec %1) %2) 
-              (range 4) 
-              (range 24 -1 -8))))</pre></td></tr><tr><td class="docs"><h3>word-bytes</h3>
-
-<p>Takes a 32-bit word and creates a vector of 
-the 4 bytes individually.</p>
-
-<pre><code>(word-bytes 0x12ab1f3b)
-</code></pre>
-
-<p>evaluates to</p>
-
-<blockquote>
-  <p>[0x12 0xab 0x1f 0x3b]</p>
-</blockquote>
-
-<p>This is the inverse of byte-words.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- word-bytes [word]
-  (mapv #(bit-and 0xff (bit-shift-right word %)) (range 24 -1 -8)))</pre></td></tr><tr><td class="docs"><h3>mask</h3>
+   0xa7 0xa9 0xbb 0xb5 0x9f 0x91 0x83 0x8d])</pre></td></tr><tr><td class="docs"><h3>mask</h3>
 
 <p>Calculates the word (4 bytes) mask for a given byte shift.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- mask [shift]
@@ -3556,20 +3522,25 @@ shift argument should be a multiple of 8</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- inv-sub-word [word]
   (apply bit-or 
          (map #((get-in-sbox invSbox) word %) (range 0 32 8))))</pre></td></tr><tr><td class="docs"><h3>sub-bytes</h3>
+
+<p>Maps sub-word or inv-sub-word over the given word to
+substitute or inverse subsitute all the bytes.  <em>inv</em>
+should be false for encryption S-box substitution, false
+for decryption inverse S-box substitution.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- sub-bytes [state inv]
   (let [subfn (if inv inv-sub-word sub-word)]
    (map #(subfn %) state)))</pre></td></tr><tr><td class="docs"><h3>get-last-nk</h3>
 
-<p>Get the last <em>Nk</em> items from a vector.</p>
+<p>Get the last <em>N<sub>k</sub></em> items from a vector.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- get-last-nk [vec nk]
   (subvec vec (- (count vec) nk)))</pre></td></tr><tr><td class="docs"><h3>next-word</h3>
 
 <p>Calculates the next word during key expansion.</p>
 
 <ul>
-<li>Get the head and tail elements from the <em>Nk</em>
+<li>Get the head and tail elements from the <em>N<sub>k</sub></em>
 length tail vector of the key expansion.</li>
-<li>If the current index mod <em>Nk</em> is 0</li>
+<li>If the current index mod <em>N<sub>k</sub></em> is 0</li>
 </ul>
 
 <blockquote>
@@ -3582,7 +3553,7 @@ length tail vector of the key expansion.</li>
 </blockquote>
 
 <ul>
-<li>If the key size is 8 and the current index mod <em>Nk</em> is 4</li>
+<li>If the key size is 8 and the current index mod <em>N<sub>k</sub></em> is 4</li>
 </ul>
 
 <blockquote>
@@ -3596,7 +3567,7 @@ length tail vector of the key expansion.</li>
 <li>Else, XOR tail and head</li>
 </ul>
 
-<p>Evalutates to a function over the given <em>Nk</em> key length.
+<p>Evalutates to a function over the given <em>N<sub>k</sub></em> key length.
 The function takes the current state of the key expansion and
 the index of the next word to be calculated.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- next-word [nk]
@@ -3615,7 +3586,7 @@ the index of the next word to be calculated.</p>
                 (bit-xor (sub-word tail) head)
                 (bit-xor tail head)))))))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
 
-<p>The expand key takes a vector of <em>Nk</em> words that represent
+<p>The expand key takes a vector of <em>N<sub>k</sub></em> words that represent
 a key of 128, 192, or 256 bits.</p>
 
 <ul>
@@ -3752,6 +3723,49 @@ in the state.</p>
     (map #(bytes-word %) 
          (map #(mixfn %) 
               (map #(word-bytes %) state)))))</pre></td></tr><tr><td class="docs"><h3>cipher</h3>
+
+<p>The AES cipher.</p>
+
+<ul>
+<li>Get the lower and upper bounds for the key
+schedule.</li>
+<li>Grab the key material out of the key schedule.</li>
+<li>If the current round is 0</li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Add the key material to the state</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>If the current round is less than <em>N<sub>r</sub></em></li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Do S-box substitution on the state</li>
+  <li>Shift the state rows</li>
+  <li>Mix the state columns</li>
+  <li>Add the key material to the state</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>Else the current round is equal to <em>N<sub>r</sub></em></li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Do S-box substitution on the state</li>
+  <li>Shift the state rows</li>
+  <li>Add the key material to the state</li>
+  </ul>
+</blockquote>
+
+<p>Evalutates to a function over the given key and number of rounds.
+The function takes the state and the current round number.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- cipher [ks nr]
  (fn [state round]
    (let [next (+ round 1)
@@ -3768,6 +3782,49 @@ in the state.</p>
          (add-round-key 
           (shift-rows 
            (sub-bytes state false) false) km))))))</pre></td></tr><tr><td class="docs"><h3>inv-cipher</h3>
+
+<p>The AES inverse cipher.</p>
+
+<ul>
+<li>Get the lower and upper bounds for the key
+schedule.</li>
+<li>Grab the key material out of the key schedule.</li>
+<li>If the current round is equal to <em>N<sub>r</sub></em></li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Add the key material to the state</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>If the current round is greater than 0</li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Shift the state rows</li>
+  <li>Do S-box substitution on the state</li>
+  <li>Add the key material to the state</li>
+  <li>Mix the state columns</li>
+  </ul>
+</blockquote>
+
+<ul>
+<li>Else the current round is equal to 0</li>
+</ul>
+
+<blockquote>
+  <ul>
+  <li>Shift the state rows</li>
+  <li>Do S-box substitution on the state</li>
+  <li>Add the key material to the state</li>
+  </ul>
+</blockquote>
+
+<p>Evalutates to a function over the given key and number of rounds.
+The function takes the state and the current round number.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- inv-cipher [ks nr]
   (fn [state round]
     (let [next (+ round 1)
@@ -3788,10 +3845,10 @@ in the state.</p>
 <p>Process a block for encryption or decryption.</p>
 
 <ol>
-<li><em>block<em>: A 4-word vector representing a block.</li>
-<li><em>key<em>: A 4,6, or 8-word vector representing a 
+<li><em>block</em>: A 4-word vector representing a block.</li>
+<li><em>key</em>: A 4,6, or 8-word vector representing a 
 128, 192, or 256 bit key.</li>
-<li><em>enc<em>: true if you are encrypting the block, false
+<li><em>enc</em>: true if you are encrypting the block, false
 if you are decrypting the block.</li>
 </ol>
 
