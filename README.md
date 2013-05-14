@@ -8,6 +8,7 @@ Cryptography implementations in Clojure
 ### Blowfish
 
 ## Modes
+### ECB
 ### CBC
 
 ## Padding
