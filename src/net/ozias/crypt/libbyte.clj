@@ -3,6 +3,18 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.libbyte)
 
+;; ### get-byte
+;; Get byte <em>num</em> out of the given word.  <em>num</em>
+;; should be 1-4.
+;;
+;;     (get-byte 0x11223344 4)
+;;
+;; evaluates to 0x11
+(defn get-byte [num word]
+  (let [shift (* 8 (- num 1))
+        sftfn (if (= 0 shift) word (bit-shift-right word shift))]
+    (bit-and sftfn 0xFF)))
+
 ;; ### bytes-word
 ;; Takes a vector of 4 bytes and creates
 ;; one 32-bit word composed of the 4 bytes.
