@@ -301,35 +301,83 @@
 (defn- +mod32 [a b]
   (mod (+ a b) 0x100000000))
 
-(defn xor-sboxes [word [b5 b6 b7 b8]]
-  (bit-xor
-   (bit-xor 
-    (bit-xor 
-     (bit-xor word (nth s5 b5)) (nth s6 b6)) (nth s7 b7)) (nth s8 b8)))
-
-(defn xor-sbox [sbox word keyword idx]
-  (bit-xor word (nth sbox (get-byte keyword idx))))
-
 (defn get-bytes [kw [a b c d]]
   [(get-byte kw a) (get-byte kw b) (get-byte kw c) (get-byte kw d)])
 
-;; ### generate-subkeys 
-(defn- generate-subkeys [key]
-  (let [k03 (nth key 0)
-        k47 (nth key 1)
-        k8b (nth key 2)
-        kcf (nth key 3)
-        z03 (xor-sbox s7 (xor-sboxes k03 (get-bytes kcf [1 3 0 2])) k8b 0)
-        z47 (xor-sbox s8 (xor-sboxes k8b (get-bytes z03 [0 2 1 3])) k8b 2)
-        z8b (xor-sbox s5 (xor-sboxes kcf (get-bytes z47 [3 2 1 0])) k8b 1)
-        zcf (xor-sbox s6 (xor-sboxes k47 (get-bytes z8b [2 1 3 0])) k8b 3)
-        k1 (
-        _ (println (Long/toHexString z03))
-        _ (println (Long/toHexString z47))
-        _ (println (Long/toHexString z8b))
-        _ (println (Long/toHexString zcf))]
+(defn xor-line [w1 w2 [a b c d :as order] w3 fsbox idx]
+  (let [barr (get-bytes w2 order)
+        lb (get-byte w3 idx)]
+    (bit-xor 
+     w1 
+     (nth s5 (nth barr 0)) 
+     (nth s6 (nth barr 1)) 
+     (nth s7 (nth barr 2)) 
+     (nth s8 (nth barr 3))
+     (nth fsbox lb))))
 
-))
+(defn gen-words [words [i0 i1 i2 i3 i4 i5]]
+  (let [seed (nth words i0)
+        down (nth words i5)
+        ow0 (xor-line (nth words i1) seed [1 3 0 2] down s7 0)
+        ow1 (xor-line (nth words i2) ow0  [0 2 1 3] down s8 2)
+        ow2 (xor-line (nth words i3) ow1  [3 2 1 0] down s5 1)
+        ow3 (xor-line (nth words i4) ow2  [2 1 3 0] down s6 3)]
+  [ow0 ow1 ow2 ow3]))
+
+(defn- gen-subkey-word [[a b c d e] w0 w1 tail]
+  (bit-xor
+   (nth s5 (get-byte w0 a))
+   (nth s6 (get-byte w0 b))
+   (nth s7 (get-byte w1 c))
+   (nth s8 (get-byte w1 d))
+   (nth tail e)))
+
+(defn- gen-tails [[a b c d] [w0 w1 w2 w3]]
+  [(nth s5 (get-byte w0 a))
+   (nth s6 (get-byte w1 b))
+   (nth s7 (get-byte w2 c))
+   (nth s8 (get-byte w3 d))])
+
+(defn- get-tails [[w0 w1 w2 w3 :as words] round]
+  (condp = round
+    0 (gen-tails [2 2 1 0] words)
+    1 (gen-tails [0 1 3 3] [w2 w3 w0 w1])
+    2 (gen-tails [1 0 2 2] [w2 w3 w0 w1])
+    3 (gen-tails [3 3 0 1] words)))
+
+;;                       03 47 8b cf  
+(defn- generate-subkey [[w0 w1 w2 w3 :as words] round]
+  (let [rnd (mod round 4)
+        tails (get-tails words rnd)]
+    (cond
+      (or (= rnd 0)(= rnd 3)) [(gen-subkey-word [0 1 3 2 0] w2 w1 tails)
+                               (gen-subkey-word [2 3 1 0 1] w2 w1 tails)
+                               (gen-subkey-word [0 1 3 2 2] w3 w0 tails)
+                               (gen-subkey-word [2 3 1 0 3] w3 w0 tails)]
+      (or (= rnd 1)(= rnd 2)) [(gen-subkey-word [3 2 0 1 0] w0 w3 tails)
+                               (gen-subkey-word [1 0 2 3 1] w0 w3 tails)
+                               (gen-subkey-word [3 2 0 1 2] w1 w2 tails)
+                               (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))
+
+;; ### expand-key
+;; Generate enough key material to support the creation of the subkeys.
+;;
+;; Evaluates to a vector of 8 vectors containing 4 32-bit words each.
+;; These serve as input material for the generate-subkey function.
+(defn- expand-key [key]
+  (subvec 
+   (reduce #(conj %1 (gen-words (last %1) %2)) 
+           [key]
+           (take 8 (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]]))) 
+   1))
+
+;; ### generate-subkeys
+;; Generates 32 key words.  K<sub>1</sub> to K<sub>16</sub> serve as the
+;; masking (K<sub>m</sub>) for each cipher round.  K<sub>17</sub> to
+;; K<sub>32</sub> serve as the rotate (K<sub>r</sub>) for each cipher
+;; round
+(defn- generate-subkeys [key]
+  (reduce into (mapv #(generate-subkey %1 %2) (expand-key key) (range 8))))
 
 ;; ### process-block
 ;; Process a block for encryption or decryption.
