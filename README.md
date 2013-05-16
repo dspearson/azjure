@@ -4,22 +4,30 @@ azjure
 Cryptography implementations in Clojure
 
 ## Usage
-1. Require the cyphersuite protocol
-```clojure
+1. Require the CypherSuite protocol
+
+```
 (:require [net.ozias.crypt.cryptsuite :as cs])
 ```
 2. Then require the suite you wish to use (a suite is a combination of cipher, mode, and padding method)
-```clojure
+
+```
 (:require [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
 ```
 3. Encrypt
-```clojure
+
+```
+;; Initialize the record to use
 (def AESCBCPKCS7 (->AESCBCPKCS7))
+;; Encrypt
 (cs/encrypt AESCBCPKCS7 key iv bytarr)
 ```
 4. Decrypt
-```Clojure
+
+```
+;; Initialize the record to use
 (def AESCBCPKCS7 (->AESCBCPKCS7))
+;; Decrypt
 (cs/decrypt AESCBCPKCS7 key iv words)
 ```
 
