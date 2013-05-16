@@ -18,7 +18,7 @@ Cryptography implementations in Clojure
 (cs/encrypt AESCBCPKCS7 key iv bytarr)
 ```
 4. Decrypt
-```clojure
+```Clojure
 (def AESCBCPKCS7 (->AESCBCPKCS7))
 (cs/decrypt AESCBCPKCS7 key iv words)
 ```
