@@ -22,7 +22,7 @@ descriptions
 Some block cipher modes require that the input be padding with bytes until a multiple of
 the cipher's blocksize.  The following padding methods are supported.
 
-See [Padding](http://en.wikipedia.org/wiki/Padding_(cryptography)) for descriptions
+See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
 
 1. Zero Byte
 2. ANSI X.923
