@@ -4,3 +4,5 @@ target
 .\#*
 .lein-repl-history
 pom.xml
+pom.xml.asc
+*.swp
