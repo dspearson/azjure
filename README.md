@@ -64,11 +64,11 @@ the cipher's blocksize.  The following padding methods are supported.
 See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
 
 1. PKCS7
+2. Zero Byte
 
 ## In Progress
 * CAST5 Cipher
 * PCBC Mode
-* Zero Byte Padding - Unpad implementation
 * ANSI X.923 Padding - Unpad implementation
 * ISO 10126 - Unpad implementation
 * ISO/IEC 7816-4 - Unpad implementation
