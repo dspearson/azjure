@@ -12,7 +12,7 @@ Add the following in the dependencies section of your project.clj file
                ...]
 ```
 
-Require the CypherSuite protocol
+Require the CryptSuite protocol
 
 ```Clojure
 (:require [net.ozias.crypt.cryptsuite :as cs])
@@ -30,7 +30,7 @@ Encrypt
 ;; Initialize the record to use
 (def AESCBCPKCS7 (->AESCBCPKCS7))
 ;; Encrypt
-(cs/encrypt AESCBCPKCS7 key iv bytarr)
+(cs/encrypt AESCBCPKCS7 key iv bytearr)
 ```
 
 Decrypt
