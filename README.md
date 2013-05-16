@@ -5,15 +5,25 @@ Cryptography implementations in Clojure
 
 ## Usage
 1. Require the cyphersuite protocol
-'''clojure
+```clojure
 (:require [net.ozias.crypt.cryptsuite :as cs])
-'''
+```
 2. Then require the suite you wish to use (a suite is a combination of cipher, mode, and padding method)
-'''clojure
+```clojure
 (:require [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
-'''
-3.
+```
+3. Encrypt
+```clojure
+(def AESCBCPKCS7 (->AESCBCPKCS7))
+(cs/encrypt AESCBCPKCS7 key iv bytarr)
+```
+4. Decrypt
+```clojure
+(def AESCBCPKCS7 (->AESCBCPKCS7))
+(cs/decrypt AESCBCPKCS7 key iv words)
+```
 
+See [testcipher](https://github.com/CraZySacX/azjure/blob/master/test/net/ozias/crypt/testcipher.clj) for examples
 
 ## Supported Block Ciphers
 1. Advanced Encryption Standard (AES) - [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
