@@ -8,7 +8,8 @@
             [net.ozias.crypt.cipher.blowfish :refer (->Blowfish)]
             [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
             [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
-            [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]))
+            [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
+            [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions
@@ -28,12 +29,13 @@
   (encrypt [_ key iv bytearr])
   (decrypt [_ key iv words]))
 
-;; #### PKCS7
-;; Setup the padding records for use in testing
+;; #### PKCS7, Zeropad
+;; Setup the padding records
 (def PKCS7 (->PKCS7pad))
+(def Zeropad (->Zeropad))
 
 ;; #### AES, Blowfish
-;; Setup the ciphers for use in testing
+;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
 
@@ -65,12 +67,12 @@
   (decrypt [_ key iv words]
     (decryptor [AES ECB PKCS7] key iv words)))
 
-(defrecord BFECBPKCS7 []
+(defrecord AESECBZERO []
     CryptSuite
   (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB PKCS7] key iv bytearr))
+    (encryptor [AES ECB Zeropad] key iv bytearr))
   (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB PKCS7] key iv words)))
+    (decryptor [AES ECB Zeropad] key iv words)))
 
 (defrecord AESCBCPKCS7 []
     CryptSuite
@@ -79,9 +81,38 @@
   (decrypt [_ key iv words]
     (decryptor [AES CBC PKCS7] key iv words)))
 
+(defrecord AESCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES CBC Zeropad] key iv words)))
+
+(defrecord BFECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish ECB PKCS7] key iv words)))
+
+(defrecord BFECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish ECB Zeropad] key iv words)))
+
 (defrecord BFCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
     (encryptor [Blowfish CBC PKCS7] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [Blowfish CBC PKCS7] key iv words)))
+
+(defrecord BFCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish CBC Zeropad] key iv words)))
+

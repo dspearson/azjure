@@ -3,7 +3,7 @@
 ;; the proper length given a block cipher with zeros
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.padding.zeropad
-  (:require [net.ozias.crypt.libbyte :refer (bytes-word)]
+  (:require [net.ozias.crypt.libbyte :refer (bytes-word word-bytes)]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -22,6 +22,16 @@
         zeropad (reduce conj unpadded (take rem (cycle [0])))]
     (mapv #(bytes-word %) (partition bytes-per-word zeropad))))
 
+;; ### unpad-blocks
+;; Unpad the given vector of words.
+;;
+;; Evaluates to a byte array.
+;;
+;; This is the inverse of pad-bytes.
+(defn- unpad-blocks [padded cipher]
+  (let [flat (reduce into (mapv #(word-bytes %) padded))]
+    (byte-array (map byte (filter #(not (= % 0)) flat)))))
+
 ;; ### Zeropad
 ;; Extend the Pad protocol through the Zeropad record type.
 (defrecord Zeropad []
@@ -29,4 +39,4 @@
   (pad [_ unpadded cipher]
     (pad-bytes (vec unpadded) cipher))
   (unpad [_ padded cipher]
-    padded))
+    (unpad-blocks padded cipher)))
