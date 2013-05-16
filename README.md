@@ -34,7 +34,7 @@ Decrypt
 (cs/decrypt AESCBCPKCS7 key iv words)
 ```
 
-See [testcipher](https://github.com/CraZySacX/azjure/blob/master/test/net/ozias/crypt/testcipher.clj) for examples
+See [testcipher.clj](https://github.com/CraZySacX/azjure/blob/master/test/net/ozias/crypt/testcipher.clj) for examples
 
 ## Supported Block Ciphers
 1. Advanced Encryption Standard (AES) - [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
