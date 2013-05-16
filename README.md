@@ -24,7 +24,7 @@ Cryptography implementations in Clojure
 ```
 4. Decrypt
 
-```
+```clojure
 ;; Initialize the record to use
 (def AESCBCPKCS7 (->AESCBCPKCS7))
 ;; Decrypt
