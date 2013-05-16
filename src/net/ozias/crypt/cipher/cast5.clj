@@ -301,10 +301,33 @@
 (defn- +mod32 [a b]
   (mod (+ a b) 0x100000000))
 
-(defn get-bytes [kw [a b c d]]
+;; ### get-bytes
+;; Takes a 32-bit word and a vector of indexes into each byte 
+;; of the word (0 to 3).
+;;
+;;     (get-bytes 0x01020304 [1 3 0 2])
+;;
+;; evaluates to
+;; > [0x02 0x04 0x01 0x03]
+;;
+;; Evaluates to a vector of 4 bytes.
+(defn- get-bytes [kw [a b c d]]
   [(get-byte kw a) (get-byte kw b) (get-byte kw c) (get-byte kw d)])
 
-(defn xor-line [w1 w2 [a b c d :as order] w3 fsbox idx]
+;; ### xor-line
+;; Represents the generation of one temp word from
+;; [http://tools.ietf.org/html/rfc2144#section-2.4](http://tools.ietf.org/html/rfc2144#section-2.4)
+;; 
+;; * <em>w1</em> - The base word.
+;; * <em>w2</em> - The seed word.  Individual bytes are pulled from this to
+;; use in the xor.
+;; * <em>[a b c d]</em> - The order to pull the bytes out of the seed word.
+;; * <em>w3</em> - The word to pull a byte from for the tail of the xor.
+;; * <em>fsbox</em> - The S-box to use for the tail substitution.
+;; * <em>idx</em> - The byte index to use in the tail word.
+;;
+;; Evaluates to a 32-bit word.
+(defn- xor-line [w1 w2 [a b c d :as order] w3 fsbox idx]
   (let [barr (get-bytes w2 order)
         lb (get-byte w3 idx)]
     (bit-xor 
@@ -315,7 +338,19 @@
      (nth s8 (nth barr 3))
      (nth fsbox lb))))
 
-(defn gen-words [words [i0 i1 i2 i3 i4 i5]]
+;; ### gen-words
+;; Generate 4 temporary 32-bit words for use in subkey generation.
+;; Represents the generation of 4 temporary words from
+;; [http://tools.ietf.org/html/rfc2144#section-2.4](http://tools.ietf.org/html/rfc2144#section-2.4)
+;;
+;; * <em>words</em> - A vector of 4 32-bit words used in the generation
+;; of the 4 32-bit temporary words.
+;; * <em>[i0 i1 i2 i3 i4 i5]</em> - A vector of indexes (0-3) into the 
+;; words vector to determine where the words are used in the temp word
+;; generation.  Note an index can appear more than once.
+;;
+;; Evaluates to a vector of 4 32-bit temporary words.
+(defn- gen-words [words [i0 i1 i2 i3 i4 i5]]
   (let [seed (nth words i0)
         down (nth words i5)
         ow0 (xor-line (nth words i1) seed [1 3 0 2] down s7 0)
@@ -324,6 +359,18 @@
         ow3 (xor-line (nth words i4) ow2  [2 1 3 0] down s6 3)]
   [ow0 ow1 ow2 ow3]))
 
+;; ### gen-subkey-word
+;; Generate one subkey word (K<sub>1</sub>) as defined at
+;; [http://tools.ietf.org/html/rfc2144#section-2.4](http://tools.ietf.org/html/rfc2144#section-2.4)
+;;
+;; * <em>[a b c d e]</em> - A vector of indexes into the given words.
+;; a and b are pulled from w0, c and d are pulled from w1 and e is pulled
+;; from the tail bytes.
+;; * <em>w0</em> - The first word to pull bytes from
+;; * <em>w1</em> - The second word to pull bytes from
+;; * <em>tail</em> - The vector of bytes representing the tail bytes
+;;
+;; Evaluates to a 32-bit word.
 (defn- gen-subkey-word [[a b c d e] w0 w1 tail]
   (bit-xor
    (nth s5 (get-byte w0 a))
@@ -332,12 +379,33 @@
    (nth s8 (get-byte w1 d))
    (nth tail e)))
 
+;; ### gen-tails
+;; Generate a vector of 4 bytes that are used as the tail
+;; byte in the xor for each K generation.
+;;
+;; * <em>[a b c d]</em> - The index into each word to pull
+;; the byte from
+;; * <em>[w0 w1 w2 w3]</em> - The 4 32-bit words used in 
+;; the subkey generation.  A tail byte come from each one.
+;;
+;; Evaluates to a vector of 4 bytes.
 (defn- gen-tails [[a b c d] [w0 w1 w2 w3]]
   [(nth s5 (get-byte w0 a))
    (nth s6 (get-byte w1 b))
    (nth s7 (get-byte w2 c))
    (nth s8 (get-byte w3 d))])
 
+;; ### get-tails
+;; Get the tail bytes based on the current round of subkey
+;; generation.  There are 4 unique tail patterns (repeated twice)
+;; used during subkey generation.
+;;
+;; * <em>[w0 w1 w2 w3]</em> - The temporary words used in the
+;; creation of the subkeys
+;; * <em>round</em> - The current round of subkeys being generated
+;; (0-3).
+;;
+;; Evaluates to a vector of 4 bytes.
 (defn- get-tails [[w0 w1 w2 w3 :as words] round]
   (condp = round
     0 (gen-tails [2 2 1 0] words)
@@ -345,7 +413,17 @@
     2 (gen-tails [1 0 2 2] [w2 w3 w0 w1])
     3 (gen-tails [3 3 0 1] words)))
 
-;;                       03 47 8b cf  
+;; ### generate-subkey
+;; Generates a vector of 4 32-bit words representing 4 subkeys.
+;; Note that round 1 and 4 use the same subkey word generation 
+;; pattern.  Round 2 and 3 use the same pattern.
+;;
+;; * <em>[w0 w1 w2 w3]</em> - The 4 32-bit temporary words used
+;; for subkey generation.
+;; * <em>round</em> - The current subkey generation round.  There
+;; are 2 sets of 4 unique rounds.
+;;
+;; Evaluates to a vector of 4 32-bit words.
 (defn- generate-subkey [[w0 w1 w2 w3 :as words] round]
   (let [rnd (mod round 4)
         tails (get-tails words rnd)]
@@ -361,6 +439,9 @@
 
 ;; ### expand-key
 ;; Generate enough key material to support the creation of the subkeys.
+;; Note that the cycle generates the pattern of indexes into the 
+;; vector of 4 words that is described in the algorithm at
+;; [http://tools.ietf.org/html/rfc2144#section-2.4](http://tools.ietf.org/html/rfc2144#section-2.4)
 ;;
 ;; Evaluates to a vector of 8 vectors containing 4 32-bit words each.
 ;; These serve as input material for the generate-subkey function.
@@ -372,12 +453,23 @@
    1))
 
 ;; ### generate-subkeys
-;; Generates 32 key words.  K<sub>1</sub> to K<sub>16</sub> serve as the
-;; masking (K<sub>m</sub>) for each cipher round.  K<sub>17</sub> to
-;; K<sub>32</sub> serve as the rotate (K<sub>r</sub>) for each cipher
+;; Generates 32 32-bit words that make up the key schedule defined at
+;; [http://tools.ietf.org/html/rfc2144#section-2.4](http://tools.ietf.org/html/rfc2144#section-2.4)
+;; 
+;; K<sub>1</sub> to K<sub>16</sub> serve as the
+;; masking keys (K<sub>m</sub>) for each cipher round.  K<sub>17</sub> to
+;; K<sub>32</sub> serve as the rotate keys (K<sub>r</sub>) for each cipher
 ;; round
+;;
+;; Evalutates to a vector of 32 32-bit words.
 (defn- generate-subkeys [key]
   (reduce into (mapv #(generate-subkey %1 %2) (expand-key key) (range 8))))
+
+;; #### mgen-subkeys
+;; Memoization of the generate-subkeys function.  generate-subkeys is
+;; called for each block so this ensures subkeys are only generated once
+;; and reused.
+(def mgen-subkeys (memoize generate-subkeys))
 
 ;; ### process-block
 ;; Process a block for encryption or decryption.
@@ -390,7 +482,7 @@
 ;;
 ;; Evaluates to a vector of two 32-bit words.
 (defn- process-block [block key enc]
-  (generate-subkeys key)
+  (mgen-subkeys key)
   block)
 
 ;; ### CAST5

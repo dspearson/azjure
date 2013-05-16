@@ -3032,7 +3032,19 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>Byte manipulation library</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  net.ozias.crypt.libbyte)</pre></td></tr><tr><td class="docs"><h3>bytes-word</h3>
+  net.ozias.crypt.libbyte)</pre></td></tr><tr><td class="docs"><h3>get-byte</h3>
+
+<p>Get byte <em>num</em> out of the given word.  <em>num</em>
+should be 1-4.</p>
+
+<pre><code>(get-byte 0x11223344 4)
+</code></pre>
+
+<p>evaluates to 0x11</p>
+</td><td class="codes"><pre class="brush: clojure">(defn get-byte [num word]
+  (let [shift (* 8 (- num 1))
+        sftfn (if (= 0 shift) word (bit-shift-right word shift))]
+    (bit-and sftfn 0xFF)))</pre></td></tr><tr><td class="docs"><h3>bytes-word</h3>
 
 <p>Takes a vector of 4 bytes and creates
 one 32-bit word composed of the 4 bytes.</p>
