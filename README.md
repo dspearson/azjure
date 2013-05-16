@@ -4,6 +4,14 @@ azjure
 Cryptography implementations in Clojure
 
 ## Usage
+Add the following in the dependencies section of your project.clj file
+
+```Clojure
+:dependencies [...
+               [net.ozias.crypt/azjure "0.1.0"]
+               ...]
+```
+
 Require the CypherSuite protocol
 
 ```Clojure
