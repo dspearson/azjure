@@ -4,6 +4,16 @@ azjure
 Cryptography implementations in Clojure
 
 ## Usage
+1. Require the cyphersuite protocol
+'''clojure
+(:require [net.ozias.crypt.cryptsuite :as cs])
+'''
+2. Then require the suite you wish to use (a suite is a combination of cipher, mode, and padding method)
+'''clojure
+(:require [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
+'''
+3.
+
 
 ## Supported Block Ciphers
 1. Advanced Encryption Standard (AES) - [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
@@ -19,7 +29,7 @@ descriptions
 2. Cipher-Block Chaining (CBC)
 
 ## Padding
-Some block cipher modes require that the input be padding with bytes until a multiple of
+Some block cipher modes require that the input be padded with bytes until a multiple of
 the cipher's blocksize.  The following padding methods are supported.
 
 See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
