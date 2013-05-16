@@ -57,14 +57,18 @@ descriptions
 1. Electronic Codebook (ECB)
 2. Cipher-Block Chaining (CBC)
 
-## Padding
+## Supported Padding
 Some block cipher modes require that the input be padded with bytes until a multiple of
 the cipher's blocksize.  The following padding methods are supported.
 
 See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
 
-1. Zero Byte
-2. ANSI X.923
-3. ISO 10126
-4. PKCS7
-5. ISO/IEC 7816-4
+1. PKCS7
+
+## In Progress
+* CAST5 Cipher
+* PCBC Mode
+* Zero Byte Padding - Unpad implementation
+* ANSI X.923 Padding - Unpad implementation
+* ISO 10126 - Unpad implementation
+* ISO/IEC 7816-4 - Unpad implementation
