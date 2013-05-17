@@ -3054,7 +3054,7 @@ the ciphertext vector.</li>
 </ul>
 
 <p>Evaluates to a vector containing the IV to use with the next block and
-the current state of the plaintext vector.</p>
+the current state of the ciphertext vector.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [cipher key]
   (fn [[iv ct] block]
     (let [encrypted (bc/encrypt-block cipher (mapv #(bit-xor %1 %2) iv block) key)

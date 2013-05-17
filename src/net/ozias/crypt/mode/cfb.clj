@@ -1,13 +1,9 @@
-;; ## Propagating Cipher-Block Chaining
-;; Propagating Cipher-Block Chaining mode
+;; ## Cipher Feedback
+;; Cipher Feedback mode
 ;;
 ;; [Block Cipher Mode of Operation](http://en.wikipedia.org/wiki/Cipher_block_chaining)
-;; > "The propagating cipher block chaining mode was designed to cause small
-;; > changes in the ciphertext to propagate indefinitely when decrypting, as
-;; > well as when encrypting."
-;;
 (ns ^{:author "Jason Ozias"}
-  net.ozias.crypt.mode.pcbc
+  net.ozias.crypt.mode.cfb
   (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
@@ -23,10 +19,10 @@
 ;; the current state of the ciphertext vector.
 (defn- encrypt-block [cipher key]
   (fn [[iv ct] block]
-    (let [encrypted (bc/encrypt-block cipher (mapv #(bit-xor %1 %2) iv block) key)
-          ciphertext (reduce conj ct encrypted)]
-      [(mapv #(bit-xor %1 %2) block encrypted)
-       ciphertext])))
+    (let [encrypted (bc/encrypt-block cipher iv key)
+          ciphertext (mapv #(bit-xor %1 %2) block encrypted)]
+      [ciphertext
+       (reduce conj ct ciphertext)])))
 
 ;; ### decrypt-block
 ;; Evaluates to a function over the given cipher and key.
@@ -39,15 +35,14 @@
 ;; the current state of the plaintext vector.
 (defn- decrypt-block [cipher key]
   (fn [[iv pt] block]
-    (let [decrypted (bc/decrypt-block cipher block key)
-          plaintext (mapv #(bit-xor %1 %2) iv decrypted)]
-      [(mapv #(bit-xor %1 %2) block plaintext)
+    (let [decrypted (bc/encrypt-block cipher iv key)
+          plaintext (mapv #(bit-xor %1 %2) decrypted block)]
+      [block
        (reduce conj pt plaintext)])))
-
-;; ### PropagatingCipherBlockChaining
-;; Extend the ModeOfOperation protocol through the 
-;; PropagatingCipherBlockChaining record.
-(defrecord PropagatingCipherBlockChaining []
+      
+;; ### CipherFeedback
+;; Extend the ModeOfOperation protocol through the CipherFeedback record.
+(defrecord CipherFeedback []
   ModeOfOperation
   (encrypt-blocks [_ cipher iv blocks key]
     (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks))))

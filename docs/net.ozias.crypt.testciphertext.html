@@ -3028,52 +3028,42 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.mode.testcbc" name="net.ozias.crypt.mode.testcbc"><h1 class="project-name">net.ozias.crypt.mode.testcbc</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Test Cipher Block Chaining Mode</h1>
-
-<p>Test suite for the CBC mode of encrypting multiple blocks.</p>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  net.ozias.crypt.mode.testcbc
-  (:require [clojure.test :refer :all]
-            [net.ozias.crypt.testkeys :refer :all]
-            [net.ozias.crypt.testivs :refer :all]
-            [net.ozias.crypt.mode.cbc :refer (-&gt;CipherBlockChaining)]
-            [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (-&gt;Blowfish)]
-            [net.ozias.crypt.cipher.twofish :refer (-&gt;Twofish)]
-            [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]))</pre></td></tr><tr><td class="docs"><h3>pt-msg</h3>
-
-<p>A sample plaintext message.  In this case it is my name as 11 
-UTF-8 bytes (0x4a61736f63204f7a696173) repeated 16 times to make 11 blocks.</p>
-</td><td class="codes"><pre class="brush: clojure">(def pt-msg [0x4a61736f 0x6e204f7a 0x6961734a 0x61736f6e
-             0x204f7a69 0x61734a61 0x736f6e20 0x4f7a6961
-             0x734a6173 0x6f6e204f 0x7a696173 0x4a61736f
-             0x6e204f7a 0x6961734a 0x61736f6e 0x204f7a69
-             0x61734a61 0x736f6e20 0x4f7a6961 0x734a6173
-             0x6f6e204f 0x7a696173 0x4a61736f 0x6e204f7a
-             0x6961734a 0x61736f6e 0x204f7a69 0x61734a61
-             0x736f6e20 0x4f7a6961 0x734a6173 0x6f6e204f
-             0x7a696173 0x4a61736f 0x6e204f7a 0x6961734a
-             0x61736f6e 0x204f7a69 0x61734a61 0x736f6e20
-             0x4f7a6961 0x734a6173 0x6f6e204f 0x7a696173])</pre></td></tr><tr><td class="docs"><h3>bf-msg</h3>
-
-<p>The plaintext message defined at 
-<a href="http://www.schneier.com/code/vectors.txt">http://www.schneier.com/code/vectors.txt</a> for
-Chained Block Cipher mode testing.</p>
-</td><td class="codes"><pre class="brush: clojure">(def bf-msg 
-  [0x37363534 0x33323120 0x4e6f7720 0x69732074
-   0x68652074 0x696d6520 0x666f7220 0x00000000])</pre></td></tr><tr><td class="docs"><h3>bf-ct-128-msg</h3>
+</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.testciphertext" name="net.ozias.crypt.testciphertext"><h1 class="project-name">net.ozias.crypt.testciphertext</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns net.ozias.crypt.testciphertext)</pre></td></tr><tr><td class="docs"><h3>ecb-aes</h3>
 
 <p>A sample ciphertext message that is the result of encrypting
-<em>bf-msg</em> with Blowfish and bf-key-128.
-Defined at <a href="http://www.schneier.com/code/vectors.txt">http://www.schneier.com/code/vectors.txt</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def bf-ct-128-msg 
-  [0x6b77b4d6 0x3006dee6 0x05b156e2 0x74039793 
-   0x58deb9e7 0x154616d9 0x59f1652b 0xd5ff92cc])</pre></td></tr><tr><td class="docs"><h3>ct-128-msg</h3>
+<em>pt-1</em> in ECB mode with AES, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ecb-aes
+  [0xf98bbfbd 0x761385a0 0x8301b617 0x2eac2a18 
+   0xfa3e70a2 0x6c1bae31 0x04e44e83 0x4d3d20ee
+   0x60912070 0xd4a26755 0x24d945b5 0xb550b9e3
+   0x372cf4ac 0x4e33d4c2 0x69663f71 0x2c24931f
+   0x2d4fa5d8 0x2bac8b7f 0x477d6ed0 0x92fa8677
+   0x9c6b0b32 0xb46a1782 0x35b8afa4 0xa2bfe9e9
+   0xb6646b63 0x00230106 0x0dcd1d38 0x93ffac22
+   0xc9aa4d89 0xef55b01a 0xfa161a19 0xf54505b8
+   0x9050c766 0x096cb2dd 0x3342266b 0xfa145275
+   0x8b3c2e4b 0x482e5269 0x0d9ddcab 0xcb4dda28
+   0x255cd45d 0x39280648 0x63d58448 0x24738d49])</pre></td></tr><tr><td class="docs"><h3>ecb-bf</h3>
 
 <p>A sample ciphertext message that is the result of encrypting
-<em>pt-msg</em> with AES and key-128.</p>
-</td><td class="codes"><pre class="brush: clojure">(def ct-128-msg 
+<em>pt-1</em> in ECB mode with Blowfish, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ecb-bf
+  [0x615b80bf 0xd8d093b3 0xb60bbc47 0xa565f5ea
+   0xe0274340 0x31009d6e 0xa01e3e7a 0x0d5bd11e
+   0x15c7bf86 0x7ed13730 0x00e57ef9 0xd7c6b039
+   0x00b87cf9 0xc6bb1a4c 0x4d144733 0xa7318bb2
+   0xd061d714 0xbb0c9be2 0xb38f9cf6 0x875d4348
+   0x20b0fd5e 0x546577df 0x615b80bf 0xd8d093b3
+   0xb60bbc47 0xa565f5ea 0xe0274340 0x31009d6e
+   0xa01e3e7a 0x0d5bd11e 0x15c7bf86 0x7ed13730
+   0x00e57ef9 0xd7c6b039 0x00b87cf9 0xc6bb1a4c
+   0x4d144733 0xa7318bb2 0xd061d714 0xbb0c9be2
+   0xb38f9cf6 0x875d4348 0x20b0fd5e 0x546577df])</pre></td></tr><tr><td class="docs"><h3>cbc-aes</h3>
+
+<p>A sample ciphertext message that is the result of encrypting
+<em>pt-1</em> in CBC mode with AES, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def cbc-aes
   [0x87a3f4f9 0x51c2e601 0x8295e40d 0xb6278619
    0x096026c7 0x72e928ba 0x085997d2 0xd05fe365
    0x9c907d01 0x6f61d49e 0x7146b7e0 0x4bb810ef
@@ -3084,92 +3074,87 @@ Defined at <a href="http://www.schneier.com/code/vectors.txt">http://www.schneie
    0x461b3e07 0xb15178ec 0x141617c6 0x5b6cf605
    0x40692fa0 0x36ebef5f 0x6fe253be 0x89be47a0
    0xa8876b85 0x94b7478b 0x557040d7 0x0dc65e85
-   0xff272147 0x6d19cddd 0x1b475267 0xc937a77e])</pre></td></tr><tr><td class="docs"><h3>ct-192-msg</h3>
+   0xff272147 0x6d19cddd 0x1b475267 0xc937a77e])</pre></td></tr><tr><td class="docs"><h3>cbc-bf</h3>
 
 <p>A sample ciphertext message that is the result of encrypting
-<em>pt-msg</em> with AES and key-192.</p>
-</td><td class="codes"><pre class="brush: clojure">(def ct-192-msg
-  [0xb46a08a4 0x06e5c7a6 0xae63f25d 0x42453eba
-   0xdec39aad 0x2295880f 0x5bb16bd4 0xa67664c5
-   0xa643dba7 0x7ce9663a 0x0961fb1f 0x3ddc82a1
-   0x21b39703 0xaeb4d122 0x2697f9d6 0xdec26955
-   0xdbf57f73 0x170d9a0f 0x092868c6 0x5cdbf77c
-   0x7bed0b13 0x7a8d917b 0xd0330034 0xa2a2fc38
-   0x2691f2e0 0xa11f8712 0x2dc55534 0x992c9257
-   0x65804741 0x83e01e40 0x48591a77 0xb38c36c2
-   0xcea6258a 0x8b7b0332 0xa04fca42 0xef2fb5de
-   0x52645170 0x957a5013 0x5d791119 0x9c3de4be
-   0x7e3a5457 0x896d477f 0x588c3fd3 0xc7062114])</pre></td></tr><tr><td class="docs"><h3>ct-256-msg</h3>
+<em>pt-1</em> in CBC mode with Blowfish, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def cbc-bf
+  [0x47b754e6 0xddeaff3f 0xbb9fad64 0xad72473c
+   0x95431a55 0xfa77214d 0x7c4a7e6f 0x0da46898
+   0x552eb0f6 0x7c5ff0d2 0x365d2dfb 0xdc48d822
+   0x7cb23440 0x47c9431f 0xba444cc9 0x11f0d44d
+   0x951b3b61 0x51a5a758 0x5eecdafe 0x66213056
+   0x0bc092d6 0x8bdd9753 0x23b0008c 0xa7f22c7c
+   0xfc42dd5b 0xa2f420d3 0xa83a9c3b 0x1fe7b4f4
+   0xdc7cd9cf 0xa0817094 0x32a0af84 0x2e8e0c4d
+   0xf00a8a41 0xc2d88cf5 0xa25eddc8 0xfe842545
+   0xc312e977 0x3749905f 0x7b30e352 0x48e15032
+   0xb9112a63 0x89af1d4c 0x2c2ab2ee 0x8252b03])</pre></td></tr><tr><td class="docs"><h3>pcbc-aes</h3>
 
 <p>A sample ciphertext message that is the result of encrypting
-<em>pt-msg</em> with AES and key-256.</p>
-</td><td class="codes"><pre class="brush: clojure">(def ct-256-msg
-  [0x2f438979 0xcb1abdbd 0x84880cfb 0x18533338
-   0xb3c1cf96 0x9380453b 0x1c7cea2c 0x3cb1d78c
-   0x21e0eb91 0xc962af80 0x1f6b3a4e 0x3e2df0d6
-   0x4b268f0d 0x53fcb5f7 0xefbe2aef 0xfcb4bf7c
-   0xc98354ac 0x98bba698 0x5e124c01 0xc461085d
-   0xb3a76c21 0x4c7e6549 0x23f137fe 0x78a4b8a2
-   0xf3358469 0x255aa294 0x7fd6d723 0x5cb95e74
-   0x48fe8cf1 0xd86ab8b3 0x978d2ef1 0x23f0b92a
-   0x7173a1a3 0xdf3e65c1 0x3c3dbb65 0x74eb58fe
-   0xa3393856 0xf92fe6d5 0x5f130dbe 0x48523022
-   0x872e7f79 0x2590c5aa 0x912aee70 0x195b05c2])</pre></td></tr><tr><td class="docs"><h3>CBC</h3>
+<em>pt-1</em> in PCBC mode with AES, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def pcbc-aes
+  [0x87a3f4f9 0x51c2e601 0x8295e40d 0xb6278619
+   0xa96fe084 0xdfb070f3 0x86743988 0xfe60f12a
+   0x68cc4a82 0xafd90f5f 0x0066f23f 0x0188263a 
+   0x3dfc721f 0xa8157f0b 0xdd1bad97 0x0e358781
+   0x0dfc9fd4 0xc8810ddb 0x23ea394a 0x7d25960b
+   0x85d1c1e6 0xe36f0485 0x8d32c4b1 0x0ea0d61e
+   0xfb24d4ef 0x10276c98 0x257138ef 0x0fc57833
+   0xc0f37794 0x6bbb36f4 0xd46ef1ff 0x2b9c2465
+   0xd205495e 0xac14eaa3 0x2e5efab7 0x0c102d4e
+   0x37cbc0d7 0x436c9838 0x1a1c1077 0xbb5bbcc3
+   0x3a30e4a0 0x634b02e9 0x1e9c1ce0 0xfc848eef])</pre></td></tr><tr><td class="docs"><h3>pcbc-bf</h3>
 
-<p>Setup the CipherBlockChaining record for use in tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def CBC (-&gt;CipherBlockChaining))</pre></td></tr><tr><td class="docs"><h3>AES</h3>
+<p>A sample ciphertext message that is the result of encrypting
+<em>pt-1</em> in PCBC mode with Blowfish, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def pcbc-bf
+  [0x47b754e6 0xddeaff3f 0xb175be73 0xf6934109
+   0xf2a2665e 0xa71edbee 0x883e6c5b 0x979c306f
+   0x475534fc 0x1c59db22 0xddd1168b 0xf23fff4b
+   0x2781a505 0x3451b61b 0x64346d0f 0xeab8eb32
+   0xdfce80c0 0x10684a25 0xa79f3bce 0xc73bfbab
+   0x1000f209 0x7ee589cd 0xb8a2fbb1 0xaffbe5d4
+   0x5040b8d6 0xfb175d59 0x364f0733 0x7170a313
+   0xb9167c16 0x983e7bec 0xed64405d 0x838c03f5
+   0xbf53a302 0xdb9edeb5 0x1f396fcc 0xfdc85927
+   0x4fb81587 0x96290c75 0xf4fac908 0xfafd5bb8
+   0xbb787530 0x5efbd02c 0x3279f83d 0x73c46c51])</pre></td></tr><tr><td class="docs"><h3>cfb-aes</h3>
 
-<p>Setup the Aes record for use in tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))</pre></td></tr><tr><td class="docs"><h3>Blowfish</h3>
+<p>A sample ciphertext message that is the result of encrypting
+<em>pt-1</em> in CFB mode with AES, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def cfb-aes
+  [0x6ac88afd 0xda6c1492 0x6d7e8f96 0x0dddf604
+   0xdb42849f 0x5896159e 0x9a5c88af 0x4641e5e4
+   0xc4ca71da 0x984365db 0x9aa03cf7 0x71e795a4
+   0x3191d4c2 0xf31f62a7 0x13fad1a8 0x440a8faf
+   0x0087682f 0x02547c79 0x495b6cad 0x8b45edc9
+   0x8c36fe90 0x82f92ff8 0x41fc2ef9 0x8c6176fe
+   0x3b3117f5 0xea99f0f1 0xab05e067 0xda53939d
+   0xb8543b28 0x03907d91 0x1acb2b0a 0xefaa514a
+   0xfe301173 0x5bd383ba 0x2d8a8ed8 0xd468d089
+   0x6797f1c3 0x45d9acdf 0xb64983ec 0x109e7464
+   0xcb8dafb3 0x85f63b9a 0x21ecddf2 0x5496bbbd])</pre></td></tr><tr><td class="docs"><h3>cfb-bf</h3>
 
-<p>Setup the Blowfish record for use in tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def Blowfish (-&gt;Blowfish))</pre></td></tr><tr><td class="docs"><h3>Twofish</h3>
+<p>A sample ciphertext message that is the result of encrypting
+<em>pt-1</em> in CFB mode with Blowfish, key-128, and iv-128.</p>
+</td><td class="codes"><pre class="brush: clojure">(def cfb-bf
+  [0x5ca477f0 0x501a9c2c 0x9aad78ec 0x88f5e48a
+   0xf371e885 0x682286f9 0x38a99c09 0x1214361d
+   0xae9b82d2 0x6fbc9e3a 0xe3fca136 0xd99dc064
+   0xce9caad1 0x6ef6e763 0x06ecb9d4 0xc3965de7
+   0xc137700e 0xb0f3db3e 0x244cebdf 0x94b56973
+   0xbf39e032 0x88e78b87 0xe4f710d7 0x44cb6e7f
+   0x42da654d 0xcd295a9c 0xc991b58a 0xa5da4c65
+   0xe263eb69 0x4a0395f4 0x89c1694c 0x745bef0d
+   0x3baecaaf 0x15725b6e 0xe79eedd0 0xde8f097e
+   0xf1dcb468 0xf65294cc 0x008ea6bd 0xcd5054ed
+   0xdb5e2258 0x1574f068 0xe17ab973 0x154c87d6])</pre></td></tr><tr><td class="docs"><h3>cbc-bf</h3>
 
-<p>Setup the Twofish record for use in tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def Twofish (-&gt;Twofish))</pre></td></tr><tr><td class="docs"><h2>encrypt-blocks</h2>
-
-<p>Encrypt a vector of blocks with CBC and the given cipher, iv, and key.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-blocks [cipher iv blocks key]
-  (mode/encrypt-blocks CBC cipher iv blocks key))</pre></td></tr><tr><td class="docs"><h2>decrypt-blocks</h2>
-
-<p>Decrypt a vector of blocks with CBC and the given cipher, iv, and key.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-blocks [cipher iv blocks key]
-  (mode/decrypt-blocks CBC cipher iv blocks key))</pre></td></tr><tr><td class="docs"><h2>testCBC</h2>
-
-<p>Test the Chaining Block Cipher mode</p>
-</td><td class="codes"><pre class="brush: clojure">(deftest testCBC
-  (testing &quot;Encryption&quot;
-    (testing &quot;AES&quot;
-      (testing &quot;IV, 128-bit Key&quot;
-        (is (= ct-128-msg (encrypt-blocks AES iv-128 pt-msg key-128))))
-      (testing &quot;Different IV, Same 128-bit Key&quot;
-        (is (not (= ct-128-msg (encrypt-blocks AES iv-128-1 pt-msg key-128)))))
-      (testing &quot;IV, 192-bit Key&quot;
-        (is (= ct-192-msg (encrypt-blocks AES iv-128 pt-msg key-192))))
-      (testing &quot;Different IV, Same 192-bit Key&quot;
-        (is (not (= ct-192-msg (encrypt-blocks AES iv-128-1 pt-msg key-192)))))
-      (testing &quot;IV, 256-bit Key&quot;
-        (is (= ct-256-msg (encrypt-blocks AES iv-128 pt-msg key-256))))
-      (testing &quot;Different IV, Same 256-bit Key&quot;
-        (is (not (= ct-256-msg (encrypt-blocks AES iv-128-1 pt-msg key-256))))))
-    (testing &quot;Blowfish&quot;
-      (is (= bf-ct-128-msg (encrypt-blocks Blowfish bf-iv-64 bf-msg bf-key-128))))
-    (testing &quot;Twofish&quot;))
-  (testing &quot;Decryption&quot;
-    (testing &quot;AES&quot;
-      (testing &quot;IV, 128-bit Key&quot;
-        (is (= pt-msg (decrypt-blocks AES iv-128 ct-128-msg key-128))))
-      (testing &quot;Different IV, Same 128-bit Key&quot;
-        (is (not (= pt-msg (decrypt-blocks AES iv-128-1 ct-128-msg key-128)))))
-      (testing &quot;IV, 192-bit Key&quot;
-        (is (= pt-msg (decrypt-blocks AES iv-128 ct-192-msg key-192))))
-      (testing &quot;Different IV, Same 192-bit Key&quot;
-        (is (not (= pt-msg (decrypt-blocks AES iv-128-1 ct-192-msg key-192)))))
-      (testing &quot;IV, 256-bit Key&quot;
-        (is (= pt-msg (decrypt-blocks AES iv-128 ct-256-msg key-256))))
-      (testing &quot;Different IV, Same 256-bit Key&quot;
-        (is (not (= pt-msg (decrypt-blocks AES iv-128-1 ct-256-msg key-256))))))
-    (testing &quot;Blowfish&quot;
-      (is (= bf-msg (decrypt-blocks Blowfish bf-iv-64 bf-ct-128-msg bf-key-128))))
-    (testing &quot;Twofish&quot;)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>A sample ciphertext message that is the result of encrypting
+<em>pt-2</em> in CBC mode with  Blowfish, key-128-1 and iv-64.
+Defined at <a href="http://www.schneier.com/code/vectors.txt">http://www.schneier.com/code/vectors.txt</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def cbc-bf-1
+  [0x6b77b4d6 0x3006dee6 0x05b156e2 0x74039793 
+   0x58deb9e7 0x154616d9 0x59f1652b 0xd5ff92cc])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

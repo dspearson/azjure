@@ -8,10 +8,10 @@
 ;; > initialization vector must be used in the first block."
 ;;
 (ns ^{:author "Jason Ozias"}
-    net.ozias.crypt.mode.cbc
-    (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
-              [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
-              [net.ozias.crypt.cipher.blockcipher :as bc]))
+  net.ozias.crypt.mode.cbc
+  (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
+            [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
+            [net.ozias.crypt.cipher.blockcipher :as bc]))
 
 ;; ### encrypt-block
 ;; Evaluates to a function over the given cipher, initialization vector and key.
