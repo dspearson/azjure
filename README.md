@@ -72,3 +72,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 ## In Progress
 * CAST5 Cipher
 * PCBC Mode
+* CFB Mode

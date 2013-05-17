@@ -6,8 +6,9 @@
             [net.ozias.crypt.padding.pad :as padder]
             [net.ozias.crypt.cipher.aes :refer (->Aes)]
             [net.ozias.crypt.cipher.blowfish :refer (->Blowfish)]
-            [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
             [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
+            [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
+            [net.ozias.crypt.mode.pcbc :refer (->PropagatingCipherBlockChaining)]
             [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
             [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]
             [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]
@@ -49,6 +50,7 @@
 ;; Setup the mode for use in testing
 (def ECB (->ElectronicCodebook))
 (def CBC (->CipherBlockChaining))
+(def PCBC (->PropagatingCipherBlockChaining))
 
 ;; ### encryptor
 ;; Helper function for encryption.  Pads the bytearr with the given padder
@@ -139,6 +141,15 @@
     (encryptor [AES CBC ISO7816] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [AES CBC ISO7816] key iv words)))
+
+;; ### AESPCBCX
+;; AES cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord AESPCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES PCBC PKCS7] key iv words)))
 
 ;; ### BFECBX
 ;; Blowfish cipher, Electronic Codebook Mode, various padding methods
