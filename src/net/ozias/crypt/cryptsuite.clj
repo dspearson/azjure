@@ -224,3 +224,12 @@
     (encryptor [Blowfish CBC ISO7816] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [Blowfish CBC ISO7816] key iv words)))
+
+;; ### BFPCBCX
+;; Blowfish cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord BFPCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish PCBC PKCS7] key iv words)))

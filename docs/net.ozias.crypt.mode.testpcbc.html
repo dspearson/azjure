@@ -3028,46 +3028,67 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.padding.iso7816pad" name="net.ozias.crypt.padding.iso7816pad"><h1 class="project-name">net.ozias.crypt.padding.iso7816pad</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>iso7816pad</h2>
+</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.mode.testpcbc" name="net.ozias.crypt.mode.testpcbc"><h1 class="project-name">net.ozias.crypt.mode.testpcbc</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Test Propagating Cipher Block Chaining Mode</h1>
 
-<p>Padding implementation that will pad a byte array to
-the proper length given a block cipher with 0x80
-followed by zeros</p>
+<p>Test suite for the PCBC mode of encrypting multiple blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  net.ozias.crypt.padding.iso7816pad
-  (:require [net.ozias.crypt.libbyte :refer (bytes-word word-bytes)]
-            [net.ozias.crypt.padding.pad :refer (Pad remaining)]
-            [net.ozias.crypt.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>pad-bytes</h3>
+  net.ozias.crypt.mode.testpcbc
+  (:require [clojure.test :refer :all]
+            [net.ozias.crypt.testkeys :refer :all]
+            [net.ozias.crypt.testivs :refer :all]
+            [net.ozias.crypt.mode.pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
+            [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
+            [net.ozias.crypt.cipher.blowfish :refer (-&gt;Blowfish)]
+            [net.ozias.crypt.cipher.blockcipher :as bc]
+            [net.ozias.crypt.mode.modeofoperation :as mode]))</pre></td></tr><tr><td class="docs"><h3>pt-msg</h3>
 
-<p>Pad the given byte array to the appropriate block size
-as defined by the cipher.</p>
+<p>A sample plaintext message.  In this case it is my name as 11 
+UTF-8 bytes (0x4a61736f63204f7a696173) repeated 16 times to make 11 blocks.</p>
+</td><td class="codes"><pre class="brush: clojure">(def pt-msg [0x4a61736f 0x6e204f7a 0x6961734a 0x61736f6e
+             0x204f7a69 0x61734a61 0x736f6e20 0x4f7a6961
+             0x734a6173 0x6f6e204f 0x7a696173 0x4a61736f
+             0x6e204f7a 0x6961734a 0x61736f6e 0x204f7a69
+             0x61734a61 0x736f6e20 0x4f7a6961 0x734a6173
+             0x6f6e204f 0x7a696173 0x4a61736f 0x6e204f7a
+             0x6961734a 0x61736f6e 0x204f7a69 0x61734a61
+             0x736f6e20 0x4f7a6961 0x734a6173 0x6f6e204f
+             0x7a696173 0x4a61736f 0x6e204f7a 0x6961734a
+             0x61736f6e 0x204f7a69 0x61734a61 0x736f6e20
+             0x4f7a6961 0x734a6173 0x6f6e204f 0x7a696173])</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def aes-ct-128-msg
+  [0x87a3f4f9 0x51c2e601 0x8295e40d 0xb6278619
+   0xa96fe084 0xdfb070f3 0x86743988 0xfe60f12a
+   0x68cc4a82 0xafd90f5f 0x0066f23f 0x0188263a 
+   0x3dfc721f 0xa8157f0b 0xdd1bad97 0x0e358781
+   0x0dfc9fd4 0xc8810ddb 0x23ea394a 0x7d25960b
+   0x85d1c1e6 0xe36f0485 0x8d32c4b1 0x0ea0d61e
+   0xfb24d4ef 0x10276c98 0x257138ef 0x0fc57833
+   0xc0f37794 0x6bbb36f4 0xd46ef1ff 0x2b9c2465
+   0xd205495e 0xac14eaa3 0x2e5efab7 0x0c102d4e
+   0x37cbc0d7 0x436c9838 0x1a1c1077 0xbb5bbcc3
+   0x3a30e4a0 0x634b02e9 0x1e9c1ce0 0xfc848eef])</pre></td></tr><tr><td class="docs"><h3>PCBC</h3>
 
-<p>Evaluates to a vector of <em>N</em> 32-bit words, where
-<em>N</em> is the number of words per block.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- pad-bytes [unpadded cipher]
-  (let [wpb (/ (bc/blocksize cipher) 32)
-        bpb (/ (bc/blocksize cipher) 8)
-        bpw (/ bpb wpb)
-        l (count unpadded)
-        rem (remaining l bpb)
-        zeropad (reduce conj unpadded (take rem (cycle [0])))]
-    (mapv #(bytes-word %) (partition bpw (assoc zeropad l 0x80)))))</pre></td></tr><tr><td class="docs"><h3>unpad-blocks</h3>
+<p>Setup the PropagatingCipherBlockChaining record for use in tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def PCBC (-&gt;PropagatingCipherBlockChaining))</pre></td></tr><tr><td class="docs"><h3>AES</h3>
 
-<p>Unpad the given vector of words.</p>
+<p>Setup the Aes record for use in tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))</pre></td></tr><tr><td class="docs"><h3>Blowfish</h3>
 
-<p>Evaluates to a byte array.</p>
+<p>Setup the Blowfish record for use in tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def Blowfish (-&gt;Blowfish))</pre></td></tr><tr><td class="docs"><h2>encrypt-blocks</h2>
 
-<p>This is the inverse of pad-bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- unpad-blocks [padded cipher]
-  (let [revflat (reverse (reduce into (mapv #(word-bytes %) padded)))
-        trimmed (into [] (drop-while #(= 0 %) revflat))]
-    (byte-array (map byte (reverse (subvec trimmed 1))))))</pre></td></tr><tr><td class="docs"><h3>ISO7816pad</h3>
+<p>Encrypt a vector of blocks with CBC and the given cipher, iv, and key.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-blocks [cipher iv blocks key]
+  (mode/encrypt-blocks PCBC cipher iv blocks key))</pre></td></tr><tr><td class="docs"><h2>decrypt-blocks</h2>
 
-<p>Extend the Pad protocol through the ISO7816pad record type.</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord ISO7816pad []
-  Pad
-  (pad [_ unpadded cipher]
-    (pad-bytes (vec unpadded) cipher))
-  (unpad [_ padded cipher]
-    (unpad-blocks padded cipher)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>Decrypt a vector of blocks with CBC and the given cipher, iv, and key.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-blocks [cipher iv blocks key]
+  (mode/decrypt-blocks PCBC cipher iv blocks key))</pre></td></tr><tr><td class="docs"><h2>testPCBC</h2>
+
+<p>Test the Propagating Chaining Block Cipher mode</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest testCBC
+  (testing &quot;Encryption&quot;
+    (testing &quot;AES&quot;
+      (testing &quot;IV, 128-bit Key&quot;
+        (is (= aes-ct-128-msg (encrypt-blocks AES iv-128 pt-msg key-128)))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
