@@ -3028,85 +3028,160 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.testcipher" name="net.ozias.crypt.testcipher"><h1 class="project-name">net.ozias.crypt.testcipher</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Test Cipher Suites</h2>
+</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.testcryptsuite" name="net.ozias.crypt.testcryptsuite"><h1 class="project-name">net.ozias.crypt.testcryptsuite</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Test Crypt Suites</h2>
 
-<p>Test the cipher suites (e.g. AES/CBC/PKCS7)</p>
+<p>Test the crypt suites (e.g. AES/CBC/PKCS7)</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  net.ozias.crypt.testcipher
+  net.ozias.crypt.testcryptsuite
   (:require [clojure.test :refer :all]
-            [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]
-            [net.ozias.crypt.padding.pad :as padder]
-            [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (-&gt;Blowfish)]
-            [net.ozias.crypt.mode.cbc :refer (-&gt;CipherBlockChaining)]
-            [net.ozias.crypt.mode.ecb :refer (-&gt;ElectronicCodebook)]
-            [net.ozias.crypt.padding.pkcs7pad :refer (-&gt;PKCS7pad)]
+            [net.ozias.crypt.libbyte :refer (last-byte)]
+            [net.ozias.crypt.cryptsuite :as cs]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESECBPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESECBZERO)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESECBISO10126)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESCBCPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESCBCZERO)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;AESCBCISO10126)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFECBPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFECBZERO)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFECBISO10126)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFCBCPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFCBCZERO)]
+            [net.ozias.crypt.cryptsuite :refer (-&gt;BFCBCISO10126)]
             [net.ozias.crypt.testivs :refer (iv-128)]
-            [net.ozias.crypt.testkeys :refer (key-128)]))</pre></td></tr><tr><td class="docs"><h4>PKCS7</h4>
+            [net.ozias.crypt.testkeys :refer (key-128)]))</pre></td></tr><tr><td class="docs"><h4>AESECBPKCS7</h4>
 
-<p>Setup the padding records for use in testing</p>
-</td><td class="codes"><pre class="brush: clojure">(def PKCS7 (-&gt;PKCS7pad))</pre></td></tr><tr><td class="docs"><h4>AES, Blowfish</h4>
+<h4>AESECBZERO</h4>
 
-<p>Setup the ciphers for use in testing</p>
-</td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))
-(def Blowfish (-&gt;Blowfish))</pre></td></tr><tr><td class="docs"><h4>ECB,CBC</h4>
+<h4>AESECBISO10126</h4>
 
-<p>Setup the mode for use in testing</p>
-</td><td class="codes"><pre class="brush: clojure">(def ECB (-&gt;ElectronicCodebook))
-(def CBC (-&gt;CipherBlockChaining))</pre></td></tr><tr><td class="docs"><h4>name-bytes</h4>
+<h4>AESCBCPKCS7</h4>
+
+<h4>AESCBCZERO</h4>
+
+<h4>AESCBCISO10126</h4>
+
+<p>Setup the AES suites for use in testing.</p>
+</td><td class="codes"><pre class="brush: clojure">(def AESECBPKCS7 (-&gt;AESECBPKCS7))
+(def AESECBZERO (-&gt;AESECBZERO))
+(def AESECBISO10126 (-&gt;AESECBISO10126))
+(def AESCBCPKCS7 (-&gt;AESCBCPKCS7))
+(def AESCBCZERO (-&gt;AESCBCZERO))
+(def AESCBCISO10126 (-&gt;AESCBCISO10126))</pre></td></tr><tr><td class="docs"><h4>BFECBPKCS7</h4>
+
+<h4>BFECBZERO</h4>
+
+<h4>BFECBISO10126</h4>
+
+<h4>BFCBCPKCS7</h4>
+
+<h4>BFCBCZERO</h4>
+
+<h4>BFCBCISO10126</h4>
+
+<p>Setup the Blowfish suites for use in testing.</p>
+</td><td class="codes"><pre class="brush: clojure">(def BFECBPKCS7 (-&gt;BFECBPKCS7))
+(def BFECBZERO (-&gt;BFECBZERO))
+(def BFECBISO10126 (-&gt;BFECBISO10126))
+(def BFCBCPKCS7 (-&gt;BFCBCPKCS7))
+(def BFCBCZERO (-&gt;BFCBCZERO))
+(def BFCBCISO10126 (-&gt;BFCBCISO10126))</pre></td></tr><tr><td class="docs"><h4>name-bytes</h4>
 
 <p>My name as a byte array of UTF-8 bytes</p>
 </td><td class="codes"><pre class="brush: clojure">(def name-bytes (.getBytes &quot;Jason Ozias&quot; &quot;UTF-8&quot;))</pre></td></tr><tr><td class="docs"><h4>aes-ecb-pkcs7-res</h4>
 
 <p>The expected result of encrypting name-bytes
 with the AES/ECB/PKCS7 suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def aes-ecb-pkcs7-res [0x9e94c4e4 0x1336d233 0xdff541da 0xf087c9a7])</pre></td></tr><tr><td class="docs"><h4>aes-cbc-pkcs7-res</h4>
+</td><td class="codes"><pre class="brush: clojure">(def aes-ecb-pkcs7-res [0x9e94c4e4 0x1336d233 0xdff541da 0xf087c9a7])</pre></td></tr><tr><td class="docs"><h4>aes-ecb-zero-res</h4>
+
+<p>The expected result of encrypting name-bytes
+with the AES/ECB/Zeropad suite.</p>
+</td><td class="codes"><pre class="brush: clojure">(def aes-ecb-zero-res [0x007aabf0 0x7a9b9c1d 0x5d222885 0xd4b51dcc])</pre></td></tr><tr><td class="docs"><h4>aes-cbc-pkcs7-res</h4>
 
 <p>The expected result of encrypting name-bytes
 with the AES/CBC/PKCS7 suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def aes-cbc-pkcs7-res [0x184a08c1 0x04d97f63 0xd1692da5 0x01193b83])</pre></td></tr><tr><td class="docs"><h4>bf-ecb-pkcs7-res</h4>
+</td><td class="codes"><pre class="brush: clojure">(def aes-cbc-pkcs7-res [0x184a08c1 0x04d97f63 0xd1692da5 0x01193b83])</pre></td></tr><tr><td class="docs"><h4>aes-cbc-zero-res</h4>
+
+<p>The expected result of encrypting name-bytes
+with the AES/CBC/Zeropad suite.</p>
+</td><td class="codes"><pre class="brush: clojure">(def aes-cbc-zero-res [0x9d02ac5f 0xef9aae8d 0x4170955d 0xb8a83e91])</pre></td></tr><tr><td class="docs"><h4>bf-ecb-pkcs7-res</h4>
 
 <p>The expected result of encrypting name-bytes
 with the Blowfish/ECB/PKCS7 suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def bf-ecb-pkcs7-res [0x615b80bf 0xd8d093b3 0x8db20d6d 0xd1ef46c3])</pre></td></tr><tr><td class="docs"><h4>bf-cbc-pkcs7-res</h4>
+</td><td class="codes"><pre class="brush: clojure">(def bf-ecb-pkcs7-res [0x615b80bf 0xd8d093b3 0x8db20d6d 0xd1ef46c3])
+(def bf-ecb-zero-res [0x615b80bf 0xd8d093b3 0x70aa0c4d 0x9abf4d20])</pre></td></tr><tr><td class="docs"><h4>bf-cbc-pkcs7-res</h4>
 
 <p>The expected result of encrypting name-bytes
 with the Blowfish/CBC/PKCS7 suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def bf-cbc-pkcs7-res [0x47b754e6 0xddeaff3f 0x37af8d49 0xf5e0e239])</pre></td></tr><tr><td class="docs"><h3>encrypt</h3>
-
-<p>Helper function for encryption</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt [[cipher mode padding] key iv bytearr]
-  (mode/encrypt-blocks mode cipher iv (padder/pad padding bytearr cipher) key))</pre></td></tr><tr><td class="docs"><h3>decrypt</h3>
-
-<p>Helper function for decryption</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt [[cipher mode padding] key iv words]
-  (padder/unpad padding (mode/decrypt-blocks mode cipher iv words key) cipher))</pre></td></tr><tr><td class="docs"><h3>testSuites</h3>
+</td><td class="codes"><pre class="brush: clojure">(def bf-cbc-pkcs7-res [0x47b754e6 0xddeaff3f 0x37af8d49 0xf5e0e239])
+(def bf-cbc-zero-res [0x47b754e6 0xddeaff3f 0x6928b01d 0x842403d9])</pre></td></tr><tr><td class="docs"><h3>testSuites</h3>
 
 <p>Test the various cipher suites.</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest testSuites
-  (testing &quot;ECB&quot;
-    (testing &quot;PKCS7&quot;
-      (testing &quot;AES&quot;
+  (testing &quot;AES&quot;
+    (testing &quot;ECB&quot;
+      (testing &quot;PKCS7&quot;
         (is (= aes-ecb-pkcs7-res
-               (encrypt [AES ECB PKCS7] key-128 iv-128 name-bytes)))
+               (cs/encrypt AESECBPKCS7 key-128 iv-128 name-bytes)))
         (is (= &quot;Jason Ozias&quot;
-               (String. (decrypt [AES ECB PKCS7] key-128 iv-128 aes-ecb-pkcs7-res)))))
-      (testing &quot;Blowfish&quot;
-        (is (= bf-ecb-pkcs7-res
-               (encrypt [Blowfish ECB PKCS7] key-128 iv-128 name-bytes)))
+               (String. (cs/decrypt AESECBPKCS7 key-128 iv-128 aes-ecb-pkcs7-res)))))
+      (testing &quot;Zeropad&quot;
+        (is (= aes-ecb-zero-res
+               (cs/encrypt AESECBZERO key-128 iv-128 name-bytes)))
         (is (= &quot;Jason Ozias&quot;
-               (String. (decrypt [Blowfish ECB PKCS7] key-128 iv-128 bf-ecb-pkcs7-res)))))))
-  (testing &quot;CBC&quot;
-    (testing &quot;PKCS7&quot;
-      (testing &quot;AES&quot;
+               (String. (cs/decrypt AESECBZERO key-128 iv-128 aes-ecb-zero-res)))))
+      (testing &quot;ISO10126&quot;
+        (let [aes-ecb-iso10126-res (cs/encrypt AESECBISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count aes-ecb-iso10126-res)))
+          (is (= &quot;Jason Ozias&quot;
+                 (String. (cs/decrypt AESECBISO10126 key-128 iv-128 aes-ecb-iso10126-res)))))))
+    (testing &quot;CBC&quot;
+      (testing &quot;PKCS7&quot;
         (is (= aes-cbc-pkcs7-res 
-               (encrypt [AES CBC PKCS7] key-128 iv-128 name-bytes)))
+               (cs/encrypt AESCBCPKCS7 key-128 iv-128 name-bytes)))
         (is (= &quot;Jason Ozias&quot; 
-               (String. (decrypt [AES CBC PKCS7] key-128 iv-128 aes-cbc-pkcs7-res) &quot;UTF-8&quot;))))
-      (testing &quot;Blowfish&quot;
-        (is (= bf-cbc-pkcs7-res
-               (encrypt [Blowfish CBC PKCS7] key-128 iv-128 name-bytes)))
+               (String. (cs/decrypt AESCBCPKCS7 key-128 iv-128 aes-cbc-pkcs7-res) &quot;UTF-8&quot;))))
+      (testing &quot;Zeropad&quot;
+        (is (= aes-cbc-zero-res
+               (cs/encrypt AESCBCZERO key-128 iv-128 name-bytes)))
         (is (= &quot;Jason Ozias&quot;
-               (String. (decrypt [Blowfish CBC PKCS7] key-128 iv-128 bf-cbc-pkcs7-res))))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+               (String. (cs/decrypt AESCBCZERO key-128 iv-128 aes-cbc-zero-res)))))
+      (testing &quot;ISO10126&quot;
+        (let [aes-cbc-iso10126-res (cs/encrypt AESCBCISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count aes-cbc-iso10126-res)))
+          (is (= &quot;Jason Ozias&quot;
+                 (String. (cs/decrypt AESCBCISO10126 key-128 iv-128 aes-cbc-iso10126-res))))))))
+  (testing &quot;Blowfish&quot;
+    (testing &quot;ECB&quot;
+      (testing &quot;PKCS7&quot;
+        (is (= bf-ecb-pkcs7-res
+               (cs/encrypt BFECBPKCS7 key-128 iv-128 name-bytes)))
+        (is (= &quot;Jason Ozias&quot;
+               (String. (cs/decrypt BFECBPKCS7 key-128 iv-128 bf-ecb-pkcs7-res)))))
+      (testing &quot;Zeropad&quot;
+        (is (= bf-ecb-zero-res
+               (cs/encrypt BFECBZERO key-128 iv-128 name-bytes)))
+        (is (= &quot;Jason Ozias&quot;
+               (String. (cs/decrypt BFECBZERO key-128 iv-128 bf-ecb-zero-res)))))
+      (testing &quot;ISO10126&quot;
+        (let [bf-cbc-iso10126-res (cs/encrypt BFECBISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count bf-cbc-iso10126-res)))
+          (is (= &quot;Jason Ozias&quot;
+                 (String. (cs/decrypt BFECBISO10126 key-128 iv-128 bf-cbc-iso10126-res)))))))
+    (testing &quot;CBC&quot;
+      (testing &quot;PKCS7&quot;
+        (is (= bf-cbc-pkcs7-res
+               (cs/encrypt BFCBCPKCS7 key-128 iv-128 name-bytes)))
+        (is (= &quot;Jason Ozias&quot;
+               (String. (cs/decrypt BFCBCPKCS7 key-128 iv-128 bf-cbc-pkcs7-res)))))
+      (testing &quot;Zeropad&quot;
+        (is (= bf-cbc-zero-res
+               (cs/encrypt BFCBCZERO key-128 iv-128 name-bytes)))
+        (is (= &quot;Jason Ozias&quot;
+               (String. (cs/decrypt BFCBCZERO key-128 iv-128 bf-cbc-zero-res)))))
+      (testing &quot;ISO10126&quot;
+        (let [bf-cbc-iso10126-res (cs/encrypt BFCBCISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count bf-cbc-iso10126-res)))
+          (is (= &quot;Jason Ozias&quot;
+                 (String. (cs/decrypt BFCBCISO10126 key-128 iv-128 bf-cbc-iso10126-res)))))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

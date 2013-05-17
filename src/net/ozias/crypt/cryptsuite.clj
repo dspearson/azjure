@@ -76,6 +76,13 @@
   (decrypt [_ key iv words]
     (decryptor [AES ECB Zeropad] key iv words)))
 
+(defrecord AESECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES ECB ISO10126] key iv words)))
+
 (defrecord AESCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -89,6 +96,13 @@
     (encryptor [AES CBC Zeropad] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [AES CBC Zeropad] key iv words)))
+
+(defrecord AESCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES CBC ISO10126] key iv words)))
 
 (defrecord BFECBPKCS7 []
     CryptSuite
@@ -104,6 +118,13 @@
   (decrypt [_ key iv words]
     (decryptor [Blowfish ECB Zeropad] key iv words)))
 
+(defrecord BFECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish ECB ISO10126] key iv words)))
+
 (defrecord BFCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -118,3 +139,9 @@
   (decrypt [_ key iv words]
     (decryptor [Blowfish CBC Zeropad] key iv words)))
 
+(defrecord BFCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish CBC ISO10126] key iv words)))

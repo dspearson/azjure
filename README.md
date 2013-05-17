@@ -65,10 +65,10 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 1. PKCS7
 2. Zero Byte
+3. ISO 10126
 
 ## In Progress
 * CAST5 Cipher
 * PCBC Mode
 * ANSI X.923 Padding - Unpad implementation
-* ISO 10126 - Unpad implementation
 * ISO/IEC 7816-4 - Unpad implementation

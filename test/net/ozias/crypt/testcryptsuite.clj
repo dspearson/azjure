@@ -3,37 +3,50 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.testcryptsuite
   (:require [clojure.test :refer :all]
+            [net.ozias.crypt.libbyte :refer (last-byte)]
             [net.ozias.crypt.cryptsuite :as cs]
             [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->AESECBZERO)]
+            [net.ozias.crypt.cryptsuite :refer (->AESECBISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCZERO)]
+            [net.ozias.crypt.cryptsuite :refer (->AESCBCISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBZERO)]
+            [net.ozias.crypt.cryptsuite :refer (->BFECBISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCZERO)]
+            [net.ozias.crypt.cryptsuite :refer (->BFCBCISO10126)]
             [net.ozias.crypt.testivs :refer (iv-128)]
             [net.ozias.crypt.testkeys :refer (key-128)]))
 
 ;; #### AESECBPKCS7
 ;; #### AESECBZERO
+;; #### AESECBISO10126
 ;; #### AESCBCPKCS7
 ;; #### AESCBCZERO
+;; #### AESCBCISO10126
 ;; Setup the AES suites for use in testing.
 (def AESECBPKCS7 (->AESECBPKCS7))
-(def AESCBCPKCS7 (->AESCBCPKCS7))
 (def AESECBZERO (->AESECBZERO))
+(def AESECBISO10126 (->AESECBISO10126))
+(def AESCBCPKCS7 (->AESCBCPKCS7))
 (def AESCBCZERO (->AESCBCZERO))
+(def AESCBCISO10126 (->AESCBCISO10126))
 
 ;; #### BFECBPKCS7
 ;; #### BFECBZERO
+;; #### BFECBISO10126
 ;; #### BFCBCPKCS7
 ;; #### BFCBCZERO
+;; #### BFCBCISO10126
 ;; Setup the Blowfish suites for use in testing.
 (def BFECBPKCS7 (->BFECBPKCS7))
-(def BFCBCPKCS7 (->BFCBCPKCS7))
 (def BFECBZERO (->BFECBZERO))
+(def BFECBISO10126 (->BFECBISO10126))
+(def BFCBCPKCS7 (->BFCBCPKCS7))
 (def BFCBCZERO (->BFCBCZERO))
+(def BFCBCISO10126 (->BFCBCISO10126))
 
 ;; #### name-bytes
 ;; My name as a byte array of UTF-8 bytes
@@ -85,7 +98,12 @@
         (is (= aes-ecb-zero-res
                (cs/encrypt AESECBZERO key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt AESECBZERO key-128 iv-128 aes-ecb-zero-res))))))
+               (String. (cs/decrypt AESECBZERO key-128 iv-128 aes-ecb-zero-res)))))
+      (testing "ISO10126"
+        (let [aes-ecb-iso10126-res (cs/encrypt AESECBISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count aes-ecb-iso10126-res)))
+          (is (= "Jason Ozias"
+                 (String. (cs/decrypt AESECBISO10126 key-128 iv-128 aes-ecb-iso10126-res)))))))
     (testing "CBC"
       (testing "PKCS7"
         (is (= aes-cbc-pkcs7-res 
@@ -96,7 +114,12 @@
         (is (= aes-cbc-zero-res
                (cs/encrypt AESCBCZERO key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt AESCBCZERO key-128 iv-128 aes-cbc-zero-res)))))))
+               (String. (cs/decrypt AESCBCZERO key-128 iv-128 aes-cbc-zero-res)))))
+      (testing "ISO10126"
+        (let [aes-cbc-iso10126-res (cs/encrypt AESCBCISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count aes-cbc-iso10126-res)))
+          (is (= "Jason Ozias"
+                 (String. (cs/decrypt AESCBCISO10126 key-128 iv-128 aes-cbc-iso10126-res))))))))
   (testing "Blowfish"
     (testing "ECB"
       (testing "PKCS7"
@@ -107,9 +130,13 @@
       (testing "Zeropad"
         (is (= bf-ecb-zero-res
                (cs/encrypt BFECBZERO key-128 iv-128 name-bytes)))
-
         (is (= "Jason Ozias"
-               (String. (cs/decrypt BFECBZERO key-128 iv-128 bf-ecb-zero-res))))))
+               (String. (cs/decrypt BFECBZERO key-128 iv-128 bf-ecb-zero-res)))))
+      (testing "ISO10126"
+        (let [bf-cbc-iso10126-res (cs/encrypt BFECBISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count bf-cbc-iso10126-res)))
+          (is (= "Jason Ozias"
+                 (String. (cs/decrypt BFECBISO10126 key-128 iv-128 bf-cbc-iso10126-res)))))))
     (testing "CBC"
       (testing "PKCS7"
         (is (= bf-cbc-pkcs7-res
@@ -120,4 +147,9 @@
         (is (= bf-cbc-zero-res
                (cs/encrypt BFCBCZERO key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt BFCBCZERO key-128 iv-128 bf-cbc-zero-res))))))))
+               (String. (cs/decrypt BFCBCZERO key-128 iv-128 bf-cbc-zero-res)))))
+      (testing "ISO10126"
+        (let [bf-cbc-iso10126-res (cs/encrypt BFCBCISO10126 key-128 iv-128 name-bytes)]
+          (is (= 4 (count bf-cbc-iso10126-res)))
+          (is (= "Jason Ozias"
+                 (String. (cs/decrypt BFCBCISO10126 key-128 iv-128 bf-cbc-iso10126-res)))))))))
