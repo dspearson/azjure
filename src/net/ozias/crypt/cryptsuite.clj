@@ -10,7 +10,8 @@
             [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
             [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
             [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]
-            [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]))
+            [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]
+            [net.ozias.crypt.padding.x923pad :refer (->X923pad)]))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions
@@ -30,11 +31,12 @@
   (encrypt [_ key iv bytearr])
   (decrypt [_ key iv words]))
 
-;; #### PKCS7, Zeropad, ISO10126
+;; #### PKCS7, Zeropad, ISO10126, X923
 ;; Setup the padding records
 (def PKCS7 (->PKCS7pad))
 (def Zeropad (->Zeropad))
 (def ISO10126 (->ISO10126pad))
+(def X923 (->X923pad))
 
 ;; #### AES, Blowfish
 ;; Setup the ciphers
@@ -83,6 +85,13 @@
   (decrypt [_ key iv words]
     (decryptor [AES ECB ISO10126] key iv words)))
 
+(defrecord AESECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES ECB X923] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES ECB X923] key iv words)))
+
 (defrecord AESCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -103,6 +112,13 @@
     (encryptor [AES CBC ISO10126] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [AES CBC ISO10126] key iv words)))
+
+(defrecord AESCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES CBC X923] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES CBC X923] key iv words)))
 
 (defrecord BFECBPKCS7 []
     CryptSuite
@@ -125,6 +141,13 @@
   (decrypt [_ key iv words]
     (decryptor [Blowfish ECB ISO10126] key iv words)))
 
+(defrecord BFECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish ECB X923] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish ECB X923] key iv words)))
+
 (defrecord BFCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -145,3 +168,10 @@
     (encryptor [Blowfish CBC ISO10126] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [Blowfish CBC ISO10126] key iv words)))
+
+(defrecord BFCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish CBC X923] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish CBC X923] key iv words)))

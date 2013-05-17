@@ -4,7 +4,7 @@
 ;; a final byte indicating how many pad bytes were added.
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.padding.x923pad
-  (:require [net.ozias.crypt.libbyte :refer (bytes-word)]
+  (:require [net.ozias.crypt.libbyte :refer :all]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -24,6 +24,17 @@
         lz (- (count zeropad) 1)]
     (mapv #(bytes-word %) (partition bpw (assoc zeropad lz rem)))))
 
+;; ### unpad-blocks
+;; Unpad the given vector of words.
+;;
+;; Evaluates to a byte array.
+;;
+;; This is the inverse of pad-bytes.
+(defn- unpad-blocks [padded cipher]
+  (let [pl (last-byte (last padded))
+        flat (reduce into (mapv #(word-bytes %) padded))]
+    (byte-array (map byte (subvec flat 0 (- (count flat) pl))))))
+
 ;; ### X923pad
 ;; Extend the Pad protocol through the x923pad record type.
 (defrecord X923pad []
@@ -31,4 +42,4 @@
   (pad [_ unpadded cipher]
     (pad-bytes (vec unpadded) cipher))
   (unpad [_ padded cipher]
-    padded))
+    (unpad-blocks padded cipher)))
