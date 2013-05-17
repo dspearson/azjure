@@ -4,7 +4,7 @@
 ;; followed by zeros
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.padding.iso7816pad
-  (:require [net.ozias.crypt.libbyte :refer (bytes-word)]
+  (:require [net.ozias.crypt.libbyte :refer (bytes-word word-bytes)]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -23,6 +23,17 @@
         zeropad (reduce conj unpadded (take rem (cycle [0])))]
     (mapv #(bytes-word %) (partition bpw (assoc zeropad l 0x80)))))
 
+;; ### unpad-blocks
+;; Unpad the given vector of words.
+;;
+;; Evaluates to a byte array.
+;;
+;; This is the inverse of pad-bytes.
+(defn- unpad-blocks [padded cipher]
+  (let [revflat (reverse (reduce into (mapv #(word-bytes %) padded)))
+        trimmed (into [] (drop-while #(= 0 %) revflat))]
+    (byte-array (map byte (reverse (subvec trimmed 1))))))
+
 ;; ### ISO7816pad
 ;; Extend the Pad protocol through the ISO7816pad record type.
 (defrecord ISO7816pad []
@@ -30,4 +41,4 @@
   (pad [_ unpadded cipher]
     (pad-bytes (vec unpadded) cipher))
   (unpad [_ padded cipher]
-    padded))
+    (unpad-blocks padded cipher)))

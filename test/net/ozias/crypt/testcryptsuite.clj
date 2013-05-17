@@ -9,18 +9,22 @@
             [net.ozias.crypt.cryptsuite :refer (->AESECBZERO)]
             [net.ozias.crypt.cryptsuite :refer (->AESECBISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->AESECBX923)]
+            [net.ozias.crypt.cryptsuite :refer (->AESECBISO7816)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCZERO)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCX923)]
+            [net.ozias.crypt.cryptsuite :refer (->AESCBCISO7816)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBZERO)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBX923)]
+            [net.ozias.crypt.cryptsuite :refer (->BFECBISO7816)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCZERO)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCISO10126)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCX923)]
+            [net.ozias.crypt.cryptsuite :refer (->BFCBCISO7816)]
             [net.ozias.crypt.testivs :refer (iv-128)]
             [net.ozias.crypt.testkeys :refer (key-128)]))
 
@@ -28,37 +32,45 @@
 ;; #### AESECBZERO
 ;; #### AESECBISO10126
 ;; #### AESECBX923
+;; #### AESECBISO7816
 ;; #### AESCBCPKCS7
 ;; #### AESCBCZERO
 ;; #### AESCBCISO10126
 ;; #### AESCBCX923
+;; #### AESCBCISO7816
 ;; Setup the AES suites for use in testing.
 (def AESECBPKCS7 (->AESECBPKCS7))
 (def AESECBZERO (->AESECBZERO))
 (def AESECBISO10126 (->AESECBISO10126))
 (def AESECBX923 (->AESECBX923))
+(def AESECBISO7816 (->AESECBISO7816))
 (def AESCBCPKCS7 (->AESCBCPKCS7))
 (def AESCBCZERO (->AESCBCZERO))
 (def AESCBCISO10126 (->AESCBCISO10126))
 (def AESCBCX923 (->AESCBCX923))
+(def AESCBCISO7816 (->AESCBCISO7816))
 
 ;; #### BFECBPKCS7
 ;; #### BFECBZERO
 ;; #### BFECBISO10126
 ;; #### BFECBX923
+;; #### BFECBISO7816
 ;; #### BFCBCPKCS7
 ;; #### BFCBCZERO
 ;; #### BFCBCISO10126
 ;; #### BFCBCX923
+;; #### BFCBCISO7816
 ;; Setup the Blowfish suites for use in testing.
 (def BFECBPKCS7 (->BFECBPKCS7))
 (def BFECBZERO (->BFECBZERO))
 (def BFECBISO10126 (->BFECBISO10126))
 (def BFECBX923 (->BFECBX923))
+(def BFECBISO7816 (->BFECBISO7816))
 (def BFCBCPKCS7 (->BFCBCPKCS7))
 (def BFCBCZERO (->BFCBCZERO))
 (def BFCBCISO10126 (->BFCBCISO10126))
 (def BFCBCX923 (->BFCBCX923))
+(def BFCBCISO7816 (->BFCBCISO7816))
 
 ;; #### name-bytes
 ;; My name as a byte array of UTF-8 bytes
@@ -70,9 +82,11 @@
 (def aes-ecb-pkcs7-res [0x9e94c4e4 0x1336d233 0xdff541da 0xf087c9a7])
 (def aes-ecb-zero-res [0x007aabf0 0x7a9b9c1d 0x5d222885 0xd4b51dcc])
 (def aes-ecb-x923-res [0x4609ef72 0xcec01435 0x711663f8 0x1aa876ec])
+(def aes-ecb-iso7816-res [0xe9ba8e42 0xf496b5d7 0x040f3be3 0xe600380e])
 (def aes-cbc-pkcs7-res [0x184a08c1 0x04d97f63 0xd1692da5 0x01193b83])
 (def aes-cbc-zero-res [0x9d02ac5f 0xef9aae8d 0x4170955d 0xb8a83e91])
 (def aes-cbc-x923-res [0x52c34aae 0x9e4d5953 0xd0f05a65 0xafbc56e2])
+(def aes-cbc-iso7816-res [0x87fc70c4 0x143941f7 0xbdc8cc55 0x36a09c7e])
 
 ;; #### bf-X-X-res
 ;; The expected result of encrypting name-bytes
@@ -80,9 +94,11 @@
 (def bf-ecb-pkcs7-res [0x615b80bf 0xd8d093b3 0x8db20d6d 0xd1ef46c3])
 (def bf-ecb-zero-res [0x615b80bf 0xd8d093b3 0x70aa0c4d 0x9abf4d20])
 (def bf-ecb-x923-res [0x615b80bf 0xd8d093b3 0xc517e502 0xbbb74029])
+(def bf-ecb-iso7816-res [0x615b80bf 0xd8d093b3 0x7e2f9dfc 0x6d943806])
 (def bf-cbc-pkcs7-res [0x47b754e6 0xddeaff3f 0x37af8d49 0xf5e0e239])
 (def bf-cbc-zero-res [0x47b754e6 0xddeaff3f 0x6928b01d 0x842403d9])
 (def bf-cbc-x923-res [0x47b754e6 0xddeaff3f 0x16c11f09 0xa23a4d3d])
+(def bf-cbc-iso7816-res [0x47b754e6 0xddeaff3f 0xa1788ec7 0xd5f3796c])
 
 ;; ### testSuites
 ;; Test the various cipher suites.
@@ -108,7 +124,12 @@
         (is (= aes-ecb-x923-res
                (cs/encrypt AESECBX923 key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt AESECBX923 key-128 iv-128 aes-ecb-x923-res))))))
+               (String. (cs/decrypt AESECBX923 key-128 iv-128 aes-ecb-x923-res)))))
+      (testing "ISO 7816"
+        (is (= aes-ecb-iso7816-res
+               (cs/encrypt AESECBISO7816 key-128 iv-128 name-bytes)))
+        (is (= "Jason Ozias"
+               (String. (cs/decrypt AESECBISO7816 key-128 iv-128 aes-ecb-iso7816-res))))))
     (testing "CBC"
       (testing "PKCS7"
         (is (= aes-cbc-pkcs7-res 
@@ -129,7 +150,12 @@
         (is (= aes-cbc-x923-res
                (cs/encrypt AESCBCX923 key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt AESCBCX923 key-128 iv-128 aes-cbc-x923-res)))))))
+               (String. (cs/decrypt AESCBCX923 key-128 iv-128 aes-cbc-x923-res)))))
+      (testing "ISO 7816"
+        (is (= aes-cbc-iso7816-res
+               (cs/encrypt AESCBCISO7816 key-128 iv-128 name-bytes)))
+        (is (= "Jason Ozias"
+               (String. (cs/decrypt AESCBCISO7816 key-128 iv-128 aes-cbc-iso7816-res)))))))
   (testing "Blowfish"
     (testing "ECB"
       (testing "PKCS7"
@@ -151,7 +177,12 @@
         (is (= bf-ecb-x923-res
                (cs/encrypt BFECBX923 key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt BFECBX923 key-128 iv-128 bf-ecb-x923-res))))))
+               (String. (cs/decrypt BFECBX923 key-128 iv-128 bf-ecb-x923-res)))))
+      (testing "ISO 7816"
+        (is (= bf-ecb-iso7816-res
+               (cs/encrypt BFECBISO7816 key-128 iv-128 name-bytes)))
+        (is (= "Jason Ozias"
+               (String. (cs/decrypt BFECBISO7816 key-128 iv-128 bf-ecb-iso7816-res))))))
     (testing "CBC"
       (testing "PKCS7"
         (is (= bf-cbc-pkcs7-res
@@ -172,4 +203,9 @@
         (is (= bf-cbc-x923-res
                (cs/encrypt BFCBCX923 key-128 iv-128 name-bytes)))
         (is (= "Jason Ozias"
-               (String. (cs/decrypt BFCBCX923 key-128 iv-128 bf-cbc-x923-res))))))))
+               (String. (cs/decrypt BFCBCX923 key-128 iv-128 bf-cbc-x923-res)))))
+      (testing "ISO 7816"
+        (is (= bf-cbc-iso7816-res
+               (cs/encrypt BFCBCISO7816 key-128 iv-128 name-bytes)))
+        (is (= "Jason Ozias"
+               (String. (cs/decrypt BFCBCISO7816 key-128 iv-128 bf-cbc-iso7816-res))))))))

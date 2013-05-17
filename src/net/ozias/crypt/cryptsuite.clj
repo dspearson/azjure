@@ -11,7 +11,8 @@
             [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
             [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]
             [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]
-            [net.ozias.crypt.padding.x923pad :refer (->X923pad)]))
+            [net.ozias.crypt.padding.x923pad :refer (->X923pad)]
+            [net.ozias.crypt.padding.iso7816pad :refer (->ISO7816pad)]))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions
@@ -31,12 +32,13 @@
   (encrypt [_ key iv bytearr])
   (decrypt [_ key iv words]))
 
-;; #### PKCS7, Zeropad, ISO10126, X923
+;; #### PKCS7, Zeropad, ISO10126, X923, ISO7816
 ;; Setup the padding records
 (def PKCS7 (->PKCS7pad))
 (def Zeropad (->Zeropad))
 (def ISO10126 (->ISO10126pad))
 (def X923 (->X923pad))
+(def ISO7816 (->ISO7816pad))
 
 ;; #### AES, Blowfish
 ;; Setup the ciphers
@@ -64,6 +66,8 @@
 (defn- decryptor [[cipher mode padding] key iv words]
   (padder/unpad padding (mode/decrypt-blocks mode cipher iv words key) cipher))
 
+;; ### AESECBX
+;; AES cipher, Electronic Codebook Mode, various padding methods
 (defrecord AESECBPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -92,6 +96,15 @@
   (decrypt [_ key iv words]
     (decryptor [AES ECB X923] key iv words)))
 
+(defrecord AESECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES ECB ISO7816] key iv words)))
+
+;; ### AESCBCX
+;; AES cipher, Cipher-Block Chaining Mode, various padding methods
 (defrecord AESCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -120,6 +133,15 @@
   (decrypt [_ key iv words]
     (decryptor [AES CBC X923] key iv words)))
 
+(defrecord AESCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [AES CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [AES CBC ISO7816] key iv words)))
+
+;; ### BFECBX
+;; Blowfish cipher, Electronic Codebook Mode, various padding methods
 (defrecord BFECBPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -148,6 +170,15 @@
   (decrypt [_ key iv words]
     (decryptor [Blowfish ECB X923] key iv words)))
 
+(defrecord BFECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish ECB ISO7816] key iv words)))
+
+;; ### BFCBCX
+;; Blowfish cipher, Cipher-Block Chaining Mode, various padding methods
 (defrecord BFCBCPKCS7 []
     CryptSuite
   (encrypt [_ key iv bytearr]
@@ -175,3 +206,10 @@
     (encryptor [Blowfish CBC X923] key iv bytearr))
   (decrypt [_ key iv words]
     (decryptor [Blowfish CBC X923] key iv words)))
+
+(defrecord BFCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr]
+    (encryptor [Blowfish CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words]
+    (decryptor [Blowfish CBC ISO7816] key iv words)))

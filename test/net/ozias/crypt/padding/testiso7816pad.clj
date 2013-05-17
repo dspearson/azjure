@@ -58,4 +58,10 @@
       (is (= res-name (padder/pad ISO7816pad name-bytes Blowfish))))
     (testing "Twofish"
       (is (= res-128 (padder/pad ISO7816pad test-bytes Twofish)))
-      (is (= res-name (padder/pad ISO7816pad name-bytes Twofish))))))
+      (is (= res-name (padder/pad ISO7816pad name-bytes Twofish)))))
+  (testing "Unpadding"
+    (testing "AES"
+      (let [aes-unpad1 (padder/unpad ISO7816pad res-128 Aes)
+            aes-unpad2 (padder/unpad ISO7816pad res-name Aes)]
+        (is (every? true? (map = test-bytes aes-unpad1)))
+        (is (every? true? (map = name-bytes aes-unpad2)))))))
