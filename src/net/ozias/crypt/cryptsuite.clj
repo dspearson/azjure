@@ -9,7 +9,8 @@
             [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
             [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
             [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
-            [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]))
+            [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]
+            [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions
@@ -29,10 +30,11 @@
   (encrypt [_ key iv bytearr])
   (decrypt [_ key iv words]))
 
-;; #### PKCS7, Zeropad
+;; #### PKCS7, Zeropad, ISO10126
 ;; Setup the padding records
 (def PKCS7 (->PKCS7pad))
 (def Zeropad (->Zeropad))
+(def ISO10126 (->ISO10126pad))
 
 ;; #### AES, Blowfish
 ;; Setup the ciphers

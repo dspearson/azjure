@@ -64,4 +64,12 @@
              (= 14 (last-byte (last tfpad1)))))
         (is (and 
              (= 4 (count tfpad2))
-             (= 5 (last-byte (last tfpad2)))))))))
+             (= 5 (last-byte (last tfpad2))))))))
+  (testing "Unpadding"
+    (testing "AES"
+      (let [aes-pad1 (padder/pad ISO10126pad test-bytes Aes)
+            aes-pad2 (padder/pad ISO10126pad name-bytes Aes)
+            aes-unpad1 (padder/unpad ISO10126pad aes-pad1 Aes)
+            aes-unpad2 (padder/unpad ISO10126pad aes-pad2 Aes)]
+        (is (every? true? (map = test-bytes aes-unpad1)))
+        (is (every? true? (map = name-bytes aes-unpad2)))))))
