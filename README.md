@@ -56,6 +56,7 @@ descriptions
 
 1. Electronic Codebook (ECB)
 2. Cipher-Block Chaining (CBC)
+3. Propagating Cipher-Block Chaining (PCBC)
 
 ## Supported Padding
 Some block cipher modes require that the input be padded with bytes until a multiple of
@@ -71,5 +72,5 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 ## In Progress
 * CAST5 Cipher
-* PCBC Mode
+* Twofish Cipher
 * CFB Mode
