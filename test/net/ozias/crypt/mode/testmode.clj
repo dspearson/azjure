@@ -1,18 +1,19 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.testmode
   (:require [clojure.test :refer :all]
-            [net.ozias.crypt.testkeys :refer :all]
-            [net.ozias.crypt.testivs :refer :all]
-            [net.ozias.crypt.testciphertext :refer :all]
-            [net.ozias.crypt.testplaintext :refer :all]
-            [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
-            [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
-            [net.ozias.crypt.mode.pcbc :refer (->PropagatingCipherBlockChaining)]
-            [net.ozias.crypt.mode.cfb :refer (->CipherFeedback)]
-            [net.ozias.crypt.cipher.aes :refer (->Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (->Blowfish)]
-            [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]))
+            (net.ozias.crypt [testkeys :refer :all]
+                             [testivs :refer :all]
+                             [testciphertext :refer :all]
+                             [testplaintext :refer :all])
+            (net.ozias.crypt.mode [modeofoperation :as mode]
+                                  [ecb :refer (->ElectronicCodebook)]
+                                  [cbc :refer (->CipherBlockChaining)]
+                                  [pcbc :refer (->PropagatingCipherBlockChaining)]
+                                  [cfb :refer (->CipherFeedback)]
+                                  [ofb :refer (->OutputFeedback)])
+            (net.ozias.crypt.cipher [blockcipher :as bc]
+                                    [aes :refer (->Aes)]
+                                    [blowfish :refer (->Blowfish)])))
 
 ;; #### Modes
 ;; Setup the mode records for use in tests
@@ -20,6 +21,7 @@
 (def CBC (->CipherBlockChaining))
 (def PCBC (->PropagatingCipherBlockChaining))
 (def CFB (->CipherFeedback))
+(def OFB (->OutputFeedback))
 
 ;; #### Ciphers
 ;; Setup the cipher records for use in tests
@@ -37,6 +39,7 @@
    [PCBC BF  iv-128 key-128   pt-1 pcbc-bf]
    [CFB  AES iv-128 key-128   pt-1 cfb-aes]
    [CFB  BF  iv-128 key-128   pt-1 cfb-bf]
+   [OFB  AES iv-128 key-128   pt-1 ofb-aes]
    [CBC  BF  iv-64  key-128-1 pt-2 cbc-bf-1]])
 
 ;; ## encrypt-blocks

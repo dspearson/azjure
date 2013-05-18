@@ -1,20 +1,21 @@
 ;; ## Crypt Suite Protocol
 (ns ^{:author "Jason Ozias"} 
   net.ozias.crypt.cryptsuite
-  (:require [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]
-            [net.ozias.crypt.padding.pad :as padder]
-            [net.ozias.crypt.cipher.aes :refer (->Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (->Blowfish)]
-            [net.ozias.crypt.mode.ecb :refer (->ElectronicCodebook)]
-            [net.ozias.crypt.mode.cbc :refer (->CipherBlockChaining)]
-            [net.ozias.crypt.mode.pcbc :refer (->PropagatingCipherBlockChaining)]
-            [net.ozias.crypt.mode.cfb :refer (->CipherFeedback)]
-            [net.ozias.crypt.padding.pkcs7pad :refer (->PKCS7pad)]
-            [net.ozias.crypt.padding.zeropad :refer (->Zeropad)]
-            [net.ozias.crypt.padding.iso10126pad :refer (->ISO10126pad)]
-            [net.ozias.crypt.padding.x923pad :refer (->X923pad)]
-            [net.ozias.crypt.padding.iso7816pad :refer (->ISO7816pad)]))
+  (:require (net.ozias.crypt.cipher [blockcipher :as bc]
+                                    [aes :refer (->Aes)]
+                                    [blowfish :refer (->Blowfish)])
+            (net.ozias.crypt.mode [modeofoperation :as mode]
+                                  [ecb :refer (->ElectronicCodebook)]
+                                  [cbc :refer (->CipherBlockChaining)]
+                                  [pcbc :refer (->PropagatingCipherBlockChaining)]
+                                  [cfb :refer (->CipherFeedback)]
+                                  [ofb :refer (->OutputFeedback)])
+            (net.ozias.crypt.padding [pad :as padder]
+                                     [pkcs7pad :refer (->PKCS7pad)]
+                                     [zeropad :refer (->Zeropad)]
+                                     [iso10126pad :refer (->ISO10126pad)]
+                                     [x923pad :refer (->X923pad)]
+                                     [iso7816pad :refer (->ISO7816pad)])))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions
@@ -47,12 +48,13 @@
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
 
-;; #### ECB,CBC,PCBC,CFB
+;; #### ECB,CBC,PCBC,CFB,OFB
 ;; Setup the mode for use in testing
 (def ECB (->ElectronicCodebook))
 (def CBC (->CipherBlockChaining))
 (def PCBC (->PropagatingCipherBlockChaining))
 (def CFB (->CipherFeedback))
+(def OFB (->OutputFeedback))
 
 ;; ### encryptor
 ;; Helper function for encryption.  Pads the bytearr with the given padder
@@ -160,7 +162,7 @@
 
 (defrecord AESCFBZERO []
     CryptSuite
-  (encrypt [_ key iv bytearr](encryptor [AES CFB Zeropad] key iv bytearr))
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB Zeropad] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [AES CFB Zeropad] key iv words)))
 
 (defrecord AESCFBISO10126 []
@@ -177,6 +179,33 @@
     CryptSuite
   (encrypt [_ key iv bytearr] (encryptor [AES CFB ISO7816] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [AES CFB ISO7816] key iv words)))
+
+;; ### AESOFBX
+;; AES cipher, Output Feedback Mode, various padding methods
+(defrecord AESOFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB PKCS7] key iv words)))
+
+(defrecord AESOFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB Zeropad] key iv words)))
+
+(defrecord AESOFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB ISO10126] key iv words)))
+
+(defrecord AESOFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB X923] key iv words)))
+
+(defrecord AESOFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB ISO7816] key iv words)))
 
 ;; ### BFECBX
 ;; Blowfish cipher, Electronic Codebook Mode, various padding methods
@@ -285,3 +314,30 @@
     CryptSuite
   (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB ISO7816] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [Blowfish CFB ISO7816] key iv words)))
+
+;; ### BFOFBX
+;; Blowfish cipher, Output Feedback Mode, various padding methods
+(defrecord BFOFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB PKCS7] key iv words)))
+
+(defrecord BFOFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB Zeropad] key iv words)))
+
+(defrecord BFOFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB ISO10126] key iv words)))
+
+(defrecord BFOFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB X923] key iv words)))
+
+(defrecord BFOFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB ISO7816] key iv words)))

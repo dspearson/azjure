@@ -4,33 +4,46 @@
   net.ozias.crypt.testcryptsuite
   (:require [clojure.test :refer :all]
             [net.ozias.crypt.libbyte :refer (last-byte)]
-            [net.ozias.crypt.cryptsuite :as cs]
-            [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->AESECBZERO)]
-            [net.ozias.crypt.cryptsuite :refer (->AESECBISO10126)]
-            [net.ozias.crypt.cryptsuite :refer (->AESECBX923)]
-            [net.ozias.crypt.cryptsuite :refer (->AESECBISO7816)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCBCPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCBCZERO)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCBCISO10126)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCBCX923)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCBCISO7816)]
-            [net.ozias.crypt.cryptsuite :refer (->AESPCBCPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->AESCFBX923)]
-            [net.ozias.crypt.cryptsuite :refer (->BFECBPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->BFECBZERO)]
-            [net.ozias.crypt.cryptsuite :refer (->BFECBISO10126)]
-            [net.ozias.crypt.cryptsuite :refer (->BFECBX923)]
-            [net.ozias.crypt.cryptsuite :refer (->BFECBISO7816)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCBCPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCBCZERO)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCBCISO10126)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCBCX923)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCBCISO7816)]
-            [net.ozias.crypt.cryptsuite :refer (->BFPCBCPKCS7)]
-            [net.ozias.crypt.cryptsuite :refer (->BFCFBX923)]
-            [net.ozias.crypt.testivs :refer (iv-128)]
-            [net.ozias.crypt.testkeys :refer (key-128)]))
+            (net.ozias.crypt [cryptsuite :as cs]
+                             [cryptsuite :refer (->AESECBPKCS7)]
+                             [cryptsuite :refer (->AESECBZERO)]
+                             [cryptsuite :refer (->AESECBISO10126)]
+                             [cryptsuite :refer (->AESECBX923)]
+                             [cryptsuite :refer (->AESECBISO7816)]
+                             [cryptsuite :refer (->AESCBCPKCS7)]
+                             [cryptsuite :refer (->AESCBCZERO)]
+                             [cryptsuite :refer (->AESCBCISO10126)]
+                             [cryptsuite :refer (->AESCBCX923)]
+                             [cryptsuite :refer (->AESCBCISO7816)]
+                             [cryptsuite :refer (->AESPCBCPKCS7)]
+                             [cryptsuite :refer (->AESPCBCZERO)]
+                             [cryptsuite :refer (->AESPCBCISO10126)]
+                             [cryptsuite :refer (->AESPCBCX923)]
+                             [cryptsuite :refer (->AESPCBCISO7816)]
+                             [cryptsuite :refer (->AESCFBPKCS7)]
+                             [cryptsuite :refer (->AESCFBZERO)]
+                             [cryptsuite :refer (->AESCFBISO10126)]
+                             [cryptsuite :refer (->AESCFBX923)]
+                             [cryptsuite :refer (->AESCFBISO7816)]
+                             [cryptsuite :refer (->AESOFBPKCS7)]
+                             [cryptsuite :refer (->AESOFBZERO)]
+                             [cryptsuite :refer (->AESOFBISO10126)]
+                             [cryptsuite :refer (->AESOFBX923)]
+                             [cryptsuite :refer (->AESOFBISO7816)]
+                             [cryptsuite :refer (->BFECBPKCS7)]
+                             [cryptsuite :refer (->BFECBZERO)]
+                             [cryptsuite :refer (->BFECBISO10126)]
+                             [cryptsuite :refer (->BFECBX923)]
+                             [cryptsuite :refer (->BFECBISO7816)]
+                             [cryptsuite :refer (->BFCBCPKCS7)]
+                             [cryptsuite :refer (->BFCBCZERO)]
+                             [cryptsuite :refer (->BFCBCISO10126)]
+                             [cryptsuite :refer (->BFCBCX923)]
+                             [cryptsuite :refer (->BFCBCISO7816)]
+                             [cryptsuite :refer (->BFPCBCPKCS7)]
+                             [cryptsuite :refer (->BFCFBX923)])
+            (net.ozias.crypt [testivs :refer (iv-128)]
+                             [testkeys :refer (key-128)])))
 
 ;; #### AESXX
 ;; Setup the AES suites for use in testing.
@@ -45,7 +58,20 @@
 (def AESCBCX923 (->AESCBCX923))
 (def AESCBCISO7816 (->AESCBCISO7816))
 (def AESPCBCPKCS7 (->AESPCBCPKCS7))
+(def AESPCBCZERO (->AESPCBCZERO))
+(def AESPCBCISO10126 (->AESPCBCISO10126))
+(def AESPCBCX923 (->AESCBCX923))
+(def AESPCBCISO7816 (->AESPCBCISO7816))
+(def AESCFBPKCS7 (->AESCFBPKCS7))
+(def AESCFBZERO (->AESCFBZERO))
+(def AESCFBISO10126 (->AESCFBISO10126))
 (def AESCFBX923 (->AESCFBX923))
+(def AESCFBISO7816 (->AESCFBISO7816))
+(def AESOFBPKCS7 (->AESOFBPKCS7))
+(def AESOFBZERO (->AESOFBZERO))
+(def AESOFBISO10126 (->AESOFBISO10126))
+(def AESOFBX923 (->AESOFBX923))
+(def AESOFBISO7816 (->AESOFBISO7816))
 
 ;; #### BFXX
 ;; Setup the Blowfish suites for use in testing.
@@ -84,7 +110,19 @@
                           0xe209d7a1 0x8ed8ce63 0xf8675723 0xfa5ad724]]
    [AESCFBX923    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a 
                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d 
-                          0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae68]]])
+                          0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae68]]
+   [AESOFBPKCS7   phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
+                          0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
+                          0xe3f93f7e 0x5616fedd 0xd4e45260 0x44458b99]]
+   [AESOFBZERO    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
+                          0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
+                          0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f9d]]
+   [AESOFBX923    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
+                          0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
+                          0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f99]]
+   [AESOFBISO7816 phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
+                          0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
+                          0xe3f93f7e 0x5616fedd 0xd4e45260 0xc0418f9d]]])
 
 ;; #### bf-test-vectors
 ;; Test vectors for each supported Blowfish suite
