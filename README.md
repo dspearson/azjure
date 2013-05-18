@@ -58,6 +58,7 @@ descriptions
 2. Cipher-Block Chaining (CBC)
 3. Propagating Cipher-Block Chaining (PCBC)
 4. Cipher Feedback (CFB)
+5. Output Feedback (OFB)
 
 ## Supported Padding
 Some block cipher modes require that the input be padded with bytes until a multiple of
@@ -74,4 +75,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 ## In Progress
 * CAST5 Cipher
 * Twofish Cipher
-* OFB Mode
+* CTR Mode
