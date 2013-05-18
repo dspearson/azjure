@@ -3032,24 +3032,26 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   net.ozias.crypt.mode.testmode
   (:require [clojure.test :refer :all]
-            [net.ozias.crypt.testkeys :refer :all]
-            [net.ozias.crypt.testivs :refer :all]
-            [net.ozias.crypt.testciphertext :refer :all]
-            [net.ozias.crypt.testplaintext :refer :all]
-            [net.ozias.crypt.mode.ecb :refer (-&gt;ElectronicCodebook)]
-            [net.ozias.crypt.mode.cbc :refer (-&gt;CipherBlockChaining)]
-            [net.ozias.crypt.mode.pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
-            [net.ozias.crypt.mode.cfb :refer (-&gt;CipherFeedback)]
-            [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (-&gt;Blowfish)]
-            [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]))</pre></td></tr><tr><td class="docs"><h4>Modes</h4>
+            (net.ozias.crypt [testkeys :refer :all]
+                             [testivs :refer :all]
+                             [testciphertext :refer :all]
+                             [testplaintext :refer :all])
+            (net.ozias.crypt.mode [modeofoperation :as mode]
+                                  [ecb :refer (-&gt;ElectronicCodebook)]
+                                  [cbc :refer (-&gt;CipherBlockChaining)]
+                                  [pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
+                                  [cfb :refer (-&gt;CipherFeedback)]
+                                  [ofb :refer (-&gt;OutputFeedback)])
+            (net.ozias.crypt.cipher [blockcipher :as bc]
+                                    [aes :refer (-&gt;Aes)]
+                                    [blowfish :refer (-&gt;Blowfish)])))</pre></td></tr><tr><td class="docs"><h4>Modes</h4>
 
 <p>Setup the mode records for use in tests</p>
 </td><td class="codes"><pre class="brush: clojure">(def ECB (-&gt;ElectronicCodebook))
 (def CBC (-&gt;CipherBlockChaining))
 (def PCBC (-&gt;PropagatingCipherBlockChaining))
-(def CFB (-&gt;CipherFeedback))</pre></td></tr><tr><td class="docs"><h4>Ciphers</h4>
+(def CFB (-&gt;CipherFeedback))
+(def OFB (-&gt;OutputFeedback))</pre></td></tr><tr><td class="docs"><h4>Ciphers</h4>
 
 <p>Setup the cipher records for use in tests</p>
 </td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))
@@ -3065,6 +3067,7 @@ net.brehaut.ClojureTools = (function (SH) {
    [PCBC BF  iv-128 key-128   pt-1 pcbc-bf]
    [CFB  AES iv-128 key-128   pt-1 cfb-aes]
    [CFB  BF  iv-128 key-128   pt-1 cfb-bf]
+   [OFB  AES iv-128 key-128   pt-1 ofb-aes]
    [CBC  BF  iv-64  key-128-1 pt-2 cbc-bf-1]])</pre></td></tr><tr><td class="docs"><h2>encrypt-blocks</h2>
 
 <p>Encrypt a vector of blocks.</p>

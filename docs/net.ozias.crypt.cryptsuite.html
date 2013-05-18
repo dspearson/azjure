@@ -3031,19 +3031,21 @@ net.brehaut.ClojureTools = (function (SH) {
 </script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.cryptsuite" name="net.ozias.crypt.cryptsuite"><h1 class="project-name">net.ozias.crypt.cryptsuite</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Crypt Suite Protocol</h2>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;} 
   net.ozias.crypt.cryptsuite
-  (:require [net.ozias.crypt.cipher.blockcipher :as bc]
-            [net.ozias.crypt.mode.modeofoperation :as mode]
-            [net.ozias.crypt.padding.pad :as padder]
-            [net.ozias.crypt.cipher.aes :refer (-&gt;Aes)]
-            [net.ozias.crypt.cipher.blowfish :refer (-&gt;Blowfish)]
-            [net.ozias.crypt.mode.ecb :refer (-&gt;ElectronicCodebook)]
-            [net.ozias.crypt.mode.cbc :refer (-&gt;CipherBlockChaining)]
-            [net.ozias.crypt.mode.pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
-            [net.ozias.crypt.padding.pkcs7pad :refer (-&gt;PKCS7pad)]
-            [net.ozias.crypt.padding.zeropad :refer (-&gt;Zeropad)]
-            [net.ozias.crypt.padding.iso10126pad :refer (-&gt;ISO10126pad)]
-            [net.ozias.crypt.padding.x923pad :refer (-&gt;X923pad)]
-            [net.ozias.crypt.padding.iso7816pad :refer (-&gt;ISO7816pad)]))</pre></td></tr><tr><td class="docs"><h3>CipherSuite</h3>
+  (:require (net.ozias.crypt.cipher [blockcipher :as bc]
+                                    [aes :refer (-&gt;Aes)]
+                                    [blowfish :refer (-&gt;Blowfish)])
+            (net.ozias.crypt.mode [modeofoperation :as mode]
+                                  [ecb :refer (-&gt;ElectronicCodebook)]
+                                  [cbc :refer (-&gt;CipherBlockChaining)]
+                                  [pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
+                                  [cfb :refer (-&gt;CipherFeedback)]
+                                  [ofb :refer (-&gt;OutputFeedback)])
+            (net.ozias.crypt.padding [pad :as padder]
+                                     [pkcs7pad :refer (-&gt;PKCS7pad)]
+                                     [zeropad :refer (-&gt;Zeropad)]
+                                     [iso10126pad :refer (-&gt;ISO10126pad)]
+                                     [x923pad :refer (-&gt;X923pad)]
+                                     [iso7816pad :refer (-&gt;ISO7816pad)])))</pre></td></tr><tr><td class="docs"><h3>CipherSuite</h3>
 
 <p>This protocol defines two functions</p>
 
@@ -3073,12 +3075,14 @@ given words vector.</p>
 
 <p>Setup the ciphers</p>
 </td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))
-(def Blowfish (-&gt;Blowfish))</pre></td></tr><tr><td class="docs"><h4>ECB,CBC</h4>
+(def Blowfish (-&gt;Blowfish))</pre></td></tr><tr><td class="docs"><h4>ECB,CBC,PCBC,CFB,OFB</h4>
 
 <p>Setup the mode for use in testing</p>
 </td><td class="codes"><pre class="brush: clojure">(def ECB (-&gt;ElectronicCodebook))
 (def CBC (-&gt;CipherBlockChaining))
-(def PCBC (-&gt;PropagatingCipherBlockChaining))</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
+(def PCBC (-&gt;PropagatingCipherBlockChaining))
+(def CFB (-&gt;CipherFeedback))
+(def OFB (-&gt;OutputFeedback))</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
 
 <p>Helper function for encryption.  Pads the bytearr with the given padder
 and then encrypts the array with the given cipher and mode.</p>
@@ -3097,144 +3101,220 @@ the cipher and mode given.  Then unpads the result with the given padder.</p>
 <p>AES cipher, Electronic Codebook Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES ECB PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES ECB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES ECB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBZERO []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES ECB Zeropad] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES ECB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES ECB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBISO10126 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES ECB ISO10126] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES ECB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES ECB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBX923 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES ECB X923] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES ECB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES ECB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES ECB X923] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBISO7816 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES ECB ISO7816] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES ECB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESCBCX</h3>
+  (encrypt [_ key iv bytearr] (encryptor [AES ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES ECB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESCBCX</h3>
 
 <p>AES cipher, Cipher-Block Chaining Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES CBC PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES CBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES CBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCZERO []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES CBC Zeropad] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES CBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCISO10126 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES CBC ISO10126] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES CBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCX923 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES CBC X923] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES CBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [AES CBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCISO7816 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES CBC ISO7816] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES CBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESPCBCX</h3>
+  (encrypt [_ key iv bytearr] (encryptor [AES CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESPCBCX</h3>
 
 <p>AES cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [AES PCBC PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [AES PCBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFECBX</h3>
+  (encrypt [_ key iv bytearr] (encryptor [AES PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES PCBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES PCBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES PCBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES PCBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES PCBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES PCBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES PCBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES PCBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES PCBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESCFBX</h3>
+
+<p>AES cipher, Cipher Feedback Mode, various padding methods</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CFB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CFB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CFB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CFB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES CFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES CFB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>AESOFBX</h3>
+
+<p>AES cipher, Output Feedback Mode, various padding methods</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [AES OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [AES OFB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFECBX</h3>
 
 <p>Blowfish cipher, Electronic Codebook Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFECBPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish ECB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFECBZERO []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB Zeropad] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish ECB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFECBISO10126 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB ISO10126] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish ECB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFECBX923 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB X923] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish ECB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish ECB X923] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFECBISO7816 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish ECB ISO7816] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish ECB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFCBCX</h3>
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish ECB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFCBCX</h3>
 
 <p>Blowfish cipher, Cipher-Block Chaining Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish CBC PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish CBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCZERO []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish CBC Zeropad] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish CBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCISO10126 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish CBC ISO10126] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish CBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCX923 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish CBC X923] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish CBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCISO7816 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish CBC ISO7816] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish CBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFPCBCX</h3>
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFPCBCX</h3>
 
 <p>Blowfish cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCPKCS7 []
     CryptSuite
-  (encrypt [_ key iv bytearr]
-    (encryptor [Blowfish PCBC PKCS7] key iv bytearr))
-  (decrypt [_ key iv words]
-    (decryptor [Blowfish PCBC PKCS7] key iv words)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish PCBC PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish PCBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish PCBC Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish PCBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish PCBC ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish PCBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish PCBC X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish PCBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish PCBC ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFCFBX</h3>
+
+<p>Blowfish cipher, Cipher Feedback Mode, various padding methods</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CFB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CFB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CFB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CFB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish CFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish CFB ISO7816] key iv words)))</pre></td></tr><tr><td class="docs"><h3>BFOFBX</h3>
+
+<p>Blowfish cipher, Output Feedback Mode, various padding methods</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB PKCS7] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB Zeropad] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB ISO10126] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB X923] key iv words)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Blowfish OFB ISO7816] key iv words)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
