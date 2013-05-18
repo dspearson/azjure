@@ -16,6 +16,7 @@
             [net.ozias.crypt.cryptsuite :refer (->AESCBCX923)]
             [net.ozias.crypt.cryptsuite :refer (->AESCBCISO7816)]
             [net.ozias.crypt.cryptsuite :refer (->AESPCBCPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (->AESCFBX923)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBPKCS7)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBZERO)]
             [net.ozias.crypt.cryptsuite :refer (->BFECBISO10126)]
@@ -27,6 +28,7 @@
             [net.ozias.crypt.cryptsuite :refer (->BFCBCX923)]
             [net.ozias.crypt.cryptsuite :refer (->BFCBCISO7816)]
             [net.ozias.crypt.cryptsuite :refer (->BFPCBCPKCS7)]
+            [net.ozias.crypt.cryptsuite :refer (->BFCFBX923)]
             [net.ozias.crypt.testivs :refer (iv-128)]
             [net.ozias.crypt.testkeys :refer (key-128)]))
 
@@ -43,6 +45,7 @@
 (def AESCBCX923 (->AESCBCX923))
 (def AESCBCISO7816 (->AESCBCISO7816))
 (def AESPCBCPKCS7 (->AESPCBCPKCS7))
+(def AESCFBX923 (->AESCFBX923))
 
 ;; #### BFXX
 ;; Setup the Blowfish suites for use in testing.
@@ -57,6 +60,7 @@
 (def BFCBCX923 (->BFCBCX923))
 (def BFCBCISO7816 (->BFCBCISO7816))
 (def BFPCBCPKCS7 (->BFPCBCPKCS7))
+(def BFCFBX923 (->BFCFBX923))
 
 ;; #### name-bytes
 ;; My name as a byte array of UTF-8 bytes
@@ -77,7 +81,10 @@
    [AESPCBCPKCS7  myname [0x184a08c1 0x04d97f63 0xd1692da5 0x01193b83]]
    [AESECBPKCS7   phrase [0xf7021c01 0xde43c814 0x7cd2477a 0x7eba55b3 
                           0x698dc29f 0x6db0d5ed 0xa4eec682 0xb3393abb
-                          0xe209d7a1 0x8ed8ce63 0xf8675723 0xfa5ad724]]])
+                          0xe209d7a1 0x8ed8ce63 0xf8675723 0xfa5ad724]]
+   [AESCFBX923    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a 
+                          0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d 
+                          0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae68]]])
 
 ;; #### bf-test-vectors
 ;; Test vectors for each supported Blowfish suite
@@ -93,7 +100,10 @@
    [BFPCBCPKCS7  myname [0x47b754e6 0xddeaff3f 0xc8b2f7e3 0x847c38a3]]
    [BFCBCPKCS7   phrase [0xbdf91633 0xc1068045 0x4ae7d456 0xeccbc94f 
                          0xcee6b9ea 0xbf248754 0xb922030a 0xe72d5db6 
-                         0x55c680fe 0xabaae236 0x36ff9ff8 0xcf85485f]]])
+                         0x55c680fe 0xabaae236 0x36ff9ff8 0xcf85485f]]
+   [BFCFBX923    phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
+                         0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
+                         0x57dede33 0xf9b441b5 0x185cfecc 0xf740a3cf]]])
 
 (defn- encryptor [[suite pt ct]]
   (is (= ct (cs/encrypt suite key-128 iv-128 (.getBytes pt "UTF-8")))))
