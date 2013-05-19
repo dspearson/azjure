@@ -3,7 +3,7 @@
 ;; [http://tools.ietf.org/html/rfc2144](http://tools.ietf.org/html/rfc2144)
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.cast5
-  (:require [net.ozias.crypt.libbyte :refer (get-byte bytes-word)] 
+  (:require [net.ozias.crypt.libbyte :refer :all] 
             [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
 
 ;; #### s1
@@ -517,41 +517,26 @@
 (defn- >>> [word shift]
   (<<< word (minv-shift shift)))
 
-(defn- f1 [word kmi kri]
-  (let [temp (<<< (+mod32 kmi word) kri)
-        ia (get-byte 4 temp)
-        ib (get-byte 3 temp)
-        ic (get-byte 2 temp)
-        id (get-byte 1 temp)]
-    (-> (nth s1 ia)
-        (bit-xor (nth s2 ib))
-        (-mod32 (nth s3 ic))
-        (+mod32 (nth s4 id)))))
-;;    (+mod32 (-mod32 (bit-xor (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+(defn- f1 [[ia ib ic id]]
+  (-> (nth s1 ia)
+      (bit-xor (nth s2 ib))
+      (-mod32 (nth s3 ic))
+      (+mod32 (nth s4 id))))
 
-(defn- f2 [word kmi kri]
-  (let [temp (<<< (bit-xor kmi word) kri)
-        ia (get-byte 4 temp)
-        ib (get-byte 3 temp)
-        ic (get-byte 2 temp)
-        id (get-byte 1 temp)]
-    (-> (nth s1 ia)
-        (-mod32 (nth s2 ib))
-        (+mod32 (nth s3 ic))
-        (bit-xor (nth s4 id)))))
-;;    (bit-xor (+mod32 (-mod32 (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+(defn- f2 [[ia ib ic id]]
+  (-> (nth s1 ia)
+      (-mod32 (nth s2 ib))
+      (+mod32 (nth s3 ic))
+      (bit-xor (nth s4 id))))
 
-(defn- f3 [word kmi kri]
-  (let [temp (<<< (-mod32 kmi word) kri)
-        ia (get-byte 4 temp)
-        ib (get-byte 3 temp)
-        ic (get-byte 2 temp)
-        id (get-byte 1 temp)]
-    (-> (nth s1 ia)
-        (+mod32 (nth s2 ib))
-        (bit-xor (nth s3 ic))
-        (-mod32 (nth s4 id)))))
-;;    (-mod32 (bit-xor (+mod32 (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+(defn- f3 [[ia ib ic id]]
+  (-> (nth s1 ia)
+      (+mod32 (nth s2 ib))
+      (bit-xor (nth s3 ic))
+      (-mod32 (nth s4 id))))
+
+(defn- rotate [word shift]
+  (word-bytes (<<< word shift)))
 
 ;; Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
 ;; Rounds 2, 5, 8, 11, and 14 use f function Type 2.
@@ -559,15 +544,22 @@
 (defn- roundfn [word kmi kri round]
   (let [rnd (mod round 3)]
     (condp = rnd 
-      0 (f1 word kmi kri)
-      1 (f2 word kmi kri)
-      2 (f3 word kmi kri))))
+      0 (-> (+mod32 kmi word)
+            (rotate kri)
+            (f1))
+      1 (-> (bit-xor kmi word)
+            (rotate kri)
+            (f2))
+      2 (-> (-mod32 kmi word)
+            (rotate kri)
+            (f3)))))
 
-(defn- encrypt [[km kr]]
-  (fn [[l0 r0] round]
-    (let [l r0
-          r (bit-xor l0 (roundfn r0 (nth km round) (nth kr round) round))]
-      [l r])))
+(defn- cast5 [[km kr]]
+  (fn [[li ri] round]
+    [ri
+     (->> round
+          (roundfn ri (nth km round) (nth kr round))
+          (bit-xor li))]))
 
 ;; ### process-block
 ;; Process a block for encryption or decryption.
@@ -582,16 +574,16 @@
 ;; [0x238B4FE5 0x847E44B2]
 (defn- process-block [block key enc]
   (let [kb (count key)
-        rounds (if (> kb 10) 16 12)
+        rcnt (if (> kb 10) 16 12)
+        rounds (if enc (range rcnt) (range (dec rcnt) -1 -1))
         padded (reduce conj key (take (- 16 kb) (cycle [0])))
         kw (mapv #(bytes-word %) (partition 4 padded))
         ks (mgen-subkeys kw)
         km (subvec ks 0 16)
         kr (mapv (partial bit-and 0x1f) (subvec ks 16 (count ks)))]
-    (->> (range rounds)
-         (reduce #((encrypt [km kr]) %1 %2) block)
+    (->> rounds
+         (reduce #((cast5 [km kr]) %1 %2) block)
          reverse)))
-;;    (reverse (reduce #((encrypt [km kr]) %1 %2) block (range rounds)))))
 
 ;; ### CAST5
 ;; Extend the BlockCipher protocol through the CAST5 record type.
