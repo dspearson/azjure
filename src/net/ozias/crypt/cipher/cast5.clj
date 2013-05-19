@@ -561,6 +561,19 @@
           (roundfn ri (nth km round) (nth kr round))
           (bit-xor li))]))
 
+(defn- key-schedule [key]
+  (->> (cycle [0])
+       (take (- 16 (count key)))
+       (reduce conj key)
+       (partition 4)
+       (mapv #(bytes-word %))
+       (mgen-subkeys)
+       ((juxt 
+         #(subvec % 0 16) 
+         #(mapv (partial bit-and 0x1f) (subvec % 16 (count %)))))))
+
+(def mkey-schedule (memoize key-schedule))
+
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
@@ -573,16 +586,10 @@
 ;; Evaluates to a vector of two 32-bit words.
 ;; [0x238B4FE5 0x847E44B2]
 (defn- process-block [block key enc]
-  (let [kb (count key)
-        rcnt (if (> kb 10) 16 12)
-        rounds (if enc (range rcnt) (range (dec rcnt) -1 -1))
-        padded (reduce conj key (take (- 16 kb) (cycle [0])))
-        kw (mapv #(bytes-word %) (partition 4 padded))
-        ks (mgen-subkeys kw)
-        km (subvec ks 0 16)
-        kr (mapv (partial bit-and 0x1f) (subvec ks 16 (count ks)))]
-    (->> rounds
-         (reduce #((cast5 [km kr]) %1 %2) block)
+  (let [rcnt (if (> (count key) 10) 16 12)
+        ks (mkey-schedule key)]
+    (->> (if enc (range rcnt) (range (dec rcnt) -1 -1))
+         (reduce #((cast5 ks) %1 %2) block)
          reverse)))
 
 ;; ### CAST5
