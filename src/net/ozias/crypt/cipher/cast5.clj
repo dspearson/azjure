@@ -3,7 +3,7 @@
 ;; [http://tools.ietf.org/html/rfc2144](http://tools.ietf.org/html/rfc2144)
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.cast5
-  (:require [net.ozias.crypt.libbyte :refer (get-byte)] 
+  (:require [net.ozias.crypt.libbyte :refer (get-byte bytes-word)] 
             [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
 
 ;; #### s1
@@ -301,6 +301,23 @@
 (defn- +mod32 [a b]
   (mod (+ a b) 0x100000000))
 
+(defn- -mod32 [a b]
+  (mod (- a b) 0x100000000))
+
+;; ### flip
+;; get-bytes take a value from 1 to 4 with 4 representing the
+;; most significant byte and 1 representing the least.
+;;
+;; The bytes in the CAST5 spec are indexed from 0 to 3, with
+;; 0 representing the most significant byte and 3 representinng
+;; the least.
+;;
+;; This function flips the spec index into the get-bytes index.
+(defn- flip [idx]
+  (- 4 idx))
+
+(def mflip (memoize flip))
+
 ;; ### get-bytes
 ;; Takes a 32-bit word and a vector of indexes into each byte 
 ;; of the word (0 to 3).
@@ -312,7 +329,7 @@
 ;;
 ;; Evaluates to a vector of 4 bytes.
 (defn- get-bytes [kw [a b c d]]
-  [(get-byte kw a) (get-byte kw b) (get-byte kw c) (get-byte kw d)])
+  [(get-byte (mflip a) kw) (get-byte (mflip b) kw) (get-byte (mflip c) kw) (get-byte (mflip d) kw)])
 
 ;; ### xor-line
 ;; Represents the generation of one temp word from
@@ -329,7 +346,7 @@
 ;; Evaluates to a 32-bit word.
 (defn- xor-line [w1 w2 [a b c d :as order] w3 fsbox idx]
   (let [barr (get-bytes w2 order)
-        lb (get-byte w3 idx)]
+        lb (get-byte (mflip idx) w3)]
     (bit-xor 
      w1 
      (nth s5 (nth barr 0)) 
@@ -350,7 +367,7 @@
 ;; generation.  Note an index can appear more than once.
 ;;
 ;; Evaluates to a vector of 4 32-bit temporary words.
-(defn- gen-words [words [i0 i1 i2 i3 i4 i5]]
+(defn- gen-words [words [i0 i1 i2 i3 i4 i5 :as indices]]
   (let [seed (nth words i0)
         down (nth words i5)
         ow0 (xor-line (nth words i1) seed [1 3 0 2] down s7 0)
@@ -373,10 +390,10 @@
 ;; Evaluates to a 32-bit word.
 (defn- gen-subkey-word [[a b c d e] w0 w1 tail]
   (bit-xor
-   (nth s5 (get-byte w0 a))
-   (nth s6 (get-byte w0 b))
-   (nth s7 (get-byte w1 c))
-   (nth s8 (get-byte w1 d))
+   (nth s5 (get-byte (mflip a) w0))
+   (nth s6 (get-byte (mflip b) w0))
+   (nth s7 (get-byte (mflip c) w1))
+   (nth s8 (get-byte (mflip d) w1))
    (nth tail e)))
 
 ;; ### gen-tails
@@ -390,10 +407,10 @@
 ;;
 ;; Evaluates to a vector of 4 bytes.
 (defn- gen-tails [[a b c d] [w0 w1 w2 w3]]
-  [(nth s5 (get-byte w0 a))
-   (nth s6 (get-byte w1 b))
-   (nth s7 (get-byte w2 c))
-   (nth s8 (get-byte w3 d))])
+  [(nth s5 (get-byte (mflip a) w0))
+   (nth s6 (get-byte (mflip b) w1))
+   (nth s7 (get-byte (mflip c) w2))
+   (nth s8 (get-byte (mflip d) w3))])
 
 ;; ### get-tails
 ;; Get the tail bytes based on the current round of subkey
@@ -446,11 +463,11 @@
 ;; Evaluates to a vector of 8 vectors containing 4 32-bit words each.
 ;; These serve as input material for the generate-subkey function.
 (defn- expand-key [key]
-  (subvec 
-   (reduce #(conj %1 (gen-words (last %1) %2)) 
-           [key]
-           (take 8 (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]]))) 
-   1))
+  (->
+   (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
+        (take 8)
+        (reduce #(conj %1 (gen-words (last %1) %2)) [key]))
+   (subvec 1)))
 
 ;; ### generate-subkeys
 ;; Generates 32 32-bit words that make up the key schedule defined at
@@ -463,7 +480,9 @@
 ;;
 ;; Evalutates to a vector of 32 32-bit words.
 (defn- generate-subkeys [key]
-  (reduce into (mapv #(generate-subkey %1 %2) (expand-key key) (range 8))))
+  (->> (range 8)
+       (mapv #(generate-subkey %1 %2) (expand-key key))
+       (reduce into)))
 
 ;; #### mgen-subkeys
 ;; Memoization of the generate-subkeys function.  generate-subkeys is
@@ -471,19 +490,108 @@
 ;; and reused.
 (def mgen-subkeys (memoize generate-subkeys))
 
+(defn- inv-shift [shift]
+  (- 32 shift))
+
+(def minv-shift (memoize inv-shift))
+
+;; ### <<<
+;; Circular left shift
+;;
+;; Shift a 32-bit word left by <em>shift</em> bits, shifting
+;; the leftmost bits into the rightmost positions.
+;;
+;;     (<<< 0x12345678 8)
+;;
+;; evaluates to
+;;
+;; > 0x34567812
+(defn- <<< [word shift]
+  (let [sft (mod shift 32)]
+    (if (zero? sft)
+      word
+      (bit-or 
+       (bit-and (bit-shift-left word sft) 0xFFFFFFFF) 
+       (bit-shift-right word (minv-shift sft))))))
+
+(defn- >>> [word shift]
+  (<<< word (minv-shift shift)))
+
+(defn- f1 [word kmi kri]
+  (let [temp (<<< (+mod32 kmi word) kri)
+        ia (get-byte 4 temp)
+        ib (get-byte 3 temp)
+        ic (get-byte 2 temp)
+        id (get-byte 1 temp)]
+    (-> (nth s1 ia)
+        (bit-xor (nth s2 ib))
+        (-mod32 (nth s3 ic))
+        (+mod32 (nth s4 id)))))
+;;    (+mod32 (-mod32 (bit-xor (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+
+(defn- f2 [word kmi kri]
+  (let [temp (<<< (bit-xor kmi word) kri)
+        ia (get-byte 4 temp)
+        ib (get-byte 3 temp)
+        ic (get-byte 2 temp)
+        id (get-byte 1 temp)]
+    (-> (nth s1 ia)
+        (-mod32 (nth s2 ib))
+        (+mod32 (nth s3 ic))
+        (bit-xor (nth s4 id)))))
+;;    (bit-xor (+mod32 (-mod32 (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+
+(defn- f3 [word kmi kri]
+  (let [temp (<<< (-mod32 kmi word) kri)
+        ia (get-byte 4 temp)
+        ib (get-byte 3 temp)
+        ic (get-byte 2 temp)
+        id (get-byte 1 temp)]
+    (-> (nth s1 ia)
+        (+mod32 (nth s2 ib))
+        (bit-xor (nth s3 ic))
+        (-mod32 (nth s4 id)))))
+;;    (-mod32 (bit-xor (+mod32 (nth s1 ia) (nth s2 ib)) (nth s3 ic)) (nth s4 id))))
+
+;; Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
+;; Rounds 2, 5, 8, 11, and 14 use f function Type 2.
+;; Rounds 3, 6, 9, 12, and 15 use f function Type 3.
+(defn- roundfn [word kmi kri round]
+  (let [rnd (mod round 3)]
+    (condp = rnd 
+      0 (f1 word kmi kri)
+      1 (f2 word kmi kri)
+      2 (f3 word kmi kri))))
+
+(defn- encrypt [[km kr]]
+  (fn [[l0 r0] round]
+    (let [l r0
+          r (bit-xor l0 (roundfn r0 (nth km round) (nth kr round) round))]
+      [l r])))
+
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
 ;; 1. <em>block</em>: A vector of two 32-bit words representing a block.
-;; 2. <em>key</em>: A vector of bytes representing a 
-;; key of 40 to 128 bits (currently only support multiples of 8 bits).
+;; 2. <em>key</em>: A vector of byte values (0-255) representing a 
+;; key of 40 to 128 bits (only supports multiples of 8 bits).
 ;; 3. <em>enc</em>: true if you are encrypting the block, false
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
+;; [0x238B4FE5 0x847E44B2]
 (defn- process-block [block key enc]
-  (mgen-subkeys key)
-  block)
+  (let [kb (count key)
+        rounds (if (> kb 10) 16 12)
+        padded (reduce conj key (take (- 16 kb) (cycle [0])))
+        kw (mapv #(bytes-word %) (partition 4 padded))
+        ks (mgen-subkeys kw)
+        km (subvec ks 0 16)
+        kr (mapv (partial bit-and 0x1f) (subvec ks 16 (count ks)))]
+    (->> (range rounds)
+         (reduce #((encrypt [km kr]) %1 %2) block)
+         reverse)))
+;;    (reverse (reduce #((encrypt [km kr]) %1 %2) block (range rounds)))))
 
 ;; ### CAST5
 ;; Extend the BlockCipher protocol through the CAST5 record type.
