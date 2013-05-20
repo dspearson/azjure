@@ -558,7 +558,8 @@
         ks (mkey-schedule key)]
     (->> (if enc (range rcnt) (range (dec rcnt) -1 -1))
          (reduce #((cast5 ks) %1 %2) block)
-         reverse)))
+         reverse
+         (into []))))
 
 ;; ### CAST5
 ;; Extend the BlockCipher protocol through the CAST5 record type.
