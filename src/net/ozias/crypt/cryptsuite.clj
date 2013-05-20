@@ -3,7 +3,8 @@
   net.ozias.crypt.cryptsuite
   (:require (net.ozias.crypt.cipher [blockcipher :as bc]
                                     [aes :refer (->Aes)]
-                                    [blowfish :refer (->Blowfish)])
+                                    [blowfish :refer (->Blowfish)]
+                                    [cast5 :refer (->CAST5)])
             (net.ozias.crypt.mode [modeofoperation :as mode]
                                   [ecb :refer (->ElectronicCodebook)]
                                   [cbc :refer (->CipherBlockChaining)]
@@ -43,10 +44,11 @@
 (def X923 (->X923pad))
 (def ISO7816 (->ISO7816pad))
 
-;; #### AES, Blowfish
+;; #### AES, Blowfish, CAST5
 ;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
+(def CAST5 (->CAST5))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB
 ;; Setup the mode for use in testing
@@ -341,3 +343,138 @@
     CryptSuite
   (encrypt [_ key iv bytearr] (encryptor [Blowfish OFB ISO7816] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [Blowfish OFB ISO7816] key iv words)))
+
+;; ### CAST5ECBX
+;; CAST5 cipher, Electronic Codebook Mode, various padding methods
+(defrecord CAST5ECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 ECB PKCS7] key iv words)))
+
+(defrecord CAST5ECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 ECB Zeropad] key iv words)))
+
+(defrecord CAST5ECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 ECB ISO10126] key iv words)))
+
+(defrecord CAST5ECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 ECB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 ECB X923] key iv words)))
+
+(defrecord CAST5ECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 ECB ISO7816] key iv words)))
+
+;; ### CAST5CBCX
+;; CAST5 cipher, Cipher-Block Chaining Mode, various padding methods
+(defrecord CAST5CBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CBC PKCS7] key iv words)))
+
+(defrecord CAST5CBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CBC Zeropad] key iv words)))
+
+(defrecord CAST5CBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CBC ISO10126] key iv words)))
+
+(defrecord CAST5CBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CBC X923] key iv words)))
+
+(defrecord CAST5CBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CBC ISO7816] key iv words)))
+
+;; ### CAST5PCBCX
+;; CAST5 cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord CAST5PCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 PCBC PKCS7] key iv words)))
+
+(defrecord CAST5PCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 PCBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 PCBC Zeropad] key iv words)))
+
+(defrecord CAST5PCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 PCBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 PCBC ISO10126] key iv words)))
+
+(defrecord CAST5PCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 PCBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 PCBC X923] key iv words)))
+
+(defrecord CAST5PCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 PCBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 PCBC ISO7816] key iv words)))
+
+;; ### CAST5CFBX
+;; CAST5 cipher, Cipher Feedback Mode, various padding methods
+(defrecord CAST5CFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CFB PKCS7] key iv words)))
+
+(defrecord CAST5CFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CFB Zeropad] key iv words)))
+
+(defrecord CAST5CFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CFB ISO10126] key iv words)))
+
+(defrecord CAST5CFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CFB X923] key iv words)))
+
+(defrecord CAST5CFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 CFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 CFB ISO7816] key iv words)))
+
+;; ### CAST5OFBX
+;; CAST5 cipher, Output Feedback Mode, various padding methods
+(defrecord CAST5OFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 OFB PKCS7] key iv words)))
+
+(defrecord CAST5OFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 OFB Zeropad] key iv words)))
+
+(defrecord CAST5OFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 OFB ISO10126] key iv words)))
+
+(defrecord CAST5OFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 OFB X923] key iv words)))
+
+(defrecord CAST5OFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST5 OFB ISO7816] key iv words)))

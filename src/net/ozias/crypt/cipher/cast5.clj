@@ -3,7 +3,8 @@
 ;; [http://tools.ietf.org/html/rfc2144](http://tools.ietf.org/html/rfc2144)
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.cast5
-  (:require [net.ozias.crypt.libbyte :refer :all] 
+  (:require (net.ozias.crypt [libbyte :refer :all]
+                             [libcrypt :refer (+modw -modw)])
             [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
 
 ;; #### s1
@@ -294,16 +295,6 @@
    0xe97625a5 0x0614d1b7 0x0e25244b 0x0c768347 0x589e8d82 0x0d2059d1 0xa466bb1e 0xf8da0a82
    0x04f19130 0xba6e4ec0 0x99265164 0x1ee7230d 0x50b2ad80 0xeaee6801 0x8db2a283 0xea8bf59e])
 
-;; ### +mod32
-;; Add a and b  mod 2<sup>32</sup><br/>
-;; (Note that 2<sup>32</sup> is 0x100000000, not 0xFFFFFFFF as 
-;; I originally had.  Annoying bug to find.)
-(defn- +mod32 [a b]
-  (mod (+ a b) 0x100000000))
-
-(defn- -mod32 [a b]
-  (mod (- a b) 0x100000000))
-
 ;; ### flip
 ;; get-bytes take a value from 1 to 4 with 4 representing the
 ;; most significant byte and 1 representing the least.
@@ -316,6 +307,8 @@
 (defn- flip [idx]
   (- 4 idx))
 
+;; #### mflip
+;; Memoization of flip
 (def mflip (memoize flip))
 
 ;; ### get-bytes
@@ -328,8 +321,10 @@
 ;; > [0x02 0x04 0x01 0x03]
 ;;
 ;; Evaluates to a vector of 4 bytes.
-(defn- get-bytes [kw [a b c d]]
-  [(get-byte (mflip a) kw) (get-byte (mflip b) kw) (get-byte (mflip c) kw) (get-byte (mflip d) kw)])
+(defn- get-bytes [kw [a b c d :as order]]
+  (->> order
+       (mapv #(mflip %))
+       (mapv #(get-byte % kw))))
 
 ;; ### xor-line
 ;; Represents the generation of one temp word from
@@ -369,7 +364,7 @@
 ;; Evaluates to a vector of 4 32-bit temporary words.
 (defn- gen-words [words [i0 i1 i2 i3 i4 i5 :as indices]]
   (let [seed (nth words i0)
-        down (nth words i5)
+        down (nth words i5) 
         ow0 (xor-line (nth words i1) seed [1 3 0 2] down s7 0)
         ow1 (xor-line (nth words i2) ow0  [0 2 1 3] down s8 2)
         ow2 (xor-line (nth words i3) ow1  [3 2 1 0] down s5 1)
@@ -490,50 +485,23 @@
 ;; and reused.
 (def mgen-subkeys (memoize generate-subkeys))
 
-(defn- inv-shift [shift]
-  (- 32 shift))
-
-(def minv-shift (memoize inv-shift))
-
-;; ### <<<
-;; Circular left shift
-;;
-;; Shift a 32-bit word left by <em>shift</em> bits, shifting
-;; the leftmost bits into the rightmost positions.
-;;
-;;     (<<< 0x12345678 8)
-;;
-;; evaluates to
-;;
-;; > 0x34567812
-(defn- <<< [word shift]
-  (let [sft (mod shift 32)]
-    (if (zero? sft)
-      word
-      (bit-or 
-       (bit-and (bit-shift-left word sft) 0xFFFFFFFF) 
-       (bit-shift-right word (minv-shift sft))))))
-
-(defn- >>> [word shift]
-  (<<< word (minv-shift shift)))
-
 (defn- f1 [[ia ib ic id]]
   (-> (nth s1 ia)
       (bit-xor (nth s2 ib))
-      (-mod32 (nth s3 ic))
-      (+mod32 (nth s4 id))))
+      (-modw (nth s3 ic))
+      (+modw (nth s4 id))))
 
 (defn- f2 [[ia ib ic id]]
   (-> (nth s1 ia)
-      (-mod32 (nth s2 ib))
-      (+mod32 (nth s3 ic))
+      (-modw (nth s2 ib))
+      (+modw (nth s3 ic))
       (bit-xor (nth s4 id))))
 
 (defn- f3 [[ia ib ic id]]
   (-> (nth s1 ia)
-      (+mod32 (nth s2 ib))
+      (+modw (nth s2 ib))
       (bit-xor (nth s3 ic))
-      (-mod32 (nth s4 id))))
+      (-modw (nth s4 id))))
 
 (defn- rotate [word shift]
   (word-bytes (<<< word shift)))
@@ -544,13 +512,13 @@
 (defn- roundfn [word kmi kri round]
   (let [rnd (mod round 3)]
     (condp = rnd 
-      0 (-> (+mod32 kmi word)
+      0 (-> (+modw kmi word)
             (rotate kri)
             (f1))
       1 (-> (bit-xor kmi word)
             (rotate kri)
             (f2))
-      2 (-> (-mod32 kmi word)
+      2 (-> (-modw kmi word)
             (rotate kri)
             (f3)))))
 

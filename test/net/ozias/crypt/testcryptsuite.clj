@@ -53,7 +53,32 @@
                              [cryptsuite :refer (->BFOFBZERO)]
                              [cryptsuite :refer (->BFOFBISO10126)]
                              [cryptsuite :refer (->BFOFBX923)]
-                             [cryptsuite :refer (->BFOFBISO7816)])
+                             [cryptsuite :refer (->BFOFBISO7816)]
+                             [cryptsuite :refer (->CAST5ECBPKCS7)]
+                             [cryptsuite :refer (->CAST5ECBZERO)]
+                             [cryptsuite :refer (->CAST5ECBISO10126)]
+                             [cryptsuite :refer (->CAST5ECBX923)]
+                             [cryptsuite :refer (->CAST5ECBISO7816)]
+                             [cryptsuite :refer (->CAST5CBCPKCS7)]
+                             [cryptsuite :refer (->CAST5CBCZERO)]
+                             [cryptsuite :refer (->CAST5CBCISO10126)]
+                             [cryptsuite :refer (->CAST5CBCX923)]
+                             [cryptsuite :refer (->CAST5CBCISO7816)]
+                             [cryptsuite :refer (->CAST5PCBCPKCS7)]
+                             [cryptsuite :refer (->CAST5PCBCZERO)]
+                             [cryptsuite :refer (->CAST5PCBCISO10126)]
+                             [cryptsuite :refer (->CAST5PCBCX923)]
+                             [cryptsuite :refer (->CAST5PCBCISO7816)]
+                             [cryptsuite :refer (->CAST5CFBPKCS7)]
+                             [cryptsuite :refer (->CAST5CFBZERO)]
+                             [cryptsuite :refer (->CAST5CFBISO10126)]
+                             [cryptsuite :refer (->CAST5CFBX923)]
+                             [cryptsuite :refer (->CAST5CFBISO7816)]
+                             [cryptsuite :refer (->CAST5OFBPKCS7)]
+                             [cryptsuite :refer (->CAST5OFBZERO)]
+                             [cryptsuite :refer (->CAST5OFBISO10126)]
+                             [cryptsuite :refer (->CAST5OFBX923)]
+                             [cryptsuite :refer (->CAST5OFBISO7816)])
             (net.ozias.crypt [testivs :refer (iv-128)]
                              [testkeys :refer (key-128)])))
 
@@ -112,6 +137,34 @@
 (def BFOFBISO10126 (->BFOFBISO10126))
 (def BFOFBX923 (->BFOFBX923))
 (def BFOFBISO7816 (->BFOFBISO7816))
+
+;; #### CAST5XX
+;; Setup the Blowfish suites for use in testing.
+(def CAST5ECBPKCS7 (->CAST5ECBPKCS7))
+(def CAST5ECBZERO (->CAST5ECBZERO))
+(def CAST5ECBISO10126 (->CAST5ECBISO10126))
+(def CAST5ECBX923 (->CAST5ECBX923))
+(def CAST5ECBISO7816 (->CAST5ECBISO7816))
+(def CAST5CBCPKCS7 (->CAST5CBCPKCS7))
+(def CAST5CBCZERO (->CAST5CBCZERO))
+(def CAST5CBCISO10126 (->CAST5CBCISO10126))
+(def CAST5CBCX923 (->CAST5CBCX923))
+(def CAST5CBCISO7816 (->CAST5CBCISO7816))
+(def CAST5PCBCPKCS7 (->CAST5PCBCPKCS7))
+(def CAST5PCBCZERO (->CAST5PCBCZERO))
+(def CAST5PCBCISO10126 (->CAST5PCBCISO10126))
+(def CAST5PCBCX923 (->CAST5PCBCX923))
+(def CAST5PCBCISO7816 (->CAST5PCBCISO7816))
+(def CAST5CFBPKCS7 (->CAST5CFBPKCS7))
+(def CAST5CFBZERO (->CAST5CFBZERO))
+(def CAST5CFBISO10126 (->CAST5CFBISO10126))
+(def CAST5CFBX923 (->CAST5CFBX923))
+(def CAST5CFBISO7816 (->CAST5CFBISO7816))
+(def CAST5OFBPKCS7 (->CAST5OFBPKCS7))
+(def CAST5OFBZERO (->CAST5OFBZERO))
+(def CAST5OFBISO10126 (->CAST5OFBISO10126))
+(def CAST5OFBX923 (->CAST5OFBX923))
+(def CAST5OFBISO7816 (->CAST5OFBISO7816))
 
 ;; #### phrase
 ;; A phrase to test encryption/decryption
@@ -244,6 +297,70 @@
    [BFOFBISO7816  phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
                           0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
                           0x939d3bc4 0x507cc229 0x96c15780 0x7fa6a91f]]])
+;; #### cast5-test-vectors
+;; Test vectors for each supported Blowfish suite
+(def cast5-test-vectors
+  [
+   ;;[CAST5ECBPKCS7    phrase [0x5fbdd9ca 0x58380768 0x66cfa580 0xd4ad1440
+   ;;                          0x9eba3971 0xfcb104fd 0xb24c22d7 0xf8d3fc48
+   ;;                          0xc364956f 0xd12ade0e 0xb66c5ba1 0xabe5a6d3]]
+   ;;[CAST5ECBZERO     phrase [0x0f1fc868 0xf00210b4 0x66cfa580 0xd4ad1440
+   ;;                          0x9eba3971 0xfcb104fd 0xb24c22d7 0xf8d3fc48
+   ;;                          0xc364956f 0xd12ade0e 0xb66c5ba1 0xabe5a6d3]]
+   ;;[CAST5ECBX923     phrase [0x1e8a3242 0xda1b999a 0x66cfa580 0xd4ad1440
+   ;;                          0x9eba3971 0xfcb104fd 0xb24c22d7 0xf8d3fc48
+   ;;                          0xc364956f 0xd12ade0e 0xb66c5ba1 0xabe5a6d3]]
+   ;;[CAST5ECBISO7816  phrase [0x837179b8 0x638a7c47 0x66cfa580 0xd4ad1440
+   ;;                          0x9eba3971 0xfcb104fd 0xb24c22d7 0xf8d3fc48
+   ;;                          0xc364956f 0xd12ade0e 0xb66c5ba1 0xabe5a6d3]]
+   [CAST5CBCPKCS7    phrase [0xbb8aac73 0xd886e30e 0x040184e3 0xe934a334
+                             0xc76bcb85 0x6983fa15 0xbd9ae598 0x722a713b
+                             0xf03d133b 0xbecabb6b 0x7566deaf 0x36e33bad]]
+   [CAST5CBCZERO     phrase [0xbb8aac73 0xd886e30e 0x040184e3 0xe934a334
+                             0xc76bcb85 0x6983fa15 0xbd9ae598 0x722a713b
+                             0xf03d133b 0xbecabb6b 0xec7440f3 0xda23f3f4]]
+   [CAST5CBCX923     phrase [0xbb8aac73 0xd886e30e 0x040184e3 0xe934a334
+                             0xc76bcb85 0x6983fa15 0xbd9ae598 0x722a713b
+                             0xf03d133b 0xbecabb6b 0x2c4f8f5c 0x58b31381]]
+   [CAST5CBCISO7816  phrase [0xbb8aac73 0xd886e30e 0x040184e3 0xe934a334
+                             0xc76bcb85 0x6983fa15 0xbd9ae598 0x722a713b
+                             0xf03d133b 0xbecabb6b 0x240811f2 0xc53acb0f]]
+   [CAST5PCBCPKCS7   phrase [0xbb8aac73 0xd886e30e 0x385e7285 0xb9fc2b3a
+                             0x015d56fc 0x1966de97 0x6749101e 0xb2213fc9
+                             0xaa230cc8 0x75ba01c3 0x7c261560 0x775449]]
+   [CAST5PCBCZERO    phrase [0xbb8aac73 0xd886e30e 0x385e7285 0xb9fc2b3a
+                             0x015d56fc 0x1966de97 0x6749101e 0xb2213fc9
+                             0xaa230cc8 0x75ba01c3 0x9eb7ad1f 0xec133583]]
+   [CAST5PCBCX923    phrase [0xbb8aac73 0xd886e30e 0x385e7285 0xb9fc2b3a
+                             0x015d56fc 0x1966de97 0x6749101e 0xb2213fc9
+                             0xaa230cc8 0x75ba01c3 0xaa828644 0x9d39eab0]]
+   [CAST5PCBCISO7816 phrase [0xbb8aac73 0xd886e30e 0x385e7285 0xb9fc2b3a
+                             0x015d56fc 0x1966de97 0x6749101e 0xb2213fc9
+                             0xaa230cc8 0x75ba01c3 0x24c74b4d 0xf2fca16e]]
+   [CAST5CFBPKCS7    phrase [0x9c141308 0xf4a5cf0a 0x289ec2cd 0x838cb29a
+                             0xf4e61904 0xf7633176 0x877da731 0x3236305a
+                             0x8ceb192c 0xbfeae598 0x8e16755e 0x8a0c3c01]]
+   [CAST5CFBZERO     phrase [0x9c141308 0xf4a5cf0a 0x289ec2cd 0x838cb29a
+                             0xf4e61904 0xf7633176 0x877da731 0x3236305a
+                             0x8ceb192c 0xbfeae598 0x8e16755e 0x8e083805]]
+   [CAST5CFBX923     phrase [0x9c141308 0xf4a5cf0a 0x289ec2cd 0x838cb29a
+                             0xf4e61904 0xf7633176 0x877da731 0x3236305a
+                             0x8ceb192c 0xbfeae598 0x8e16755e 0x8e083801]]
+   [CAST5CFBISO7816  phrase [0x9c141308 0xf4a5cf0a 0x289ec2cd 0x838cb29a
+                             0xf4e61904 0xf7633176 0x877da731 0x3236305a
+                             0x8ceb192c 0xbfeae598 0x8e16755e 0xe083805]]
+   [CAST5OFBPKCS7    phrase [0x9c141308 0xf4a5cf0a 0xdfb7cb42 0x6526ce00
+                             0x35abc13d 0xa7381751 0x2f9908dc 0x666f7ad6
+                             0x333f3d8b 0x8fe3c2c8 0xa114e774 0x88f228ac]]
+   [CAST5OFBZERO     phrase [0x9c141308 0xf4a5cf0a 0xdfb7cb42 0x6526ce00
+                             0x35abc13d 0xa7381751 0x2f9908dc 0x666f7ad6
+                             0x333f3d8b 0x8fe3c2c8 0xa114e774 0x8cf62ca8]]
+   [CAST5OFBX923     phrase [0x9c141308 0xf4a5cf0a 0xdfb7cb42 0x6526ce00
+                             0x35abc13d 0xa7381751 0x2f9908dc 0x666f7ad6
+                             0x333f3d8b 0x8fe3c2c8 0xa114e774 0x8cf62cac]]
+   [CAST5OFBISO7816  phrase [0x9c141308 0xf4a5cf0a 0xdfb7cb42 0x6526ce00
+                             0x35abc13d 0xa7381751 0x2f9908dc 0x666f7ad6
+                             0x333f3d8b 0x8fe3c2c8 0xa114e774 0x0cf62ca8]]])
 
 ;; ### encryptor
 ;; Helper function for testing encryption
@@ -263,4 +380,7 @@
     (is (= true (every? true? (map #(decryptor %) aes-test-vectors)))))
   (testing "Blowfish"
     (is (= true (every? true? (map #(encryptor %) bf-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %) bf-test-vectors))))))
+    (is (= true (every? true? (map #(decryptor %) bf-test-vectors)))))
+  (testing "CAST5"
+    (is (= true (every? true? (map #(encryptor %) cast5-test-vectors))))
+    (is (= true (every? true? (map #(decryptor %) cast5-test-vectors))))))
