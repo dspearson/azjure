@@ -175,7 +175,7 @@
 ;; Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
 ;; Rounds 2, 5, 8, 11, and 14 use f function Type 2.
 ;; Rounds 3, 6, 9, 12, and 15 use f function Type 3.
-(defn- roundfn [word kmi kri round]
+(defn- roundfn [[word kmi kri round]]
   (let [rnd (mod round 3)]
     (condp = rnd 
       0 (-> (+modw kmi word)
@@ -188,38 +188,64 @@
             (rotate kri)
             (f3)))))
 
-(defn- gen-m [cm _]
-  (let [mm 0x6ED9EBA1]
-    (+modw cm mm)))
+(defn- gen-m [cms _]
+  (conj cms (+modw (last cms) 0x6ED9EBA1)))
 
-(defn- gen-r [cr _]
-  (let [mr 17]
-    (+mod32 cr mr)))
+(defn- gen-r [crs _]
+  (conj crs (+mod32 (last crs) 17)))
 
-;; r0 0-7
-;; r1 8-15
-;; r2 16-23
-;; r3 24-31
+(defn- kappa-word [tm tr iw]
+  (fn [words round]
+    (let [m8 (mod round 8)]
+      (->> [(last words) (nth tm round) (nth tr round) m8]
+           (roundfn)
+           (bit-xor (nth iw m8))
+           (conj words)))))
+
 (defn- kappa [tm tr]
-  (fn [[ai bi ci di ei fi gi hi :as words] round]
-    (let [_ (print (str "Kappa Round: " round ", "))
-          sidx (* round 8)
-          _ (println (str "Start Index: " sidx))
-          g (bit-xor gi (roundfn hi (nth tm sidx) (nth tr sidx) 0))
-          f (bit-xor fi (roundfn g (nth tm (+ 1 sidx)) (nth tr (+ 1 sidx)) 1))
-          e (bit-xor ei (roundfn f (nth tm (+ 2 sidx)) (nth tr (+ 2 sidx)) 2))
-          d (bit-xor di (roundfn e (nth tm (+ 3 sidx)) (nth tr (+ 3 sidx)) 0))
-          c (bit-xor ci (roundfn d (nth tm (+ 4 sidx)) (nth tr (+ 4 sidx)) 1))
-          b (bit-xor bi (roundfn c (nth tm (+ 5 sidx)) (nth tr (+ 5 sidx)) 2))
-          a (bit-xor ai (roundfn b (nth tm (+ 6 sidx)) (nth tr (+ 5 sidx)) 0))
-          h (bit-xor hi (roundfn a (nth tm (+ 7 sidx)) (nth tr (+ 7 sidx)) 1))]
-      [a b c d e f g h])))
+  (fn [wv round]
+    (let [[a b c d e f g h] (last wv)
+          lower (* round 8)
+          upper (+ 8 lower)
+          kwfn (kappa-word tm tr [g f e d c b a h])]
+      (->> (-> #(kwfn %1 %2)
+               (reduce [h] (range lower upper))
+               (subvec 1)
+               (reverse))
+           ((juxt #(into [] (rest %)) first))
+           (flatten)
+           (into [])
+           (conj wv)))))
 
+(defn- to-hex [val]
+  (Long/toHexString val))
+
+(defn- rev [xs]
+  (into [] (reverse xs)))
+
+;; ### key-schedule
+;; Generate the key schedule given the 256-bit key.
+;;
+;; 1. Generate 192 masking (t<sub>m</sub>) words to be used in the
+;; 24 rounds of kappa (8 used per round)
+;; 2. Generate 192 rotation (t<sub>r</sub>) words to be used in the
+;; 24 rounds of kappa (8 user per round)
+;; 3. Run 24 rounds of kappa.  The output of every 2nd round is used
+;; for K<sub>m</sub> and K<sub>r</sub> generation.
+;;
 (defn- key-schedule [[ai bi ci di ei fi gi hi :as words]]
-  (let [tm (reduce #(conj %1 (gen-m (last %1) %2)) [0x5A827999] (range 192))
-        tr (reduce #(conj %1 (gen-r (last %1) %2)) [19] (range 192))]
-    (take-nth 2 (subvec (reduce #(conj %1 ((kappa tm tr) (last %1) %2)) [words] (range 24)) 1))
-))
+  (let [trange (range 192)
+        tm (reduce #(gen-m %1 %2) [0x5A827999] trange)
+        tr (reduce #(gen-r %1 %2) [19] trange)
+        kappafn (kappa tm tr)]
+    (->> (range 24)
+         (reduce #(kappafn %1 %2) [words])
+         (take-nth 2)
+         (rest)
+         (reduce into)
+         ((juxt 
+           #(reduce into (mapv (partial rev) (partition 4 (take-nth 2 (rest %)))))
+           #(mapv (partial bit-and 0x1f) (take-nth 2 %)))))))
 
 ;; ### expand-key
 ;; Expands the key to 256-bits if needed and
@@ -238,6 +264,42 @@
 
 (def mkey-schedule (memoize key-schedule))
 
+(defn- q [[km kr]]
+  (fn [[ai bi ci di] round]
+    (let [sidx (* 4 round)
+          c (bit-xor ci (roundfn [di (nth km sidx) (nth kr sidx) 0]))
+          b (bit-xor bi (roundfn [c (nth km (+ 1 sidx)) (nth kr (+ 1 sidx)) 1]))
+          a (bit-xor ai (roundfn [b (nth km (+ 2 sidx)) (nth kr (+ 2 sidx)) 2]))
+          d (bit-xor di (roundfn [a (nth km (+ 3 sidx)) (nth kr (+ 3 sidx)) 0]))]
+      [a b c d])))
+
+(defn- qbar [[km kr]]
+  (fn [[ai bi ci di] round]
+    (let [sidx (* 4 round)
+          d (bit-xor di (roundfn [ai (nth km (+ 3 sidx)) (nth kr (+ 3 sidx)) 0]))
+          a (bit-xor ai (roundfn [bi (nth km (+ 2 sidx)) (nth kr (+ 2 sidx)) 2]))
+          b (bit-xor bi (roundfn [ci (nth km (+ 1 sidx)) (nth kr (+ 1 sidx)) 1]))
+          c (bit-xor ci (roundfn [d (nth km sidx) (nth kr sidx) 0]))]
+    [a b c d])))
+
+(defn- cast6 [[km kr :as ks]]
+  (fn [[a b c d :as words] round]
+    (let [qfn (q ks)
+          qbarfn (qbar ks)]
+      (if (< round 6)
+        (qfn words round)
+        (qbarfn words round)))))
+
+(defn- flip-chunks [xs]
+  (->> (partition 4 xs)
+       (reverse)
+       (flatten)
+       (vec)))
+
+(defn- flip-key-schedule [ks]
+  ((juxt #(flip-chunks (first %))
+         #(flip-chunks (last %))) ks))
+
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
@@ -249,13 +311,11 @@
 ;;
 ;; Evaluates to a vector of four 32-bit words.
 (defn- process-block [block key enc]
-  (let [ks (mkey-schedule key)
-        _ (println (mapv #(Long/toHexString %) ks))]
-    ;;(->> (if enc (range 12) (range 11 -1 -1))
-    ;;     (reduce #((cast5 ks) %1 %2) block)
-    ;;     reverse
-    ; ;    (into []))
-    block))
+  (let [ks (mkey-schedule (expand-key key))
+        keys (if enc ks (flip-key-schedule ks))
+        castfn (cast6 keys)]
+    (->> (range 12)
+         (reduce #(castfn %1 %2) block))))
 
 ;; ### CAST6
 ;; Extend the BlockCipher protocol through the CAST6 record type.
