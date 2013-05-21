@@ -13,12 +13,20 @@
 ;; Memoization of words-per-block
 (def mwpb (memoize words-per-block))
 
+;; ### +mod32
+;; Add a and b mod 32
+(defn +mod32 [a b]
+  (-> (+ a b)
+      (mod 32)))
+
 ;; ### +modw
 ;; Add a and b mod 2<sup>32</sup>
 (defn +modw [a b]
-  (mod (+ a b) 0x100000000))
+  (-> (+ a b)
+      (mod 0x100000000)))
 
 ;; ### -modw
-;; Add a and b mod 2<sup>32</sup>
+;; Subtract a and b mod 2<sup>32</sup>
 (defn -modw [a b]
-  (mod (- a b) 0x100000000))
+  (-> (- a b)
+      (mod 0x100000000)))

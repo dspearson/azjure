@@ -74,5 +74,6 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 5. ISO/IEC 7816-4
 
 ## In Progress
+* CAST6 Cipher
 * Twofish Cipher
 * CTR Mode
