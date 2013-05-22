@@ -47,7 +47,8 @@ See [testcryptsuite.clj](https://github.com/CraZySacX/azjure/blob/master/test/ne
 ## Supported Block Ciphers
 1. Advanced Encryption Standard (AES) - [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
 2. Blowfish (BF) - [Blowfish Spec](https://www.schneier.com/paper-blowfish-fse.html)
-3. CAST-128 (CAST5) - [CAST-128 Spec](http://tools.ietf.org/html/rfc2144)
+3. CAST-128 (CAST5) - [CAST-128 RFC](http://tools.ietf.org/html/rfc2144)
+4. CAST-256 (CAST6) - [CAST-256 RFC](http://tools.ietf.org/html/rfc2612)
 
 ## Supported Modes
 Blocks cipher modes describe the method for encrypting multiple blocks.
@@ -74,6 +75,6 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 5. ISO/IEC 7816-4
 
 ## In Progress
-* CAST6 Cipher
+* Camellia
 * Twofish Cipher
 * CTR Mode
