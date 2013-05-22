@@ -1,6 +1,6 @@
 ;; ## CAST6 Cipher
 ;; Designed to meet the spec at
-;; [http://tools.ietf.org/html/rfc2612](http://tools.ietf.org/html/rfc2612)
+;; [RFC2612](http://tools.ietf.org/html/rfc2612)
 (ns ^{:author "Jason Ozias"}
     net.ozias.crypt.cipher.cast6
     (:require (net.ozias.crypt [libbyte :refer :all]
@@ -151,30 +151,50 @@
    0x8644213e 0xb7dc59d0 0x7965291f 0xccd6fd43 0x41823979 0x932bcdf6 0xb657c34d 0x4edfd282
    0x7ae5290c 0x3cb9536b 0x851e20fe 0x9833557e 0x13ecf0b0 0xd3ffb372 0x3f85c5c1 0x0aef7ed2])
 
+;; ### f1
+;; The Type 1 function as defined at
+;; [RFC2612 Section-2.1](http://tools.ietf.org/html/rfc2612#section-2.1)
+;;
+;; Evaluates to a 32-bit word
 (defn- f1 [[ia ib ic id]]
   (-> (nth s1 ia)
       (bit-xor (nth s2 ib))
       (-modw (nth s3 ic))
       (+modw (nth s4 id))))
 
+;; ### f2
+;; The Type 2 function as defined at
+;; [RFC2612 Section-2.1](http://tools.ietf.org/html/rfc2612#section-2.1)
+;;
+;; Evaluates to a 32-bit word
 (defn- f2 [[ia ib ic id]]
   (-> (nth s1 ia)
       (-modw (nth s2 ib))
       (+modw (nth s3 ic))
       (bit-xor (nth s4 id))))
 
+;; ### f3
+;; The Type 3 function as defined at
+;; [RFC2612 Section-2.1](http://tools.ietf.org/html/rfc2612#section-2.1)
+;;
+;; Evaluates to a 32-bit word
 (defn- f3 [[ia ib ic id]]
   (-> (nth s1 ia)
       (+modw (nth s2 ib))
       (bit-xor (nth s3 ic))
       (-modw (nth s4 id))))
 
+;; ### rotate
+;; Circular rotate a word left by <em>shift</em> bits
+;;
+;; Evaluates to a 32-bit word
 (defn- rotate [word shift]
   (word-bytes (<<< word shift)))
 
-;; Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
-;; Rounds 2, 5, 8, 11, and 14 use f function Type 2.
-;; Rounds 3, 6, 9, 12, and 15 use f function Type 3.
+;; ### roundfn
+;; Apply f1, f2, or f3 depending on the given round
+;;
+;; Evaluates to a 32-bit word
 (defn- roundfn [[word kmi kri round]]
   (let [rnd (mod round 3)]
     (condp = rnd 
@@ -188,12 +208,34 @@
             (rotate kri)
             (f3)))))
 
+;; ### gen-m
+;; Generate a T<sub>m</sub> word and
+;; conj it to the end of the T<sub>m</sub>
+;; vector
+;;
+;; Evaluates to a vector of words with the
+;; last calculated T<sub>m</sub> value
+;; conj'd
 (defn- gen-m [cms _]
   (conj cms (+modw (last cms) 0x6ED9EBA1)))
 
+;; ### gen-r
+;; Generate a T<sub>r</sub> word and
+;; conj it to the end of the T<sub>r</sub>
+;; vector
+;;
+;; Evaluates to a vector of words with the
+;; last calculated T<sub>r</sub> value
+;; conj'd
 (defn- gen-r [crs _]
   (conj crs (+mod32 (last crs) 17)))
 
+;; ### kappa-word
+;; Generetes one kappa-word as defined at
+;; [RFC2612 Section 2.2](http://tools.ietf.org/html/rfc2612#section-2.2)
+;;
+;; Evaluates to a vector of 32-bit words
+;; with the last calculated kappa word conj'd
 (defn- kappa-word [tm tr iw]
   (fn [words round]
     (let [m8 (mod round 8)]
@@ -202,6 +244,11 @@
            (bit-xor (nth iw m8))
            (conj words)))))
 
+;; ### kappa
+;; The kappa algorithm as defined at
+;; [RFC2612 Section 2.2](http://tools.ietf.org/html/rfc2612#section-2.2)
+;;
+;; Evaluates to a vector of 8 32-bit words.
 (defn- kappa [tm tr]
   (fn [wv round]
     (let [[a b c d e f g h] (last wv)
@@ -211,24 +258,24 @@
       (->> (-> #(kwfn %1 %2)
                (reduce [h] (range lower upper))
                (subvec 1)
-               (reverse))
-           ((juxt #(into [] (rest %)) first))
+               (rseq))
+           ((juxt #(vec (rest %)) first))
            (flatten)
-           (into [])
+           (vec)
            (conj wv)))))
 
-(defn- to-hex [val]
-  (Long/toHexString val))
-
+;; ### rev
+;; Reverse a sequence and put into a vector
 (defn- rev [xs]
-  (into [] (reverse xs)))
+  (vec (reverse xs)))
 
 ;; ### key-schedule
-;; Generate the key schedule given the 256-bit key.
+;; Generate the key schedule given the 256-bit key as defined at
+;; [RFC 2612 Section 2.4](http://tools.ietf.org/html/rfc2612#section-2.4)
 ;;
-;; 1. Generate 192 masking (t<sub>m</sub>) words to be used in the
+;; 1. Generate 192 masking (T<sub>m</sub>) words to be used in the
 ;; 24 rounds of kappa (8 used per round)
-;; 2. Generate 192 rotation (t<sub>r</sub>) words to be used in the
+;; 2. Generate 192 rotation (T<sub>r</sub>) words to be used in the
 ;; 24 rounds of kappa (8 user per round)
 ;; 3. Run 24 rounds of kappa.  The output of every 2nd round is used
 ;; for K<sub>m</sub> and K<sub>r</sub> generation.
@@ -247,6 +294,10 @@
            #(reduce into (mapv (partial rev) (partition 4 (take-nth 2 (rest %)))))
            #(mapv (partial bit-and 0x1f) (take-nth 2 %)))))))
 
+;; ### mkey-schedule
+;; Memoization of key-schedule
+(def mkey-schedule (memoize key-schedule))
+
 ;; ### expand-key
 ;; Expands the key to 256-bits if needed and
 ;; converts to a vector of 32-bit words.
@@ -262,40 +313,105 @@
          (partition 4)
          (mapv #(bytes-word %)))))
 
-(def mkey-schedule (memoize key-schedule))
+;; ### q-word
+;; Generates one q word
+;;
+;; Evaluates to a vector of 32-bit words
+;; with the last calculated q word conj'd
+(defn- q-word [km kr iw]
+  (fn [words round]
+    (let [m4 (mod round 4)]
+      (->> [(last words) (nth km round) (nth kr round) m4]
+           (roundfn)
+           (bit-xor (nth iw m4))
+           (conj words)))))
 
+;; ### q
+;; Evaluates to a function over the given K<sub>m</sub> and K<sub>r</sub>
+;; key schedule vectors.  This is defined at
+;; [RFC2612 Section-2.2](http://tools.ietf.org/html/rfc2612#section-2.2)
+;; as the "forward quad-round"
+;;
+;; Evaluates to a vector of 4 32-bit words
 (defn- q [[km kr]]
-  (fn [[ai bi ci di] round]
-    (let [sidx (* 4 round)
-          c (bit-xor ci (roundfn [di (nth km sidx) (nth kr sidx) 0]))
-          b (bit-xor bi (roundfn [c (nth km (+ 1 sidx)) (nth kr (+ 1 sidx)) 1]))
-          a (bit-xor ai (roundfn [b (nth km (+ 2 sidx)) (nth kr (+ 2 sidx)) 2]))
-          d (bit-xor di (roundfn [a (nth km (+ 3 sidx)) (nth kr (+ 3 sidx)) 0]))]
-      [a b c d])))
+  (fn [[a b c d] round]
+    (let [lower (* round 4)
+          qwfn (q-word km kr [c b a d])]
+      (->> (-> #(qwfn %1 %2)
+               (reduce [d] (range lower (+ 4 lower)))
+               (subvec 1)
+               (rseq)) 
+           ((juxt #(vec (rest %)) first))
+           (flatten)
+           (vec)))))
 
+;; ### qbar-word
+;; Generates one qbar word
+;;
+;; Evaluates to a vector of 32-bit words
+;; with the last calculated qbar word conj'd
+(defn- qbar-word [km kr iw ow]
+  (fn [words round]
+    (let [m4 (mod round 4)]
+      (->> [(if (zero? m4) (first words) (nth ow m4)) 
+            (nth km round) (nth kr round) m4]
+           (roundfn)
+           (bit-xor (nth iw m4))
+           (conj words)))))
+
+;; ### qbar
+;; Evaluates to a function over the given K<sub>m</sub> and K<sub>r</sub>
+;; key schedule vectors.  This is defined at
+;; [RFC 2612 Section-2.2](http://tools.ietf.org/html/rfc2612#section-2.2)
+;; as the "reverse quad-round"
+;;
+;; Evaluates to a vector of 4 32-bit words.
 (defn- qbar [[km kr]]
-  (fn [[ai bi ci di] round]
-    (let [sidx (* 4 round)
-          d (bit-xor di (roundfn [ai (nth km (+ 3 sidx)) (nth kr (+ 3 sidx)) 0]))
-          a (bit-xor ai (roundfn [bi (nth km (+ 2 sidx)) (nth kr (+ 2 sidx)) 2]))
-          b (bit-xor bi (roundfn [ci (nth km (+ 1 sidx)) (nth kr (+ 1 sidx)) 1]))
-          c (bit-xor ci (roundfn [d (nth km sidx) (nth kr sidx) 0]))]
-    [a b c d])))
+  (fn [[a b c d] round]
+    (let [lower (* 4 round)
+          upper (+ 4 lower)
+          qbwfn (qbar-word km kr [c b a d] [0 c b a])]
+      (->> (range (dec upper) (dec lower) -1)
+           (reduce #(qbwfn %1 %2) [])
+           ((juxt #(vec (rest %)) first))
+           (flatten)
+           (vec)))))
 
+;; ### cast6
+;; The CAST6 algorithm.  For rounds 0-5, the q
+;; function is used to encrypt the block.  For
+;; rounds 6-11, the qbar function is used to
+;; encrypt the block.  Defined at
+;; [RFC2612 Section 2.3](http://tools.ietf.org/html/rfc2612#section-2.3)
+;;
+;; Evaluates to a vector of 4 32-bit words
+;; representing the encrypted/decrypted values.
 (defn- cast6 [[km kr :as ks]]
-  (fn [[a b c d :as words] round]
+  (fn [words round]
     (let [qfn (q ks)
           qbarfn (qbar ks)]
       (if (< round 6)
         (qfn words round)
         (qbarfn words round)))))
 
+;; ### flip-chunks
+;; Splits the given keys in to partitions of 4,
+;; reverses them, flattens the results and
+;; converts back to a vector.
+;;
+;; Evaluates to a vector
 (defn- flip-chunks [xs]
   (->> (partition 4 xs)
        (reverse)
        (flatten)
        (vec)))
 
+;; ### flip-key-schedule
+;; Used to flip the key schedule when decrypting
+;;
+;; Evaluates to a vector of vectors representing
+;; the flipped K<sub>m</sub> and K<sub>r</sub>
+;; vectors to be used during decryption.
 (defn- flip-key-schedule [ks]
   ((juxt #(flip-chunks (first %))
          #(flip-chunks (last %))) ks))
@@ -310,8 +426,6 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.
-;;
-;; Test key [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c 0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d]
 (defn- process-block [block key enc]
   (let [ks (mkey-schedule (expand-key key))
         keys (if enc ks (flip-key-schedule ks))

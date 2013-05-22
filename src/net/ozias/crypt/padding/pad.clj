@@ -15,7 +15,9 @@
 ;;
 ;; evaluates to 4.
 (defn remaining [cnt multiple]
-  (- multiple (rem cnt multiple)))
+  (if (zero? (mod cnt multiple))
+    0
+    (- multiple (mod cnt multiple))))
 
 ;; ### Pad
 ;; This protocol defines two function

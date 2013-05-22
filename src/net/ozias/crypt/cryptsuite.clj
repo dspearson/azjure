@@ -4,7 +4,8 @@
   (:require (net.ozias.crypt.cipher [blockcipher :as bc]
                                     [aes :refer (->Aes)]
                                     [blowfish :refer (->Blowfish)]
-                                    [cast5 :refer (->CAST5)])
+                                    [cast5 :refer (->CAST5)]
+                                    [cast6 :refer (->CAST6)])
             (net.ozias.crypt.mode [modeofoperation :as mode]
                                   [ecb :refer (->ElectronicCodebook)]
                                   [cbc :refer (->CipherBlockChaining)]
@@ -44,11 +45,12 @@
 (def X923 (->X923pad))
 (def ISO7816 (->ISO7816pad))
 
-;; #### AES, Blowfish, CAST5
+;; #### AES, Blowfish, CAST5, CAST6
 ;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
 (def CAST5 (->CAST5))
+(def CAST6 (->CAST6))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB
 ;; Setup the mode for use in testing
@@ -478,3 +480,138 @@
     CryptSuite
   (encrypt [_ key iv bytearr] (encryptor [CAST5 OFB ISO7816] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [CAST5 OFB ISO7816] key iv words)))
+
+;; ### CAST6ECBX
+;; CAST6 cipher, Electronic Codebook Mode, various padding methods
+(defrecord CAST6ECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 ECB PKCS7] key iv words)))
+
+(defrecord CAST6ECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 ECB Zeropad] key iv words)))
+
+(defrecord CAST6ECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 ECB ISO10126] key iv words)))
+
+(defrecord CAST6ECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 ECB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 ECB X923] key iv words)))
+
+(defrecord CAST6ECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 ECB ISO7816] key iv words)))
+
+;; ### CAST6CBCX
+;; CAST6 cipher, Cipher-Block Chaining Mode, various padding methods
+(defrecord CAST6CBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CBC PKCS7] key iv words)))
+
+(defrecord CAST6CBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CBC Zeropad] key iv words)))
+
+(defrecord CAST6CBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CBC ISO10126] key iv words)))
+
+(defrecord CAST6CBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CBC X923] key iv words)))
+
+(defrecord CAST6CBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CBC ISO7816] key iv words)))
+
+;; ### CAST6PCBCX
+;; CAST6 cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord CAST6PCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 PCBC PKCS7] key iv words)))
+
+(defrecord CAST6PCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 PCBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 PCBC Zeropad] key iv words)))
+
+(defrecord CAST6PCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 PCBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 PCBC ISO10126] key iv words)))
+
+(defrecord CAST6PCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 PCBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 PCBC X923] key iv words)))
+
+(defrecord CAST6PCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 PCBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 PCBC ISO7816] key iv words)))
+
+;; ### CAST6CFBX
+;; CAST6 cipher, Cipher Feedback Mode, various padding methods
+(defrecord CAST6CFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CFB PKCS7] key iv words)))
+
+(defrecord CAST6CFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CFB Zeropad] key iv words)))
+
+(defrecord CAST6CFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CFB ISO10126] key iv words)))
+
+(defrecord CAST6CFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CFB X923] key iv words)))
+
+(defrecord CAST6CFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 CFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 CFB ISO7816] key iv words)))
+
+;; ### CAST6OFBX
+;; CAST6 cipher, Output Feedback Mode, various padding methods
+(defrecord CAST6OFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 OFB PKCS7] key iv words)))
+
+(defrecord CAST6OFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 OFB Zeropad] key iv words)))
+
+(defrecord CAST6OFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 OFB ISO10126] key iv words)))
+
+(defrecord CAST6OFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 OFB X923] key iv words)))
+
+(defrecord CAST6OFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [CAST6 OFB ISO7816] key iv words)))

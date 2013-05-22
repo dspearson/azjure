@@ -3109,7 +3109,32 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;CAST5OFBZERO)]
                              [cryptsuite :refer (-&gt;CAST5OFBISO10126)]
                              [cryptsuite :refer (-&gt;CAST5OFBX923)]
-                             [cryptsuite :refer (-&gt;CAST5OFBISO7816)])
+                             [cryptsuite :refer (-&gt;CAST5OFBISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6ECBPKCS7)]
+                             [cryptsuite :refer (-&gt;CAST6ECBZERO)]
+                             [cryptsuite :refer (-&gt;CAST6ECBISO10126)]
+                             [cryptsuite :refer (-&gt;CAST6ECBX923)]
+                             [cryptsuite :refer (-&gt;CAST6ECBISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6CBCPKCS7)]
+                             [cryptsuite :refer (-&gt;CAST6CBCZERO)]
+                             [cryptsuite :refer (-&gt;CAST6CBCISO10126)]
+                             [cryptsuite :refer (-&gt;CAST6CBCX923)]
+                             [cryptsuite :refer (-&gt;CAST6CBCISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6PCBCPKCS7)]
+                             [cryptsuite :refer (-&gt;CAST6PCBCZERO)]
+                             [cryptsuite :refer (-&gt;CAST6PCBCISO10126)]
+                             [cryptsuite :refer (-&gt;CAST6PCBCX923)]
+                             [cryptsuite :refer (-&gt;CAST6PCBCISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6CFBPKCS7)]
+                             [cryptsuite :refer (-&gt;CAST6CFBZERO)]
+                             [cryptsuite :refer (-&gt;CAST6CFBISO10126)]
+                             [cryptsuite :refer (-&gt;CAST6CFBX923)]
+                             [cryptsuite :refer (-&gt;CAST6CFBISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6OFBPKCS7)]
+                             [cryptsuite :refer (-&gt;CAST6OFBZERO)]
+                             [cryptsuite :refer (-&gt;CAST6OFBISO10126)]
+                             [cryptsuite :refer (-&gt;CAST6OFBX923)]
+                             [cryptsuite :refer (-&gt;CAST6OFBISO7816)])
             (net.ozias.crypt [testivs :refer (iv-128)]
                              [testkeys :refer (key-128 key-128b)])))</pre></td></tr><tr><td class="docs"><h4>AESXX</h4>
 
@@ -3192,7 +3217,34 @@ net.brehaut.ClojureTools = (function (SH) {
 (def CAST5OFBZERO (-&gt;CAST5OFBZERO))
 (def CAST5OFBISO10126 (-&gt;CAST5OFBISO10126))
 (def CAST5OFBX923 (-&gt;CAST5OFBX923))
-(def CAST5OFBISO7816 (-&gt;CAST5OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
+(def CAST5OFBISO7816 (-&gt;CAST5OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>CAST6XX</h4>
+
+<p>Setup the Blowfish suites for use in testing.</p>
+</td><td class="codes"><pre class="brush: clojure">(def CAST6ECBPKCS7 (-&gt;CAST6ECBPKCS7))
+(def CAST6ECBZERO (-&gt;CAST6ECBZERO))
+(def CAST6ECBISO10126 (-&gt;CAST6ECBISO10126))
+(def CAST6ECBX923 (-&gt;CAST6ECBX923))
+(def CAST6ECBISO7816 (-&gt;CAST6ECBISO7816))
+(def CAST6CBCPKCS7 (-&gt;CAST6CBCPKCS7))
+(def CAST6CBCZERO (-&gt;CAST6CBCZERO))
+(def CAST6CBCISO10126 (-&gt;CAST6CBCISO10126))
+(def CAST6CBCX923 (-&gt;CAST6CBCX923))
+(def CAST6CBCISO7816 (-&gt;CAST6CBCISO7816))
+(def CAST6PCBCPKCS7 (-&gt;CAST6PCBCPKCS7))
+(def CAST6PCBCZERO (-&gt;CAST6PCBCZERO))
+(def CAST6PCBCISO10126 (-&gt;CAST6PCBCISO10126))
+(def CAST6PCBCX923 (-&gt;CAST6PCBCX923))
+(def CAST6PCBCISO7816 (-&gt;CAST6PCBCISO7816))
+(def CAST6CFBPKCS7 (-&gt;CAST6CFBPKCS7))
+(def CAST6CFBZERO (-&gt;CAST6CFBZERO))
+(def CAST6CFBISO10126 (-&gt;CAST6CFBISO10126))
+(def CAST6CFBX923 (-&gt;CAST6CFBX923))
+(def CAST6CFBISO7816 (-&gt;CAST6CFBISO7816))
+(def CAST6OFBPKCS7 (-&gt;CAST6OFBPKCS7))
+(def CAST6OFBZERO (-&gt;CAST6OFBZERO))
+(def CAST6OFBISO10126 (-&gt;CAST6OFBISO10126))
+(def CAST6OFBX923 (-&gt;CAST6OFBX923))
+(def CAST6OFBISO7816 (-&gt;CAST6OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
 
 <p>A phrase to test encryption/decryption</p>
 </td><td class="codes"><pre class="brush: clojure">(def phrase &quot;The quick brown fox jumps over the lazy dog.&quot;)</pre></td></tr><tr><td class="docs"><h4>aes-test-vectors</h4>
@@ -3323,7 +3375,7 @@ net.brehaut.ClojureTools = (function (SH) {
                           0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
                           0x939d3bc4 0x507cc229 0x96c15780 0x7fa6a91f]]])</pre></td></tr><tr><td class="docs"><h4>cast5-test-vectors</h4>
 
-<p>Test vectors for each supported Blowfish suite</p>
+<p>Test vectors for each supported CAST5 suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def cast5-test-vectors
   [[CAST5ECBPKCS7    phrase [0x34e1b3fc 0x0d72f1d8 0x5d837126 0x6e69cc65
                              0x77222960 0x6685b5d2 0x03822655 0xfffd9170
@@ -3356,8 +3408,8 @@ net.brehaut.ClojureTools = (function (SH) {
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xcb2d2cf9 0x21ec8f86]]
    [CAST5PCBCX923    phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
-                             0xe62349f8 0xbdfb4b21 0xfe7c58d 0x5f6c3049
-                             0x1fc7865d 0xca1371b 0x6ccb25fa 0x9853500b]]
+                             0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
+                             0x1fc7865d 0x0ca1371b 0x6ccb25fa 0x9853500b]]
    [CAST5PCBCISO7816 phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xdf93ffe8 0x5a976927]]
@@ -3384,8 +3436,70 @@ net.brehaut.ClojureTools = (function (SH) {
                              0x663c9740 0xac905ad5 0xa0157086 0x92848ba9]]
    [CAST5OFBISO7816  phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
                              0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x12848bad]]
-])</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
+                             0x663c9740 0xac905ad5 0xa0157086 0x12848bad]]])</pre></td></tr><tr><td class="docs"><h4>cast6-test-vectors</h4>
+
+<p>Test vectors for each supported CAST6 suite</p>
+</td><td class="codes"><pre class="brush: clojure">(def cast6-test-vectors
+  [[CAST6ECBPKCS7    phrase [0x16a8f433 0x3954ed44 0xe2991485 0x5fc31a07
+                             0xedda7098 0x6a877194 0x0fb47b6c 0xfa1d087e
+                             0xed9cf548 0x55edc7c6 0x56a94528 0xef50218f]]
+   [CAST6ECBZERO     phrase [0x16a8f433 0x3954ed44 0xe2991485 0x5fc31a07
+                             0xedda7098 0x6a877194 0x0fb47b6c 0xfa1d087e
+                             0x40c1394f 0x20956d67 0x012e820f 0x75a6b853]]
+   [CAST6ECBX923     phrase [0x16a8f433 0x3954ed44 0xe2991485 0x5fc31a07
+                             0xedda7098 0x6a877194 0x0fb47b6c 0xfa1d087e
+                             0xac17f63a 0xe8c185d2 0x909a8f2d 0x77fbbe9c]]
+   [CAST6ECBISO7816  phrase [0x16a8f433 0x3954ed44 0xe2991485 0x5fc31a07
+                             0xedda7098 0x6a877194 0x0fb47b6c 0xfa1d087e
+                             0xfd1b3087 0xfdc4d6c9 0xc3f301da 0xb181adfb]]
+   [CAST6CBCPKCS7    phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0x633c745e 0x1940d579 0xf57bea1c 0x39486330
+                             0xc59fe2d2 0x6b0b12de 0xf478a36f 0x7cd7c3bc]]
+   [CAST6CBCZERO     phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0x633c745e 0x1940d579 0xf57bea1c 0x39486330
+                             0xf59481a7 0x223b82c5 0x9fbee450 0x49a969cb]]
+   [CAST6CBCX923     phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0x633c745e 0x1940d579 0xf57bea1c 0x39486330
+                             0x80e0c88f 0x2af0abf0 0x5b960339 0x632d8b92]]
+   [CAST6CBCISO7816  phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0x633c745e 0x1940d579 0xf57bea1c 0x39486330
+                             0x7fa8f65e 0x10507d61 0x38a88894 0x696b5763]]
+   [CAST6PCBCPKCS7   phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
+                             0xf826cd2d 0x972ff4e4 0x3d32ff00 0x87ef0a7a]]
+   [CAST6PCBCZERO    phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
+                             0xcddd45e2 0xc924c710 0x9881fe79 0xa2ccf011]]
+   [CAST6PCBCX923    phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
+                             0x4824ce3a 0x98bafc05 0xd5db54d4 0x76b6512c]]
+   [CAST6PCBCISO7816 phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
+                             0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
+                             0x8a91d9d0 0x0b6c3527 0x02876a9c 0x00ee1032]]
+   [CAST6CFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
+                             0x6e379438 0x2ffd710a 0xf7919f09 0xfbb3c775]]
+   [CAST6CFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
+                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c371]]
+   [CAST6CFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
+                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c375]]
+   [CAST6CFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
+                             0x6e379438 0x2ffd710a 0xf7919f09 0x7fb7c371]]
+   [CAST6OFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
+                             0xe8b19cf1 0x1526c200 0x01704bde 0x106437ef]]
+   [CAST6OFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
+                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033eb]]
+   [CAST6OFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
+                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033ef]]
+   [CAST6OFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
+                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
+                             0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
 
 <p>Helper function for testing encryption</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128 iv iv-128}}]
@@ -3405,5 +3519,8 @@ net.brehaut.ClojureTools = (function (SH) {
     (is (= true (every? true? (map #(decryptor %) bf-test-vectors)))))
   (testing &quot;CAST5&quot;
     (is (= true (every? true? (map #(encryptor %1 :key key-128b) cast5-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast5-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast5-test-vectors)))))
+  (testing &quot;CAST6&quot;
+    (is (= true (every? true? (map #(encryptor %1 :key key-128b) cast6-test-vectors))))
+    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

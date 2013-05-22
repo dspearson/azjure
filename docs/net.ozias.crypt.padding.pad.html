@@ -3047,7 +3047,9 @@ all padding implementations</p>
 
 <p>evaluates to 4.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn remaining [cnt multiple]
-  (- multiple (rem cnt multiple)))</pre></td></tr><tr><td class="docs"><h3>Pad</h3>
+  (if (zero? (mod cnt multiple))
+    0
+    (- multiple (mod cnt multiple))))</pre></td></tr><tr><td class="docs"><h3>Pad</h3>
 
 <p>This protocol defines two function</p>
 
