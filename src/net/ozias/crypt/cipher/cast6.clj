@@ -310,6 +310,8 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.
+;;
+;; Test key [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c 0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d]
 (defn- process-block [block key enc]
   (let [ks (mkey-schedule (expand-key key))
         keys (if enc ks (flip-key-schedule ks))
