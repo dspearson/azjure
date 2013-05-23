@@ -34,7 +34,13 @@
   (apply bit-or 
          (map #(bit-shift-left (nth vec %1) %2) 
               (range 4) 
-              (range 24 -1 -8))))
+              (range 24 -1 -8))))        
+
+(defn bytes-dword [vec]
+  (apply bit-or
+         (map #(bit-shift-left (nth vec %1) %2)
+              (range 8)
+              (range 56 -1 -8))))
 
 ;; ### word-bytes
 ;; Takes a 32-bit word and creates a vector of 
