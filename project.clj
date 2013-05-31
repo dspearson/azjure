@@ -3,7 +3,8 @@
   :url "https://github.com/CraZySacX/azjure"
   :license {:name "GPLv3"
             :url "http://www.gnu.org/licenses/gpl.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [org.clojure/math.numeric-tower "0.0.2"]]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.3"]]}}
   :aliases {"build" ["install"]
             "sdoc" ["marg" "--multi" "src/" "test/"]}

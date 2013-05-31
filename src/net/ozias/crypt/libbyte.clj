@@ -1,7 +1,8 @@
 ;; ## libbyte
 ;; Byte manipulation library
 (ns ^{:author "Jason Ozias"}
-  net.ozias.crypt.libbyte)
+  net.ozias.crypt.libbyte
+  (:require [clojure.math.numeric-tower :refer (expt)]))
 
 ;; ### get-byte
 ;; Get byte <em>num</em> out of the given word.  <em>num</em>
@@ -55,10 +56,15 @@
 (defn word-bytes [word]
   (mapv #(last-byte (bit-shift-right word %)) (range 24 -1 -8)))
 
-(defn- inv-shift [shift]
-  (- 32 shift))
+(defn- inv-shift [shift bits]
+  (- bits shift))
 
 (def minv-shift (memoize inv-shift))
+
+(defn shift-dispatch [word shift bits]
+  (cond 
+   (or (instance? BigInteger word) (> bits 32)) :a 
+   :else :default))
 
 ;; ### <<<
 ;; Circular left shift
@@ -71,13 +77,43 @@
 ;; evaluates to
 ;;
 ;; > 0x34567812
-(defn <<< [word shift]
-  (let [sft (mod shift 32)]
-    (if (zero? sft)
+(defmulti <<<-mm shift-dispatch) 
+
+(defmethod <<<-mm :a [word shift bits] 
+  (let [biw (if (instance? BigInteger word) word (BigInteger. (str word)))
+        sft (mod shift bits)
+        mask (BigInteger. (str (- (expt 2 bits) 1)))]
+    (if (zero? sft) 
       word
-      (bit-or 
-       (bit-and (bit-shift-left word sft) 0xFFFFFFFF) 
-       (bit-shift-right word (minv-shift sft))))))
+      (.or
+       (.and (.shiftLeft biw sft) mask)
+       (.shiftRight biw (minv-shift sft bits))))))
+
+(defmethod <<<-mm :default [word shift bits]
+  (let [sft (mod shift bits)
+        mask (- (expt 2 bits) 1)]
+    (if (zero? sft) 
+      word
+      (bit-or
+       (bit-and (bit-shift-left word sft) mask)
+       (bit-shift-right word (minv-shift sft bits))))))
+
+(defn <<< 
+  ([word shift bits] (<<<-mm word shift bits))
+  ([word shift] (<<<-mm word shift 32)))
+;;     (let [sft (mod shift bits)
+;;           mask (- (expt 2 bits) 1)]
+;;       (if (zero? sft) 
+;;         word
+;;         (cond
+;;          (<= bits 32) (bit-or 
+;;                       (bit-and (bit-shift-left word sft) mask) 
+;;                       (bit-shift-right word (minv-shift sft bits)))
+;;          (> bits 32) (.or
+;;                       (.and (.shiftLeft (BigInteger. (str word)) sft))
+;;                       (.shiftRight (BigInteger. (str word)) (minv-shift sft bits)))
+;;  ([word shift]
+;;     (<<< word shift 32)))
 
 ;; ### >>>
 ;; Circular right shift
@@ -90,5 +126,8 @@
 ;; evaluates to
 ;;
 ;; > 0x78123456
-(defn >>> [word shift]
-  (<<< word (minv-shift shift)))
+(defn >>>
+  ([word shift bits]
+     (<<< word (minv-shift shift bits)))
+  ([word shift]
+     (>>> word shift 32)))

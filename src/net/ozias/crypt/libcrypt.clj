@@ -8,8 +8,9 @@
 ;; Print a value as hex prefixed by 0x.
 ;;
 ;; Useful for testing
-(defn to-hex [val]
-  (format "0x%08x" val))
+(defn to-hex 
+  ([val len] (format (str "0x%0" len "x") val))
+  ([val] (to-hex val 8)))
 
 ;; ### words-per-block
 ;; Get the number of words per cipher block
