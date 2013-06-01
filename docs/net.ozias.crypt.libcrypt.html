@@ -3038,8 +3038,9 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>Print a value as hex prefixed by 0x.</p>
 
 <p>Useful for testing</p>
-</td><td class="codes"><pre class="brush: clojure">(defn to-hex [val]
-  (format &quot;0x%08x&quot; val))</pre></td></tr><tr><td class="docs"><h3>words-per-block</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn to-hex 
+  ([val len] (format (str &quot;0x%0&quot; len &quot;x&quot;) val))
+  ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs"><h3>words-per-block</h3>
 
 <p>Get the number of words per cipher block</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- words-per-block [cipher]

@@ -67,7 +67,19 @@
        (mapv #(last-byte (bit-shift-right word %)) rng)))
   ([word]
      (word-bytes word false)))
- 
+
+;; ### reverse-bytes
+;; Reverse the bytes in a word
+;;
+;;     (reverse-bytes 0x01234567)
+;;
+;; evaluates to
+;; > 0x67452301
+;; 
+(defn reverse-bytes [word]
+  (-> #(last-byte (bit-shift-right word %1))
+      (mapv (range 0 32 8))
+      (bytes-word)))
 
 (defn- inv-shift [shift bits]
   (- bits shift))

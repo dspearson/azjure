@@ -4,14 +4,14 @@
 (ns net.ozias.crypt.cipher.twofish
   (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]
             [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
-            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes <<<)]))
+            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes <<<)]))
 
-;; #### sbox0
-;; Sbox used during key schedule creation.
+;; #### q0
+;; S-box used during key schedule and MDS creation.
 ;;
 ;; Using a byte value as an index into the sbox
 ;; generates a byte value output
-(def sbox0 
+(def q0 
   [0xA9  0x67  0xB3  0xE8 0x04  0xFD  0xA3  0x76
    0x9A  0x92  0x80  0x78 0xE4  0xDD  0xD1  0x38
    0x0D  0xC6  0x35  0x98 0x18  0xF7  0xEC  0x6C
@@ -45,12 +45,12 @@
    0xCA  0x10  0x21  0xF0 0xD3  0x5D  0x0F  0x00
    0x6F  0x9D  0x36  0x42 0x4A  0x5E  0xC1  0xE0])
 
-;; #### sbox1
-;; Sbox used during key schedule creation.
+;; #### q1
+;; S-box used during key schedule and MDS creation.
 ;;
 ;; Using a byte value as an index into the sbox
 ;; generates a byte value output
-(def sbox1
+(def q1
   [0x75  0xF3  0xC6  0xF4 0xDB  0x7B  0xFB  0xC8
    0x4A  0xD3  0xE6  0x6B 0x45  0x7D  0xE8  0x4B
    0xD6  0x32  0xD8  0xFD 0x37  0x71  0xF1  0xE1
@@ -84,113 +84,152 @@
    0xD7  0x61  0x1E  0xB4 0x50  0x04  0xF6  0xC2
    0x16  0x25  0x86  0x56 0x55  0x09  0xBE  0x91])
 
-(def pvec0 [1 0 1 0])
-(def pvec1 [0 0 1 1])
-(def pvec2 [0 1 0 1])
-(def pvec3 [(bit-xor (nth pvec1 0) 1)
-            (bit-xor (nth pvec1 1) 1)
-            (bit-xor (nth pvec1 2) 1)
-            (bit-xor (nth pvec1 3) 1)])
-(def pvec4 [1 0 0 1])
+;; #### qvec0-4
+;; Vectors of q constants (0 or 1) used
+;; to identify which q S-box to use above
+;; when substituting a value.
+(def qvec0 [1 0 1 0])
+(def qvec1 [0 0 1 1])
+(def qvec2 [0 1 0 1])
+(def qvec3 [(bit-xor (nth qvec1 0) 1)
+            (bit-xor (nth qvec1 1) 1)
+            (bit-xor (nth qvec1 2) 1)
+            (bit-xor (nth qvec1 3) 1)])
+(def qvec4 [1 0 0 1])
 
-(def parr [pvec0 pvec1 pvec2 pvec3 pvec4])
+;; #### qarr
+;; An array of q constants
+(def qarr [qvec0 qvec1 qvec2 qvec3 qvec4])
 
-(def GF256_FDBK 0x169)
-(def GF256_FDBK_2 (quot GF256_FDBK 2))
-(def GF256_FDBK_4 (quot GF256_FDBK 4))
+;; ### getq
+;; Get the q vector associated with the given
+;; <em>qconst</em> value (0 or 1).
+(defn- getq [qconst]
+  (if (zero? qconst) q0 q1))
 
-(def RS_GF_FDBK 0x14D)
-
-;; #### BLOCK_SIZE
-;; Bytes in a block
-(def BLOCK_SIZE 16)
-;; #### ROUNDS
-;; Number of rounds
-(def ROUNDS 16)
-;; #### MAX_ROUNDS
-;; Max # rounds (for allocating subkeys)
-(def MAX_ROUNDS 16)
-   
-(def INPUT_WHITEN 0)
-(def OUTPUT_WHITEN (+ INPUT_WHITEN (quot BLOCK_SIZE 4)))
-(def ROUND_SUBKEYS (+ OUTPUT_WHITEN (quot BLOCK_SIZE 4)))
-(def TOTAL_SUBKEYS (+ ROUND_SUBKEYS (* 2 MAX_ROUNDS)))
-
-(def SK_STEP 0x02020202)
-(def SK_BUMP 0x01010101)
-(def SK_ROTL 9)
-
-;; ### getp
-;; Get the P vector associated with the given
-;; <em>pconst</em> value (0 or 1).
-(defn- getp [pconst]
-  (if (zero? pconst) sbox0 sbox1))
-
-;; #### mgetp
-;; Memoization of getp
-(def mgetp (memoize getp))
+;; #### mgetq
+;; Memoization of getq
+(def mgetq (memoize getq))
 
 (defn- lfsr1 [byte]
   (bit-xor
    (bit-shift-right byte 1)
-   (if (zero? (bit-and byte 0x01)) 0 GF256_FDBK_2)))
+   (if (bit-test byte 0) 0xb4 0)))
 
 (defn- lfsr2 [byte]
   (bit-xor
    (bit-shift-right byte 2)
-   (if (zero? (bit-and byte 0x02)) 0 GF256_FDBK_2)
-   (if (zero? (bit-and byte 0x01)) 0 GF256_FDBK_4)))
+   (if (bit-test byte 1) 0xb4 0)
+   (if (bit-test byte 0) 0x5a 0)))
 
 (defn- mx_x [byte]
   (bit-xor byte (lfsr2 byte)))
 
 (defn- mx_y [byte]
-  (bit-xor byte (lfsr1 byte) (lfsr2 byte)))
+  (bit-xor (mx_x byte) (lfsr1 byte)))
 
-(defn- genmdswords [[j0 j1 x0 y0 x1 y1]]
+;; ### genmdswords
+;; Generate 4 MDS words given a vector
+;; of 6 polynomial values.
+;;
+;; Evaluates to a vector of 4 32-bit
+;; words
+(defn- genmdswords [[j0 j1 x0 x1 y0 y1]]
   [(bytes-word [y1 y1 x1 j1])
    (bytes-word [j0 x0 y0 y0])
    (bytes-word [y1 j1 y1 x1])
    (bytes-word [x0 y0 j0 x0])])
 
+;; ### mdsround
+;; Generate 4 MDS words and conj them
+;; onto the MDS vector.
+;;
+;; Evaluates to a vector of the given
+;; MDS values conj'd with the newly
+;; calculated values
 (defn- mdsround [mdsvec round]
-  (let [j0 (nth sbox0 round)
-        j1 (nth sbox1 round)]
-    (->> (genmdswords [j0 j1 (mx_x j0) (mx_y j0) (mx_x j1) (mx_y j1)])
+  (let [mdspoly (juxt identity mx_x mx_y)]
+    (->> (mdspoly (nth q1 round))
+         (interleave (mdspoly (nth q0 round))) 
+         (vec) 
+         (genmdswords)
          (reduce conj mdsvec))))
 
+;; ### mds
+;; Generate 1024 (2<sup>8</sup> * 4) words to
+;; use during MDS multiplication
 (defn- mds []
   (reduce mdsround [] (range 256)))
 
+;; #### mmds
+;; Memoization of mds
 (def mmds (memoize mds))
 
-(defn- rs_rem [word _]
-  (let [b (bit-shift-right word 24)
-        g2 (bit-xor (bit-shift-left b 1) (if (zero? (bit-and b 0x80)) 0 RS_GF_FDBK))
-        g3 (bit-xor (bit-shift-right b 1) (if (zero? (bit-and b 0x01)) 0 (bit-shift-right RS_GF_FDBK 1)) g2)]
+;; ### ax
+;; Calculates αx for a byte
+;;
+;; Evaluates to a byte
+(defn- ax [byte]
+  (bit-xor 
+   (bit-shift-left byte 1)
+   (if (bit-test byte 7) 0x14D 0)))
+
+;; ### invax
+;; Calculates (1/α)x for a byte
+;;
+;; Evaluates to a byte
+(defn- invax [byte]
+  (bit-xor 
+   (bit-shift-right byte 1)
+   (if (bit-test byte 0) (bit-shift-right 0x14D 1) 0)))
+
+;; ### axinvax
+;; Calculates (α + 1/α)x for a byte.
+;;
+;; Evaluates to a byte
+(defn- axinvax [byte]
+  (bit-xor (ax byte) (invax byte)))
+
+;; ### rs-poly
+;; Calcutate the Reed Solomon polynomial over
+;; a given 32-bit word. α is the constant 0x14D
+;;
+;; > x<sup>4</sup> + (α + 1/α)x<sup>3</sup> + αx<sup>2</sup> + (α + 1/α)x + 1
+;;
+;; Evaluates to a 32-bit word
+(defn- rs-poly [word _]
+  (let [x (bit-shift-right word 24)]
     (bit-xor
-     (bit-and (bit-shift-left word 8) 0xFFFFFFFF)
-     (bit-shift-left g3 24)
-     (bit-shift-left g2 16)
-     (bit-shift-left g3 8)
-     b)))
+     (bit-and (bit-shift-left word 8) 0xFFFFFFFF) 
+     (bit-shift-left (axinvax x) 24)                      
+     (bit-shift-left (ax x) 16)
+     (bit-shift-left (axinvax x) 8)
+     x)))
 
-(defn- rs_mds_encode [[ke ko]]
+;; ### rsmm
+;; Reed-Solomon matrix multiply.  Two input 32-bit words 
+;; are used to calculate a 32-bit output word
+;;
+;; Evaluates to a 32-bit word
+(defn- rsmm [w0 w1]
   (let [r (range 4)]
-    (mapv #(reduce rs_rem (bit-xor %1 (reduce rs_rem %2 r)) r) ke ko)))
+    (reduce rs-poly (bit-xor w0 (reduce rs-poly w1 r)) r)))
 
-;; 0x01234567 -> 0x67452301
-(defn- reverse-bytes [word]
-  (-> #(bit-and (bit-shift-right word %1) 0xFF)
-      (mapv (range 0 32 8))
-      (bytes-word)))
+;; ### genSv
+;; Generate the S vector
+;;
+;; Evaluates to a vector of <em>n</em> 32-bit words where
+;; <em>n</em> is the number of 64-bit blocks in the
+;; key
+(defn- genSv [[me mo]]
+  (mapv rsmm me mo))
 
-(defn- qsub [byte km pconst]
-  (bit-xor (nth (mgetp pconst) byte) km))
+(defn- qsub [byte km qconst]
+  (bit-xor (nth (mgetq qconst) byte) km))
 
 (defn- qsubs [kw]
   (fn [bv idx]
-    (mapv qsub bv (word-bytes (nth kw idx) true) (nth parr (inc idx)))))
+    (mapv qsub bv (word-bytes (nth kw idx) true) (nth qarr (inc idx)))))
 
 (defn- mulmds [mds]
   (fn [idxv]
@@ -211,22 +250,22 @@
 (def odds (comp evens rest))
 
 (defn- expand-key [key mds]
-  (let [keko (-> (mapv reverse-bytes key)
+  (let [memo (-> (mapv reverse-bytes key)
                  ((juxt evens odds)))
-        rs (rs_mds_encode keko)
-        _ (println (str "K(evens): " (mapv to-hex (first keko))))
-        _ (println (str "K(odds):  " (mapv to-hex (last keko))))
-        _ (println (str "Sbox Key: " (mapv to-hex rs)))
-        stepsa (conj (reductions + (cycle [SK_STEP])) 0)
-        stepsb (map (partial + SK_BUMP) stepsa)
-        hfuncefn (hfunc mds (first keko))
-        hfuncofn (hfunc mds (last keko))
-        hfuncrng (range (quot (+ ROUND_SUBKEYS (* 2 ROUNDS)) 2))
+        sbk (genSv memo)
+        _ (println (str "Me: " (mapv to-hex (first memo))))
+        _ (println (str "Mo: " (mapv to-hex (last memo))))
+        _ (println (str "S:  " (mapv to-hex sbk)))
+        stepsa (conj (reductions + (cycle [0x02020202])) 0)
+        stepsb (map (partial + 0x01010101) stepsa)
+        hfuncefn (hfunc mds (first memo))
+        hfuncofn (hfunc mds (last memo))
+        hfuncrng (range 20)
         a (mapv hfuncefn stepsa hfuncrng)
         b (mapv #(<<< % 8) (mapv hfuncofn stepsb hfuncrng))
         a (mapv +modw a b)
         subkeys a
-        a (mapv #(<<< % SK_ROTL) (mapv +modw a b))
+        a (mapv #(<<< % 9) (mapv +modw a b))
         subkeys (vec (interleave subkeys a))]
     subkeys))
 
