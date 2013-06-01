@@ -3,11 +3,15 @@
 ;; [https://www.schneier.com/paper-twofish-paper.pdf](https://www.schneier.com/paper-twofish-paper.pdf)
 (ns net.ozias.crypt.cipher.twofish
   (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]
-            [net.ozias.crypt.libcrypt :refer (to-hex)]
-            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes)]))
+            [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
+            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes <<<)]))
 
-;; #### P0
-(def P0 
+;; #### sbox0
+;; Sbox used during key schedule creation.
+;;
+;; Using a byte value as an index into the sbox
+;; generates a byte value output
+(def sbox0 
   [0xA9  0x67  0xB3  0xE8 0x04  0xFD  0xA3  0x76
    0x9A  0x92  0x80  0x78 0xE4  0xDD  0xD1  0x38
    0x0D  0xC6  0x35  0x98 0x18  0xF7  0xEC  0x6C
@@ -41,7 +45,12 @@
    0xCA  0x10  0x21  0xF0 0xD3  0x5D  0x0F  0x00
    0x6F  0x9D  0x36  0x42 0x4A  0x5E  0xC1  0xE0])
 
-(def P1
+;; #### sbox1
+;; Sbox used during key schedule creation.
+;;
+;; Using a byte value as an index into the sbox
+;; generates a byte value output
+(def sbox1
   [0x75  0xF3  0xC6  0xF4 0xDB  0x7B  0xFB  0xC8
    0x4A  0xD3  0xE6  0x6B 0x45  0x7D  0xE8  0x4B
    0xD6  0x32  0xD8  0xFD 0x37  0x71  0xF1  0xE1
@@ -75,26 +84,16 @@
    0xD7  0x61  0x1E  0xB4 0x50  0x04  0xF6  0xC2
    0x16  0x25  0x86  0x56 0x55  0x09  0xBE  0x91])
 
-(def P_00 1)
-(def P_01 0)
-(def P_02 0)
-(def P_03 (bit-xor P_01  1))
-(def P_04 1)
-(def P_10 0)
-(def P_11 0)
-(def P_12 1)
-(def P_13 (bit-xor P_11 1))
-(def P_14 0)
-(def P_20 1)
-(def P_21 1)
-(def P_22 0)
-(def P_23 (bit-xor P_21 1))
-(def P_24 0)
-(def P_30 0)
-(def P_31 1)
-(def P_32 1)
-(def P_33 (bit-xor P_31 1))
-(def P_34 1)
+(def pvec0 [1 0 1 0])
+(def pvec1 [0 0 1 1])
+(def pvec2 [0 1 0 1])
+(def pvec3 [(bit-xor (nth pvec1 0) 1)
+            (bit-xor (nth pvec1 1) 1)
+            (bit-xor (nth pvec1 2) 1)
+            (bit-xor (nth pvec1 3) 1)])
+(def pvec4 [1 0 0 1])
+
+(def parr [pvec0 pvec1 pvec2 pvec3 pvec4])
 
 (def GF256_FDBK 0x169)
 (def GF256_FDBK_2 (quot GF256_FDBK 2))
@@ -121,59 +120,64 @@
 (def SK_BUMP 0x01010101)
 (def SK_ROTL 9)
 
-(defn- getp [i]
-  (if (zero? i) P0 P1))
+;; ### getp
+;; Get the P vector associated with the given
+;; <em>pconst</em> value (0 or 1).
+(defn- getp [pconst]
+  (if (zero? pconst) sbox0 sbox1))
 
+;; #### mgetp
+;; Memoization of getp
 (def mgetp (memoize getp))
 
-(defn- lfsr1 [word]
+(defn- lfsr1 [byte]
   (bit-xor
-   (bit-shift-right word 1)
-   (if (zero? (bit-and word 0x01)) 0 GF256_FDBK_2)))
+   (bit-shift-right byte 1)
+   (if (zero? (bit-and byte 0x01)) 0 GF256_FDBK_2)))
 
-(defn- lfsr2 [word]
+(defn- lfsr2 [byte]
   (bit-xor
-   (bit-shift-right word 2)
-   (if (zero? (bit-and word 0x02)) 0 GF256_FDBK_2)
-   (if (zero? (bit-and word 0x01)) 0 GF256_FDBK_4)))
+   (bit-shift-right byte 2)
+   (if (zero? (bit-and byte 0x02)) 0 GF256_FDBK_2)
+   (if (zero? (bit-and byte 0x01)) 0 GF256_FDBK_4)))
 
-(defn- mx_1 [word]
-  word)
+(defn- mx_x [byte]
+  (bit-xor byte (lfsr2 byte)))
 
-(defn- mx_x [word]
-  (bit-xor word (lfsr2 word)))
+(defn- mx_y [byte]
+  (bit-xor byte (lfsr1 byte) (lfsr2 byte)))
 
-(defn- mx_y [word]
-  (bit-xor word (lfsr1 word) (lfsr2 word)))
-
-(defn- genmdswords [[j0 j1 x0 x1 y0 y1]]
-  [(bytes-word [j1 x1 y1 y1])
-   (bytes-word [y0 y0 x0 j0])
-   (bytes-word [x1 y1 j1 y1])
-   (bytes-word [x0 j0 y0 x0])])
+(defn- genmdswords [[j0 j1 x0 y0 x1 y1]]
+  [(bytes-word [y1 y1 x1 j1])
+   (bytes-word [j0 x0 y0 y0])
+   (bytes-word [y1 j1 y1 x1])
+   (bytes-word [x0 y0 j0 x0])])
 
 (defn- mdsround [mdsvec round]
-  (let [j0 (nth P0 round)
-        j1 (nth P1 round)]
+  (let [j0 (nth sbox0 round)
+        j1 (nth sbox1 round)]
     (->> (genmdswords [j0 j1 (mx_x j0) (mx_y j0) (mx_x j1) (mx_y j1)])
          (reduce conj mdsvec))))
 
 (defn- mds []
-  (reduce #(mdsround %1 %2) [] (range 256)))
+  (reduce mdsround [] (range 256)))
+
+(def mmds (memoize mds))
 
 (defn- rs_rem [word _]
   (let [b (bit-shift-right word 24)
         g2 (bit-xor (bit-shift-left b 1) (if (zero? (bit-and b 0x80)) 0 RS_GF_FDBK))
         g3 (bit-xor (bit-shift-right b 1) (if (zero? (bit-and b 0x01)) 0 (bit-shift-right RS_GF_FDBK 1)) g2)]
     (bit-xor
-     (bit-shift-left word 8)
+     (bit-and (bit-shift-left word 8) 0xFFFFFFFF)
      (bit-shift-left g3 24)
      (bit-shift-left g2 16)
      (bit-shift-left g3 8)
      b)))
 
-(defn- rs_mds_encode [w1 w2]
-  (reduce #(rs_rem %1 %2 ) (bit-xor w2 (reduce #(rs_rem %1 %2) w1 (range 4))) (range 4)))
+(defn- rs_mds_encode [[ke ko]]
+  (let [r (range 4)]
+    (mapv #(reduce rs_rem (bit-xor %1 (reduce rs_rem %2 r)) r) ke ko)))
 
 ;; 0x01234567 -> 0x67452301
 (defn- reverse-bytes [word]
@@ -181,60 +185,54 @@
       (mapv (range 0 32 8))
       (bytes-word)))
 
-(defn- pfn [b k p]
-  (bit-xor (nth (mgetp p) b) k))
+(defn- qsub [byte km pconst]
+  (bit-xor (nth (mgetp pconst) byte) km))
 
-(defn- type0 [bv kw]
-  (let [kv (word-bytes (nth kw 3))
-        _ (println "Executing type0")]
-    (mapv #(pfn %1 %2 %3) bv kv [P_04 P_14 P_24 P_34])))
+(defn- qsubs [kw]
+  (fn [bv idx]
+    (mapv qsub bv (word-bytes (nth kw idx) true) (nth parr (inc idx)))))
 
-(defn- type1 [bv kw mds]
-  (let [kv (word-bytes (nth kw 0))
-        idxv (mapv #(+ %2 (* 4 %1)) (mapv #(pfn %1 %2 %3) bv kv [P_01 P_11 P_21 P_31]) (range 4))
-        _ (println "Executing type1")]
-    (reduce bit-xor (mapv #(nth mds (nth idxv %)) (range 4)))))
+(defn- mulmds [mds]
+  (fn [idxv]
+    (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))
 
-(defn- type2 [bv kw mds]
-  (let [kb0 (word-bytes (nth kw 0))
-        kb1 (word-bytes (nth kw 1))
-        bi (mapv #(pfn %1 %2 %3) bv kb1 [P_02 P_12 P_22 P_32])
-        idxv (mapv #(pfn %1 %2 %3) bi kb0 [P_01 P_11 P_21 P_31])
-        _ (println "Executing type2")]
-    (reduce bit-xor (mapv #(nth mds (nth idxv %)) (range 4)))))
+(defn- hfunc [mds kw]
+  (fn [word _]
+    (-> (qsubs kw)
+        (reduce (word-bytes word true) (range (dec (count kw)) -1 -1))
+        ((mulmds mds)))))
 
-(defn- type3 [bv kw]
-  (let [kv (word-bytes (nth kw 2))
-        _ (println "Executing type3")]
-    (mapv #(pfn %1 %2 %3) bv kv [P_03 P_13 P_23 P_33])))
-  
-(defn- f32 [word kw mds]
-  (let [bytes (word-bytes word)]
-    (condp = (bit-and (count kw) 3)
-      0 (-> bytes 
-            (type0 kw)
-            (type3 kw)
-            (type2 kw mds))
-      1 (type1 bytes kw mds)
-      2 (type2 bytes kw mds)
-      3 (-> bytes
-            (type3 kw)
-            (type2 kw mds)))))
+;; test-keys
+(def key-128 [0x0 0x0 0x0 0x0])
+(def key-192 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677])
+(def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])
+
+(def evens (partial take-nth 2))
+(def odds (comp evens rest))
 
 (defn- expand-key [key mds]
-  (let [rk (mapv #(reverse-bytes %) key)
-        _ (println (mapv (partial to-hex) rk))
-        ke (take-nth 2 key)
-        ko (take-nth 2 (rest key))
-        rs (mapv #(rs_mds_encode %1 %2) ke ko)
-        _ (println (mapv (partial to-hex) rs))
-        skcnt (+ ROUND_SUBKEYS (* 2 ROUNDS))
-        _ (println (to-hex (f32 0x0 ke mds)))]
-    key))
+  (let [keko (-> (mapv reverse-bytes key)
+                 ((juxt evens odds)))
+        rs (rs_mds_encode keko)
+        _ (println (str "K(evens): " (mapv to-hex (first keko))))
+        _ (println (str "K(odds):  " (mapv to-hex (last keko))))
+        _ (println (str "Sbox Key: " (mapv to-hex rs)))
+        stepsa (conj (reductions + (cycle [SK_STEP])) 0)
+        stepsb (map (partial + SK_BUMP) stepsa)
+        hfuncefn (hfunc mds (first keko))
+        hfuncofn (hfunc mds (last keko))
+        hfuncrng (range (quot (+ ROUND_SUBKEYS (* 2 ROUNDS)) 2))
+        a (mapv hfuncefn stepsa hfuncrng)
+        b (mapv #(<<< % 8) (mapv hfuncofn stepsb hfuncrng))
+        a (mapv +modw a b)
+        subkeys a
+        a (mapv #(<<< % SK_ROTL) (mapv +modw a b))
+        subkeys (vec (interleave subkeys a))]
+    subkeys))
 
 (defn- process-block [block key enc]
-  (let [mds (mds)
-        km (expand-key key mds)]
+  (let [ks (expand-key key (mmds))
+        _ (println (str "KS: " (mapv to-hex ks)))]
     block))
 
 ;; ### Twofish
