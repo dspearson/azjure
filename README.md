@@ -77,4 +77,7 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 ## In Progress
 * Camellia
+* Salsa20
 * CTR Mode
+* Standardize API to work with vectors of bytes (not bytearray as the Java byte is signed
+and we need to work with bytes from 0-255.
