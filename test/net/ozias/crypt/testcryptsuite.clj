@@ -103,7 +103,32 @@
                              [cryptsuite :refer (->CAST6OFBZERO)]
                              [cryptsuite :refer (->CAST6OFBISO10126)]
                              [cryptsuite :refer (->CAST6OFBX923)]
-                             [cryptsuite :refer (->CAST6OFBISO7816)])
+                             [cryptsuite :refer (->CAST6OFBISO7816)]
+                             [cryptsuite :refer (->TFECBPKCS7)]
+                             [cryptsuite :refer (->TFECBZERO)]
+                             [cryptsuite :refer (->TFECBISO10126)]
+                             [cryptsuite :refer (->TFECBX923)]
+                             [cryptsuite :refer (->TFECBISO7816)]
+                             [cryptsuite :refer (->TFCBCPKCS7)]
+                             [cryptsuite :refer (->TFCBCZERO)]
+                             [cryptsuite :refer (->TFCBCISO10126)]
+                             [cryptsuite :refer (->TFCBCX923)]
+                             [cryptsuite :refer (->TFCBCISO7816)]
+                             [cryptsuite :refer (->TFPCBCPKCS7)]
+                             [cryptsuite :refer (->TFPCBCZERO)]
+                             [cryptsuite :refer (->TFPCBCISO10126)]
+                             [cryptsuite :refer (->TFPCBCX923)]
+                             [cryptsuite :refer (->TFPCBCISO7816)]
+                             [cryptsuite :refer (->TFCFBPKCS7)]
+                             [cryptsuite :refer (->TFCFBZERO)]
+                             [cryptsuite :refer (->TFCFBISO10126)]
+                             [cryptsuite :refer (->TFCFBX923)]
+                             [cryptsuite :refer (->TFCFBISO7816)]
+                             [cryptsuite :refer (->TFOFBPKCS7)]
+                             [cryptsuite :refer (->TFOFBZERO)]
+                             [cryptsuite :refer (->TFOFBISO10126)]
+                             [cryptsuite :refer (->TFOFBX923)]
+                             [cryptsuite :refer (->TFOFBISO7816)])
             (net.ozias.crypt [testivs :refer (iv-128)]
                              [testkeys :refer (key-128 key-128b)])))
 
@@ -218,6 +243,34 @@
 (def CAST6OFBISO10126 (->CAST6OFBISO10126))
 (def CAST6OFBX923 (->CAST6OFBX923))
 (def CAST6OFBISO7816 (->CAST6OFBISO7816))
+
+;; #### TFXX
+;; Setup the Twofish suites for use in testing.
+(def TFECBPKCS7 (->TFECBPKCS7))
+(def TFECBZERO (->TFECBZERO))
+(def TFECBISO10126 (->TFECBISO10126))
+(def TFECBX923 (->TFECBX923))
+(def TFECBISO7816 (->TFECBISO7816))
+(def TFCBCPKCS7 (->TFCBCPKCS7))
+(def TFCBCZERO (->TFCBCZERO))
+(def TFCBCISO10126 (->TFCBCISO10126))
+(def TFCBCX923 (->TFCBCX923))
+(def TFCBCISO7816 (->TFCBCISO7816))
+(def TFPCBCPKCS7 (->TFPCBCPKCS7))
+(def TFPCBCZERO (->TFPCBCZERO))
+(def TFPCBCISO10126 (->TFPCBCISO10126))
+(def TFPCBCX923 (->TFPCBCX923))
+(def TFPCBCISO7816 (->TFPCBCISO7816))
+(def TFCFBPKCS7 (->TFCFBPKCS7))
+(def TFCFBZERO (->TFCFBZERO))
+(def TFCFBISO10126 (->TFCFBISO10126))
+(def TFCFBX923 (->TFCFBX923))
+(def TFCFBISO7816 (->TFCFBISO7816))
+(def TFOFBPKCS7 (->TFOFBPKCS7))
+(def TFOFBZERO (->TFOFBZERO))
+(def TFOFBISO10126 (->TFOFBISO10126))
+(def TFOFBX923 (->TFOFBX923))
+(def TFOFBISO7816 (->TFOFBISO7816))
 
 ;; #### phrase
 ;; A phrase to test encryption/decryption
@@ -479,6 +532,70 @@
                              0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
                              0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])
 
+;; #### tf-test-vectors
+;; Test vectors for each supported Blowfish suite
+(def tf-test-vectors
+  [[TFECBPKCS7    phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0x39A0613B 0xBFEA1314 0x176EB713 0x47EAC291]]
+   [TFECBZERO     phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0xB0282B3F 0x97533E3F 0x2B486704 0x6288AD7C]]
+   [TFECBX923     phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0x9CF28E99 0x115A9C6D 0x2FD20232 0x6CDD9DAB]]
+   [TFECBISO7816  phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0xC39BDDB4 0x8F2A7838 0x854152A9 0x37BE3A64]]
+   [TFCBCPKCS7    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x00B243DF 0x57C1186D 0x1B6AF535 0x495E488E]]
+   [TFCBCZERO     phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x1032CC97 0x73D10AD2 0x87E65230 0xFCE7BF95]]
+   [TFCBCX923     phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x7F180009 0x86547F24 0xC25317F2 0x8E04EBD6]]
+   [TFCBCISO7816  phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0xB3F9229C 0xBB37B7D3 0x2D0292AD 0x5C49EF22]]
+   [TFPCBCPKCS7   phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0x7AB5318B 0x3A68614F 0x7D47E004 0x8501A27E]]
+   [TFPCBCZERO    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0xC9CBF9D9 0x55148687 0x5BA04DA9 0x2A5412F0]]
+   [TFPCBCX923    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0xEB172D7C 0x191BBCF2 0x75940A4C 0x8B85CB16]]
+   [TFPCBCISO7816 phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0x3D9A63D1 0x75B06C26 0x278FF5E1 0xF97E7D05]]
+   [TFCFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x95B5B8BF]]
+   [TFCFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBB]]
+   [TFCFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBF]]
+   [TFCFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x11B1BCBB]]
+   [TFOFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x636FD62B]]
+   [TFOFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22F]]
+   [TFOFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22B]]
+   [TFOFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0xE76BD22F]]])
+
 ;; ### encryptor
 ;; Helper function for testing encryption
 (defn- encryptor [[suite pt ct] & {:keys [key iv] :or {key key-128 iv iv-128}}]
@@ -503,4 +620,7 @@
     (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast5-test-vectors)))))
   (testing "CAST6"
     (is (= true (every? true? (map #(encryptor %1 :key key-128b) cast6-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors))))))
+    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors)))))
+  (testing "Twofish"
+    (is (= true (every? true? (map #(encryptor %) tf-test-vectors))))
+    (is (= true (every? true? (map #(decryptor %) tf-test-vectors))))))

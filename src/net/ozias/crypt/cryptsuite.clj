@@ -5,7 +5,8 @@
                                     [aes :refer (->Aes)]
                                     [blowfish :refer (->Blowfish)]
                                     [cast5 :refer (->CAST5)]
-                                    [cast6 :refer (->CAST6)])
+                                    [cast6 :refer (->CAST6)]
+                                    [twofish :refer (->Twofish)])
             (net.ozias.crypt.mode [modeofoperation :as mode]
                                   [ecb :refer (->ElectronicCodebook)]
                                   [cbc :refer (->CipherBlockChaining)]
@@ -45,12 +46,13 @@
 (def X923 (->X923pad))
 (def ISO7816 (->ISO7816pad))
 
-;; #### AES, Blowfish, CAST5, CAST6
+;; #### AES, Blowfish, CAST5, CAST6, Twofish
 ;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
+(def Twofish (->Twofish))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB
 ;; Setup the mode for use in testing
@@ -615,3 +617,138 @@
     CryptSuite
   (encrypt [_ key iv bytearr] (encryptor [CAST6 OFB ISO7816] key iv bytearr))
   (decrypt [_ key iv words] (decryptor [CAST6 OFB ISO7816] key iv words)))
+
+;; ### TFECBX
+;; Twofish cipher, Electronic Codebook Mode, various padding methods
+(defrecord TFECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish ECB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish ECB PKCS7] key iv words)))
+
+(defrecord TFECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish ECB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish ECB Zeropad] key iv words)))
+
+(defrecord TFECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish ECB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish ECB ISO10126] key iv words)))
+
+(defrecord TFECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish ECB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish ECB X923] key iv words)))
+
+(defrecord TFECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish ECB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish ECB ISO7816] key iv words)))
+
+;; ### TFCBCX
+;; Twofish cipher, Cipher-Block Chaining Mode, various padding methods
+(defrecord TFCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CBC PKCS7] key iv words)))
+
+(defrecord TFCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CBC Zeropad] key iv words)))
+
+(defrecord TFCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CBC ISO10126] key iv words)))
+
+(defrecord TFCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CBC X923] key iv words)))
+
+(defrecord TFCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CBC ISO7816] key iv words)))
+
+;; ### TFPCBCX
+;; Twofish cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord TFPCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish PCBC PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish PCBC PKCS7] key iv words)))
+
+(defrecord TFPCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish PCBC Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish PCBC Zeropad] key iv words)))
+
+(defrecord TFPCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish PCBC ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish PCBC ISO10126] key iv words)))
+
+(defrecord TFPCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish PCBC X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish PCBC X923] key iv words)))
+
+(defrecord TFPCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish PCBC ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish PCBC ISO7816] key iv words)))
+
+;; ### TFCFBX
+;; Twofish cipher, Cipher Feedback Mode, various padding methods
+(defrecord TFCFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CFB PKCS7] key iv words)))
+
+(defrecord TFCFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CFB Zeropad] key iv words)))
+
+(defrecord TFCFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CFB ISO10126] key iv words)))
+
+(defrecord TFCFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CFB X923] key iv words)))
+
+(defrecord TFCFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish CFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish CFB ISO7816] key iv words)))
+
+;; ### TFOFBX
+;; Twofish cipher, Output Feedback Mode, various padding methods
+(defrecord TFOFBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish OFB PKCS7] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish OFB PKCS7] key iv words)))
+
+(defrecord TFOFBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish OFB Zeropad] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish OFB Zeropad] key iv words)))
+
+(defrecord TFOFBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish OFB ISO10126] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish OFB ISO10126] key iv words)))
+
+(defrecord TFOFBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish OFB X923] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish OFB X923] key iv words)))
+
+(defrecord TFOFBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytearr] (encryptor [Twofish OFB ISO7816] key iv bytearr))
+  (decrypt [_ key iv words] (decryptor [Twofish OFB ISO7816] key iv words)))

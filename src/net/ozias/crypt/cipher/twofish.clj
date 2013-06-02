@@ -130,12 +130,18 @@
 (def mgetq (memoize getq))
 
 ;; ### lfsr1
+;; Used during MDS generation
+;;
+;; Evaluates to a byte
 (defn- lfsr1 [byte]
   (bit-xor
    (bit-shift-right byte 1)
    (if (bit-test byte 0) 0xb4 0)))
 
 ;; ### lfsr2
+;; Used during MDS generation
+;;
+;; Evaluates to a byte
 (defn- lfsr2 [byte]
   (bit-xor
    (bit-shift-right byte 2)
@@ -143,10 +149,16 @@
    (if (bit-test byte 0) 0x5a 0)))
 
 ;; ### mx_x
+;; Used during MDS generation
+;;
+;; Evaluates to a byte
 (defn- mx_x [byte]
   (bit-xor byte (lfsr2 byte)))
 
 ;; ### mx_y
+;; Used during MDS generation
+;;
+;; Evaluates to a byte
 (defn- mx_y [byte]
   (bit-xor (mx_x byte) (lfsr1 byte)))
 
@@ -247,50 +259,78 @@
   (mapv rsmm me mo))
 
 ;; ### qsub
+;; One q S-box substitution
+;;
+;; Evaluates to a byte
 (defn- qsub [byte km qconst]
   (bit-xor (nth (mgetq qconst) byte) km))
 
 ;; ### qsubs
+;; q S-box substitions
+;;
+;; Evaluates to a vector of bytes
 (defn- qsubs [kw]
   (fn [bv idx]
     (mapv qsub bv (word-bytes (nth kw idx) true) (nth qarr (inc idx)))))
 
 ;; ### mulmds
+;; Evaluates to a function over the given mds
+;;
+;; The function takes a vector of bytes as indexs
+;; into the MDS vector.
+;;
+;; Evaluates to a 32-bit word.
 (defn- mulmds [mds]
   (fn [idxv]
     (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))
 
 ;; ### h
+;; The h function as defined in [Section 4.3.2](http://www.schneier.com/paper-twofish-paper.pdf)
+;; Evaluates to a function over the mds and a list of words.
+;;
+;; Given a word and the list of words, evaluates to a 32-bit word
 (defn- h [mds kw]
   (fn [word]
     (-> (qsubs kw)
         (reduce (word-bytes word true) (range (dec (count kw)) -1 -1))
         ((mulmds mds)))))
 
-;; test-keys
-(def key-128 [0x00000000 0x00000000 0x00000000 0x00000000])
-(def key-192 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677])
-(def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])
-
 ;; ### bodds
+;; Calculate a temp vector of words used during
+;; the even and odd subkey generation
+;;
+;; Evaluates to a vector of 32-bit words
 (defn- bodds [mds mo]
   (mapv #(<<< % 8) (mapv (h mds mo) sks1)))
 
 ;; #### mbodds
+;; Memoization of bodds
 (def mbodds (memoize bodds))
 
 ;; ### even-subkeys
+;; Generate the even subkeys
+;;
+;; Evaluates to a vector of 20 32-bit words
 (defn- even-subkeys [mds [me mo]]
   (mapv +modw (mapv (h mds me) sks0) (mbodds mds mo)))
 
 ;; #### meven-subkeys
+;; Memoization of even-subkeys
 (def meven-subkeys (memoize even-subkeys))
 
 ;; ### odd-subkeys
+;; Generate the odd subkeys
+;;
+;; Evaluates to a vector of 20 32-bit words
 (defn- odd-subkeys [mds [me mo :as memo]]
   (mapv #(<<< % 9) (mapv +modw (meven-subkeys mds memo) (mbodds mds mo))))
 
 ;; ### generate-subkeys
+;; Generate the 40 subkeys that will be used over
+;; the 16 rounds of Twofish plus the input whiten
+;; and output whiten steps.
+;;
+;; Evaluates to a vector of 40 32-bit words
 (defn- generate-subkeys[mds memo]
   (-> (meven-subkeys mds memo)
       (interleave (odd-subkeys mds memo))
@@ -304,8 +344,9 @@
 (def odds (comp evens rest))
 
 ;; ### memo
-;; Split the key into evens and odds after
-;; the bytes have been reversed
+;; Split the key into evens (M<sub>e</sub>) 
+;; and odds (M<sub>o</sub>) after the bytes 
+;; have been reversed
 ;;
 ;; Evaluates to a vector of two vectors.  The
 ;; first vector contains the even elements.  The
@@ -319,7 +360,7 @@
 (def mmemo (memoize memo))
 
 ;; ### expand-key
-;; Expaned the key into the subkey vector
+;; Expand the key into the subkey vector
 ;; and the S-box values
 ;;
 ;; Evaluates to a vector.  The first element
@@ -397,12 +438,12 @@
 (defn- encrypt-block [block key]
   (let [[ks sv :as km] (expand-key key)]
     (mapv reverse-bytes
-     (whiten
-      (->> (range 16)
-           (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
-           (partition 2)
-           ((juxt last first))
-           (reduce into [])) ks 4))))
+          (whiten
+           (->> (range 16)
+                (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
+                (partition 2)
+                ((juxt last first))
+                (reduce into [])) ks 4))))
 
 ;; ### decrypt-block
 ;; Decrypt the given block with the given key
@@ -411,13 +452,14 @@
 ;; the plaintext of the block
 (defn- decrypt-block [block key]
   (let [[ks sv :as km] (expand-key key)]
-    (whiten
-     (reduce (decrypt-round km)
-             (->> (whiten (mapv reverse-bytes block) ks 4)
-                  (partition 2)
-                  ((juxt last first))
-                  (reduce into [])) 
-             (range 15 -1 -1)) ks)))
+    (mapv reverse-bytes
+          (whiten
+           (reduce (decrypt-round km)
+                   (->> (whiten (mapv reverse-bytes block) ks 4)
+                        (partition 2)
+                        ((juxt last first))
+                        (reduce into [])) 
+                   (range 15 -1 -1)) ks))))
 
 ;; ### Twofish
 ;; Extend the BlockCipher protocol thorough the Twofish record type

@@ -3134,7 +3134,32 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;CAST6OFBZERO)]
                              [cryptsuite :refer (-&gt;CAST6OFBISO10126)]
                              [cryptsuite :refer (-&gt;CAST6OFBX923)]
-                             [cryptsuite :refer (-&gt;CAST6OFBISO7816)])
+                             [cryptsuite :refer (-&gt;CAST6OFBISO7816)]
+                             [cryptsuite :refer (-&gt;TFECBPKCS7)]
+                             [cryptsuite :refer (-&gt;TFECBZERO)]
+                             [cryptsuite :refer (-&gt;TFECBISO10126)]
+                             [cryptsuite :refer (-&gt;TFECBX923)]
+                             [cryptsuite :refer (-&gt;TFECBISO7816)]
+                             [cryptsuite :refer (-&gt;TFCBCPKCS7)]
+                             [cryptsuite :refer (-&gt;TFCBCZERO)]
+                             [cryptsuite :refer (-&gt;TFCBCISO10126)]
+                             [cryptsuite :refer (-&gt;TFCBCX923)]
+                             [cryptsuite :refer (-&gt;TFCBCISO7816)]
+                             [cryptsuite :refer (-&gt;TFPCBCPKCS7)]
+                             [cryptsuite :refer (-&gt;TFPCBCZERO)]
+                             [cryptsuite :refer (-&gt;TFPCBCISO10126)]
+                             [cryptsuite :refer (-&gt;TFPCBCX923)]
+                             [cryptsuite :refer (-&gt;TFPCBCISO7816)]
+                             [cryptsuite :refer (-&gt;TFCFBPKCS7)]
+                             [cryptsuite :refer (-&gt;TFCFBZERO)]
+                             [cryptsuite :refer (-&gt;TFCFBISO10126)]
+                             [cryptsuite :refer (-&gt;TFCFBX923)]
+                             [cryptsuite :refer (-&gt;TFCFBISO7816)]
+                             [cryptsuite :refer (-&gt;TFOFBPKCS7)]
+                             [cryptsuite :refer (-&gt;TFOFBZERO)]
+                             [cryptsuite :refer (-&gt;TFOFBISO10126)]
+                             [cryptsuite :refer (-&gt;TFOFBX923)]
+                             [cryptsuite :refer (-&gt;TFOFBISO7816)])
             (net.ozias.crypt [testivs :refer (iv-128)]
                              [testkeys :refer (key-128 key-128b)])))</pre></td></tr><tr><td class="docs"><h4>AESXX</h4>
 
@@ -3244,7 +3269,34 @@ net.brehaut.ClojureTools = (function (SH) {
 (def CAST6OFBZERO (-&gt;CAST6OFBZERO))
 (def CAST6OFBISO10126 (-&gt;CAST6OFBISO10126))
 (def CAST6OFBX923 (-&gt;CAST6OFBX923))
-(def CAST6OFBISO7816 (-&gt;CAST6OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
+(def CAST6OFBISO7816 (-&gt;CAST6OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>TFXX</h4>
+
+<p>Setup the Twofish suites for use in testing.</p>
+</td><td class="codes"><pre class="brush: clojure">(def TFECBPKCS7 (-&gt;TFECBPKCS7))
+(def TFECBZERO (-&gt;TFECBZERO))
+(def TFECBISO10126 (-&gt;TFECBISO10126))
+(def TFECBX923 (-&gt;TFECBX923))
+(def TFECBISO7816 (-&gt;TFECBISO7816))
+(def TFCBCPKCS7 (-&gt;TFCBCPKCS7))
+(def TFCBCZERO (-&gt;TFCBCZERO))
+(def TFCBCISO10126 (-&gt;TFCBCISO10126))
+(def TFCBCX923 (-&gt;TFCBCX923))
+(def TFCBCISO7816 (-&gt;TFCBCISO7816))
+(def TFPCBCPKCS7 (-&gt;TFPCBCPKCS7))
+(def TFPCBCZERO (-&gt;TFPCBCZERO))
+(def TFPCBCISO10126 (-&gt;TFPCBCISO10126))
+(def TFPCBCX923 (-&gt;TFPCBCX923))
+(def TFPCBCISO7816 (-&gt;TFPCBCISO7816))
+(def TFCFBPKCS7 (-&gt;TFCFBPKCS7))
+(def TFCFBZERO (-&gt;TFCFBZERO))
+(def TFCFBISO10126 (-&gt;TFCFBISO10126))
+(def TFCFBX923 (-&gt;TFCFBX923))
+(def TFCFBISO7816 (-&gt;TFCFBISO7816))
+(def TFOFBPKCS7 (-&gt;TFOFBPKCS7))
+(def TFOFBZERO (-&gt;TFOFBZERO))
+(def TFOFBISO10126 (-&gt;TFOFBISO10126))
+(def TFOFBX923 (-&gt;TFOFBX923))
+(def TFOFBISO7816 (-&gt;TFOFBISO7816))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
 
 <p>A phrase to test encryption/decryption</p>
 </td><td class="codes"><pre class="brush: clojure">(def phrase &quot;The quick brown fox jumps over the lazy dog.&quot;)</pre></td></tr><tr><td class="docs"><h4>aes-test-vectors</h4>
@@ -3499,7 +3551,70 @@ net.brehaut.ClojureTools = (function (SH) {
                              0xe8b19cf1 0x1526c200 0x01704bde 0x146033ef]]
    [CAST6OFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
                              0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
+                             0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])</pre></td></tr><tr><td class="docs"><h4>tf-test-vectors</h4>
+
+<p>Test vectors for each supported Blowfish suite</p>
+</td><td class="codes"><pre class="brush: clojure">(def tf-test-vectors
+  [[TFECBPKCS7    phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0x39A0613B 0xBFEA1314 0x176EB713 0x47EAC291]]
+   [TFECBZERO     phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0xB0282B3F 0x97533E3F 0x2B486704 0x6288AD7C]]
+   [TFECBX923     phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0x9CF28E99 0x115A9C6D 0x2FD20232 0x6CDD9DAB]]
+   [TFECBISO7816  phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
+                          0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
+                          0xC39BDDB4 0x8F2A7838 0x854152A9 0x37BE3A64]]
+   [TFCBCPKCS7    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x00B243DF 0x57C1186D 0x1B6AF535 0x495E488E]]
+   [TFCBCZERO     phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x1032CC97 0x73D10AD2 0x87E65230 0xFCE7BF95]]
+   [TFCBCX923     phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0x7F180009 0x86547F24 0xC25317F2 0x8E04EBD6]]
+   [TFCBCISO7816  phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0xB6B6AF4D 0xA8E49CD1 0xAF413D94 0xD58A4209
+                          0xB3F9229C 0xBB37B7D3 0x2D0292AD 0x5C49EF22]]
+   [TFPCBCPKCS7   phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0x7AB5318B 0x3A68614F 0x7D47E004 0x8501A27E]]
+   [TFPCBCZERO    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0xC9CBF9D9 0x55148687 0x5BA04DA9 0x2A5412F0]]
+   [TFPCBCX923    phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0xEB172D7C 0x191BBCF2 0x75940A4C 0x8B85CB16]]
+   [TFPCBCISO7816 phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
+                          0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
+                          0x3D9A63D1 0x75B06C26 0x278FF5E1 0xF97E7D05]]
+   [TFCFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x95B5B8BF]]
+   [TFCFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBB]]
+   [TFCFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBF]]
+   [TFCFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
+                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x11B1BCBB]]
+   [TFOFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x636FD62B]]
+   [TFOFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22F]]
+   [TFOFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22B]]
+   [TFOFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
+                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
+                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0xE76BD22F]]])</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
 
 <p>Helper function for testing encryption</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128 iv iv-128}}]
@@ -3522,5 +3637,8 @@ net.brehaut.ClojureTools = (function (SH) {
     (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast5-test-vectors)))))
   (testing &quot;CAST6&quot;
     (is (= true (every? true? (map #(encryptor %1 :key key-128b) cast6-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+    (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors)))))
+  (testing &quot;Twofish&quot;
+    (is (= true (every? true? (map #(encryptor %) tf-test-vectors))))
+    (is (= true (every? true? (map #(decryptor %) tf-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
