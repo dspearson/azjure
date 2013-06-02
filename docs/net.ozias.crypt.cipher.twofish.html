@@ -3035,7 +3035,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns net.ozias.crypt.cipher.twofish
   (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]
             [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
-            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes &lt;&lt;&lt;)]))</pre></td></tr><tr><td class="docs"><h4>q0</h4>
+            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes &lt;&lt;&lt; &gt;&gt;&gt;)]))</pre></td></tr><tr><td class="docs"><h4>q0</h4>
 
 <p>S-box used during key schedule and MDS creation.</p>
 
@@ -3111,7 +3111,23 @@ generates a byte value output</p>
    0x22  0xC9  0xC0  0x9B 0x89  0xD4  0xED  0xAB
    0x12  0xA2  0x0D  0x52 0xBB  0x02  0x2F  0xA9
    0xD7  0x61  0x1E  0xB4 0x50  0x04  0xF6  0xC2
-   0x16  0x25  0x86  0x56 0x55  0x09  0xBE  0x91])</pre></td></tr><tr><td class="docs"><h4>qvec0-4</h4>
+   0x16  0x25  0x86  0x56 0x55  0x09  0xBE  0x91])</pre></td></tr><tr><td class="docs"><h4>sks0</h4>
+
+<p>Subkey generation steps</p>
+</td><td class="codes"><pre class="brush: clojure">(def sks0
+  [0x00000000 0x02020202 0x04040404 0x06060606
+   0x08080808 0x0a0a0a0a 0x0c0c0c0c 0x0e0e0e0e
+   0x10101010 0x12121212 0x14141414 0x16161616
+   0x18181818 0x1a1a1a1a 0x1c1c1c1c 0x1e1e1e1e
+   0x20202020 0x22222222 0x24242424 0x26262626])</pre></td></tr><tr><td class="docs"><h4>sks1</h4>
+
+<p>Subkey generation steps</p>
+</td><td class="codes"><pre class="brush: clojure">(def sks1
+  [0x01010101 0x03030303 0x05050505 0x07070707
+   0x09090909 0x0b0b0b0b 0x0d0d0d0d 0x0f0f0f0f
+   0x11111111 0x13131313 0x15151515 0x17171717
+   0x19191919 0x1b1b1b1b 0x1d1d1d1d 0x1f1f1f1f
+   0x21212121 0x23232323 0x25252525 0x27272727])</pre></td></tr><tr><td class="docs"><h4>qvec0-4</h4>
 
 <p>Vectors of q constants (0 or 1) used
 to identify which q S-box to use above
@@ -3134,18 +3150,18 @@ when substituting a value.</p>
   (if (zero? qconst) q0 q1))</pre></td></tr><tr><td class="docs"><h4>mgetq</h4>
 
 <p>Memoization of getq</p>
-</td><td class="codes"><pre class="brush: clojure">(def mgetq (memoize getq))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def mgetq (memoize getq))</pre></td></tr><tr><td class="docs"><h3>lfsr1</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- lfsr1 [byte]
   (bit-xor
    (bit-shift-right byte 1)
-   (if (bit-test byte 0) 0xb4 0)))</pre></td></tr><tr><td class="docs">
+   (if (bit-test byte 0) 0xb4 0)))</pre></td></tr><tr><td class="docs"><h3>lfsr2</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- lfsr2 [byte]
   (bit-xor
    (bit-shift-right byte 2)
    (if (bit-test byte 1) 0xb4 0)
-   (if (bit-test byte 0) 0x5a 0)))</pre></td></tr><tr><td class="docs">
+   (if (bit-test byte 0) 0x5a 0)))</pre></td></tr><tr><td class="docs"><h3>mx_x</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- mx_x [byte]
-  (bit-xor byte (lfsr2 byte)))</pre></td></tr><tr><td class="docs">
+  (bit-xor byte (lfsr2 byte)))</pre></td></tr><tr><td class="docs"><h3>mx_y</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- mx_y [byte]
   (bit-xor (mx_x byte) (lfsr1 byte)))</pre></td></tr><tr><td class="docs"><h3>genmdswords</h3>
 
@@ -3235,56 +3251,158 @@ are used to calculate a 32-bit output word</p>
 <em>n</em> is the number of 64-bit blocks in the
 key</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- genSv [[me mo]]
-  (mapv rsmm me mo))</pre></td></tr><tr><td class="docs">
+  (mapv rsmm me mo))</pre></td></tr><tr><td class="docs"><h3>qsub</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- qsub [byte km qconst]
-  (bit-xor (nth (mgetq qconst) byte) km))</pre></td></tr><tr><td class="docs">
+  (bit-xor (nth (mgetq qconst) byte) km))</pre></td></tr><tr><td class="docs"><h3>qsubs</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- qsubs [kw]
   (fn [bv idx]
-    (mapv qsub bv (word-bytes (nth kw idx) true) (nth qarr (inc idx)))))</pre></td></tr><tr><td class="docs">
+    (mapv qsub bv (word-bytes (nth kw idx) true) (nth qarr (inc idx)))))</pre></td></tr><tr><td class="docs"><h3>mulmds</h3>
 </td><td class="codes"><pre class="brush: clojure">(defn- mulmds [mds]
   (fn [idxv]
-    (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- hfunc [mds kw]
-  (fn [word _]
+    (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))</pre></td></tr><tr><td class="docs"><h3>h</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- h [mds kw]
+  (fn [word]
     (-&gt; (qsubs kw)
         (reduce (word-bytes word true) (range (dec (count kw)) -1 -1))
         ((mulmds mds)))))</pre></td></tr><tr><td class="docs"><p>test-keys</p>
-</td><td class="codes"><pre class="brush: clojure">(def key-128 [0x0 0x0 0x0 0x0])
+</td><td class="codes"><pre class="brush: clojure">(def key-128 [0x00000000 0x00000000 0x00000000 0x00000000])
 (def key-192 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677])
-(def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def evens (partial take-nth 2))
-(def odds (comp evens rest))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- expand-key [key mds]
-  (let [memo (-&gt; (mapv reverse-bytes key)
-                 ((juxt evens odds)))
-        sbk (genSv memo)
-        _ (println (str &quot;Me: &quot; (mapv to-hex (first memo))))
-        _ (println (str &quot;Mo: &quot; (mapv to-hex (last memo))))
-        _ (println (str &quot;S:  &quot; (mapv to-hex sbk)))
-        stepsa (conj (reductions + (cycle [0x02020202])) 0)
-        stepsb (map (partial + 0x01010101) stepsa)
-        hfuncefn (hfunc mds (first memo))
-        hfuncofn (hfunc mds (last memo))
-        hfuncrng (range 20)
-        a (mapv hfuncefn stepsa hfuncrng)
-        b (mapv #(&lt;&lt;&lt; % 8) (mapv hfuncofn stepsb hfuncrng))
-        a (mapv +modw a b)
-        subkeys a
-        a (mapv #(&lt;&lt;&lt; % 9) (mapv +modw a b))
-        subkeys (vec (interleave subkeys a))]
-    subkeys))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- process-block [block key enc]
-  (let [ks (expand-key key (mmds))
-        _ (println (str &quot;KS: &quot; (mapv to-hex ks)))]
-    block))</pre></td></tr><tr><td class="docs"><h3>Twofish</h3>
+(def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])</pre></td></tr><tr><td class="docs"><h3>bodds</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- bodds [mds mo]
+  (mapv #(&lt;&lt;&lt; % 8) (mapv (h mds mo) sks1)))</pre></td></tr><tr><td class="docs"><h4>mbodds</h4>
+</td><td class="codes"><pre class="brush: clojure">(def mbodds (memoize bodds))</pre></td></tr><tr><td class="docs"><h3>even-subkeys</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- even-subkeys [mds [me mo]]
+  (mapv +modw (mapv (h mds me) sks0) (mbodds mds mo)))</pre></td></tr><tr><td class="docs"><h4>meven-subkeys</h4>
+</td><td class="codes"><pre class="brush: clojure">(def meven-subkeys (memoize even-subkeys))</pre></td></tr><tr><td class="docs"><h3>odd-subkeys</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- odd-subkeys [mds [me mo :as memo]]
+  (mapv #(&lt;&lt;&lt; % 9) (mapv +modw (meven-subkeys mds memo) (mbodds mds mo))))</pre></td></tr><tr><td class="docs"><h3>generate-subkeys</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- generate-subkeys[mds memo]
+  (-&gt; (meven-subkeys mds memo)
+      (interleave (odd-subkeys mds memo))
+      (vec)))</pre></td></tr><tr><td class="docs"><h4>evens</h4>
+
+<p>Parital that will grab evens from a collection</p>
+</td><td class="codes"><pre class="brush: clojure">(def evens (partial take-nth 2))</pre></td></tr><tr><td class="docs"><h4>odds</h4>
+
+<p>Comp that will grab odds from a collection</p>
+</td><td class="codes"><pre class="brush: clojure">(def odds (comp evens rest))</pre></td></tr><tr><td class="docs"><h3>memo</h3>
+
+<p>Split the key into evens and odds after
+the bytes have been reversed</p>
+
+<p>Evaluates to a vector of two vectors.  The
+first vector contains the even elements.  The
+last vector contains the odd elements.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- memo [key]
+  (-&gt; (mapv reverse-bytes key)
+      ((juxt evens odds))))</pre></td></tr><tr><td class="docs"><h4>mmemo</h4>
+
+<p>Memoization of the memo function</p>
+</td><td class="codes"><pre class="brush: clojure">(def mmemo (memoize memo))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
+
+<p>Expaned the key into the subkey vector
+and the S-box values</p>
+
+<p>Evaluates to a vector.  The first element
+is a vector of subkeys.  The last element
+is a vector of the S-box values.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- expand-key [key]
+  [(generate-subkeys (mmds) (mmemo key))
+   (reverse (genSv (mmemo key)))])</pre></td></tr><tr><td class="docs"><h3>whiten</h3>
+
+<p>Whiten the given block with material from the 
+given key schedule.</p>
+
+<pre><code>(whiten ks)
+</code></pre>
+
+<p>should be used for input whitening</p>
+
+<pre><code>(whiten ks 4)
+</code></pre>
+
+<p>should be user for output whitening</p>
+
+<p>Evaluates to a vector of four 32-bit words representing
+the whitened block</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- whiten 
+  ([block ks sidx]
+     (mapv bit-xor block (subvec ks sidx (+ 4 sidx))))
+  ([block ks]
+     (whiten block ks 0)))</pre></td></tr><tr><td class="docs"><h3>f</h3>
+
+<p>The function f as defined in <a href="http://www.schneier.com/paper-twofish-paper.pdf">Section 4.1</a>
+of the Twofish paper.  Takes two input 32-bit words, the key schedule, the S-box values,
+and the round</p>
+
+<p>Evaluates to a vector of two 32-bit words.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- f [[w0 w1] [ks sv] round]
+  (let [t0 ((h (mmds) sv) w0) 
+        t1 ((h (mmds) sv) (&lt;&lt;&lt; w1 8))]
+    [(+modw t0 t1 (nth ks (+ 8 (* 2 round))))
+     (+modw t0 (* 2 t1) (nth ks (+ 9 (* 2 round))))]))</pre></td></tr><tr><td class="docs"><h3>encrypt-round</h3>
+
+<p>Evaluates to a function over the given round material (the key schedule and
+S-box values)</p>
+
+<p>Each round takes a block and the round number.  The Twofish encryption round 
+algorithm is then applied to the block.</p>
+
+<p>Evaluates to four 32-bit words representing the state of the block after the
+given round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-round [[ks sv :as rm]]
+  (fn [[w0 w1 w2 w3] round]
+    (let [[f0 f1] (f [w0 w1] rm round)]
+      (reduce conj [(&gt;&gt;&gt; (bit-xor f0 w2) 1) (bit-xor (&lt;&lt;&lt; w3 1) f1)] [w0 w1]))))</pre></td></tr><tr><td class="docs"><h3>decrypt-round</h3>
+
+<p>Evaluates to a function over the given round material (the key schedule and
+S-box values)</p>
+
+<p>Each round takes a block and the round number.  The Twofish decryption round 
+algorithm is then applied to the block.</p>
+
+<p>Evaluates to four 32-bit words representing the state of the block after the
+given round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-round [[ks sv :as rm]]
+  (fn [[w0 w1 w2 w3] round]
+    (let [[f0 f1] (f [w2 w3] rm round)]
+      (reduce conj [w2 w3] [(bit-xor (&lt;&lt;&lt; w0 1) f0) (&gt;&gt;&gt; (bit-xor f1 w1) 1)]))))</pre></td></tr><tr><td class="docs"><h3>encrypt-block</h3>
+
+<p>Encrypt the given block with the given key</p>
+
+<p>Evaluates to a vector of four 32-bit words that represent
+the ciphertext of the block</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [block key]
+  (let [[ks sv :as km] (expand-key key)]
+    (mapv reverse-bytes
+     (whiten
+      (-&gt;&gt; (range 16)
+           (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
+           (partition 2)
+           ((juxt last first))
+           (reduce into [])) ks 4))))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
+
+<p>Decrypt the given block with the given key</p>
+
+<p>Evaluates to a vector of four 32-bit words that represent
+the plaintext of the block</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [block key]
+  (let [[ks sv :as km] (expand-key key)]
+    (whiten
+     (reduce (decrypt-round km)
+             (-&gt;&gt; (whiten (mapv reverse-bytes block) ks 4)
+                  (partition 2)
+                  ((juxt last first))
+                  (reduce into [])) 
+             (range 15 -1 -1)) ks)))</pre></td></tr><tr><td class="docs"><h3>Twofish</h3>
 
 <p>Extend the BlockCipher protocol thorough the Twofish record type</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord Twofish []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (encrypt-block block key))
   (decrypt-block [_ block key]
-    (process-block block key false))
+    (decrypt-block block key))
   (blocksize [_]
     128))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

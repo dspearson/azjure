@@ -129,20 +129,24 @@
 ;; Memoization of getq
 (def mgetq (memoize getq))
 
+;; ### lfsr1
 (defn- lfsr1 [byte]
   (bit-xor
    (bit-shift-right byte 1)
    (if (bit-test byte 0) 0xb4 0)))
 
+;; ### lfsr2
 (defn- lfsr2 [byte]
   (bit-xor
    (bit-shift-right byte 2)
    (if (bit-test byte 1) 0xb4 0)
    (if (bit-test byte 0) 0x5a 0)))
 
+;; ### mx_x
 (defn- mx_x [byte]
   (bit-xor byte (lfsr2 byte)))
 
+;; ### mx_y
 (defn- mx_y [byte]
   (bit-xor (mx_x byte) (lfsr1 byte)))
 
@@ -242,17 +246,21 @@
 (defn- genSv [[me mo]]
   (mapv rsmm me mo))
 
+;; ### qsub
 (defn- qsub [byte km qconst]
   (bit-xor (nth (mgetq qconst) byte) km))
 
+;; ### qsubs
 (defn- qsubs [kw]
   (fn [bv idx]
     (mapv qsub bv (word-bytes (nth kw idx) true) (nth qarr (inc idx)))))
 
+;; ### mulmds
 (defn- mulmds [mds]
   (fn [idxv]
     (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))
 
+;; ### h
 (defn- h [mds kw]
   (fn [word]
     (-> (qsubs kw)
@@ -264,71 +272,160 @@
 (def key-192 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677])
 (def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])
 
+;; ### bodds
 (defn- bodds [mds mo]
   (mapv #(<<< % 8) (mapv (h mds mo) sks1)))
 
+;; #### mbodds
 (def mbodds (memoize bodds))
 
+;; ### even-subkeys
 (defn- even-subkeys [mds [me mo]]
   (mapv +modw (mapv (h mds me) sks0) (mbodds mds mo)))
 
+;; #### meven-subkeys
 (def meven-subkeys (memoize even-subkeys))
 
+;; ### odd-subkeys
 (defn- odd-subkeys [mds [me mo :as memo]]
   (mapv #(<<< % 9) (mapv +modw (meven-subkeys mds memo) (mbodds mds mo))))
 
+;; ### generate-subkeys
 (defn- generate-subkeys[mds memo]
   (-> (meven-subkeys mds memo)
       (interleave (odd-subkeys mds memo))
       (vec)))
 
+;; #### evens
+;; Parital that will grab evens from a collection
 (def evens (partial take-nth 2))
+;; #### odds
+;; Comp that will grab odds from a collection
 (def odds (comp evens rest))
 
+;; ### memo
+;; Split the key into evens and odds after
+;; the bytes have been reversed
+;;
+;; Evaluates to a vector of two vectors.  The
+;; first vector contains the even elements.  The
+;; last vector contains the odd elements.
 (defn- memo [key]
   (-> (mapv reverse-bytes key)
       ((juxt evens odds))))
 
+;; #### mmemo
+;; Memoization of the memo function
 (def mmemo (memoize memo))
 
+;; ### expand-key
+;; Expaned the key into the subkey vector
+;; and the S-box values
+;;
+;; Evaluates to a vector.  The first element
+;; is a vector of subkeys.  The last element
+;; is a vector of the S-box values.
 (defn- expand-key [key]
   [(generate-subkeys (mmds) (mmemo key))
    (reverse (genSv (mmemo key)))])
 
+;; ### whiten
+;; Whiten the given block with material from the 
+;; given key schedule.
+;;
+;;     (whiten ks)
+;;
+;; should be used for input whitening
+;;
+;;     (whiten ks 4)
+;;
+;; should be user for output whitening
+;;
+;; Evaluates to a vector of four 32-bit words representing
+;; the whitened block
 (defn- whiten 
   ([block ks sidx]
      (mapv bit-xor block (subvec ks sidx (+ 4 sidx))))
   ([block ks]
      (whiten block ks 0)))
 
+;; ### f
+;; The function f as defined in [Section 4.1](http://www.schneier.com/paper-twofish-paper.pdf)
+;; of the Twofish paper.  Takes two input 32-bit words, the key schedule, the S-box values,
+;; and the round
+;;
+;; Evaluates to a vector of two 32-bit words.
 (defn- f [[w0 w1] [ks sv] round]
   (let [t0 ((h (mmds) sv) w0) 
         t1 ((h (mmds) sv) (<<< w1 8))]
     [(+modw t0 t1 (nth ks (+ 8 (* 2 round))))
      (+modw t0 (* 2 t1) (nth ks (+ 9 (* 2 round))))]))
 
-(defn- tfround [[ks sv :as rm]]
-  (fn [[w0 w1 w2 w3 :as in] round]
-    (let [[f0 f1 :as fs1] (f [w0 w1] rm round)]
+;; ### encrypt-round
+;; Evaluates to a function over the given round material (the key schedule and
+;; S-box values)
+;;
+;; Each round takes a block and the round number.  The Twofish encryption round 
+;; algorithm is then applied to the block.
+;;
+;; Evaluates to four 32-bit words representing the state of the block after the
+;; given round
+(defn- encrypt-round [[ks sv :as rm]]
+  (fn [[w0 w1 w2 w3] round]
+    (let [[f0 f1] (f [w0 w1] rm round)]
       (reduce conj [(>>> (bit-xor f0 w2) 1) (bit-xor (<<< w3 1) f1)] [w0 w1]))))
 
-(defn- process-block [block key enc]
+;; ### decrypt-round
+;; Evaluates to a function over the given round material (the key schedule and
+;; S-box values)
+;;
+;; Each round takes a block and the round number.  The Twofish decryption round 
+;; algorithm is then applied to the block.
+;;
+;; Evaluates to four 32-bit words representing the state of the block after the
+;; given round
+(defn- decrypt-round [[ks sv :as rm]]
+  (fn [[w0 w1 w2 w3] round]
+    (let [[f0 f1] (f [w2 w3] rm round)]
+      (reduce conj [w2 w3] [(bit-xor (<<< w0 1) f0) (>>> (bit-xor f1 w1) 1)]))))
+
+;; ### encrypt-block
+;; Encrypt the given block with the given key
+;;
+;; Evaluates to a vector of four 32-bit words that represent
+;; the ciphertext of the block
+(defn- encrypt-block [block key]
   (let [[ks sv :as km] (expand-key key)]
     (mapv reverse-bytes
      (whiten
       (->> (range 16)
-           (reduce (tfround km) (whiten (mapv reverse-bytes block) ks))
+           (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
            (partition 2)
            ((juxt last first))
            (reduce into [])) ks 4))))
+
+;; ### decrypt-block
+;; Decrypt the given block with the given key
+;;
+;; Evaluates to a vector of four 32-bit words that represent
+;; the plaintext of the block
+(defn- decrypt-block [block key]
+  (let [[ks sv :as km] (expand-key key)]
+    (whiten
+     (reduce (decrypt-round km)
+             (->> (whiten (mapv reverse-bytes block) ks 4)
+                  (partition 2)
+                  ((juxt last first))
+                  (reduce into [])) 
+             (range 15 -1 -1)) ks)))
 
 ;; ### Twofish
 ;; Extend the BlockCipher protocol thorough the Twofish record type
 (defrecord Twofish []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (encrypt-block block key))
   (decrypt-block [_ block key]
-    (process-block block key false))
+    (decrypt-block block key))
   (blocksize [_]
     128))

@@ -3039,7 +3039,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>Useful for testing</p>
 </td><td class="codes"><pre class="brush: clojure">(defn to-hex 
-  ([val len] (format (str &quot;0x%0&quot; len &quot;x&quot;) val))
+  ([val len] (format (str &quot;0x%0&quot; len &quot;X&quot;) val))
   ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs"><h3>words-per-block</h3>
 
 <p>Get the number of words per cipher block</p>
@@ -3055,9 +3055,14 @@ net.brehaut.ClojureTools = (function (SH) {
       (mod 32)))</pre></td></tr><tr><td class="docs"><h3>+modw</h3>
 
 <p>Add a and b mod 2<sup>32</sup></p>
-</td><td class="codes"><pre class="brush: clojure">(defn +modw [a b]
-  (-&gt; (+ a b)
-      (mod 0x100000000)))</pre></td></tr><tr><td class="docs"><h3>-modw</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn +modw
+  ([] 0)
+  ([a] a)
+  ([a b]
+     (-&gt; (+ a b)
+         (mod 0x100000000)))
+  ([a b &amp; more]
+     (reduce +modw (+modw a b) more)))</pre></td></tr><tr><td class="docs"><h3>-modw</h3>
 
 <p>Subtract a and b mod 2<sup>32</sup></p>
 </td><td class="codes"><pre class="brush: clojure">(defn -modw [a b]
