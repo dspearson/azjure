@@ -4,7 +4,7 @@
 (ns net.ozias.crypt.cipher.twofish
   (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]
             [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
-            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes <<<)]))
+            [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes <<< >>>)]))
 
 ;; #### q0
 ;; S-box used during key schedule and MDS creation.
@@ -83,6 +83,24 @@
    0x12  0xA2  0x0D  0x52 0xBB  0x02  0x2F  0xA9
    0xD7  0x61  0x1E  0xB4 0x50  0x04  0xF6  0xC2
    0x16  0x25  0x86  0x56 0x55  0x09  0xBE  0x91])
+
+;; #### sks0
+;; Subkey generation steps
+(def sks0
+  [0x00000000 0x02020202 0x04040404 0x06060606
+   0x08080808 0x0a0a0a0a 0x0c0c0c0c 0x0e0e0e0e
+   0x10101010 0x12121212 0x14141414 0x16161616
+   0x18181818 0x1a1a1a1a 0x1c1c1c1c 0x1e1e1e1e
+   0x20202020 0x22222222 0x24242424 0x26262626])
+
+;; #### sks1
+;; Subkey generation steps
+(def sks1
+  [0x01010101 0x03030303 0x05050505 0x07070707
+   0x09090909 0x0b0b0b0b 0x0d0d0d0d 0x0f0f0f0f
+   0x11111111 0x13131313 0x15151515 0x17171717
+   0x19191919 0x1b1b1b1b 0x1d1d1d1d 0x1f1f1f1f
+   0x21212121 0x23232323 0x25252525 0x27272727])
 
 ;; #### qvec0-4
 ;; Vectors of q constants (0 or 1) used
@@ -235,44 +253,74 @@
   (fn [idxv]
     (reduce bit-xor (mapv #(nth mds (+ % (* 4 (nth idxv %)))) (range 4)))))
 
-(defn- hfunc [mds kw]
-  (fn [word _]
+(defn- h [mds kw]
+  (fn [word]
     (-> (qsubs kw)
         (reduce (word-bytes word true) (range (dec (count kw)) -1 -1))
         ((mulmds mds)))))
 
 ;; test-keys
-(def key-128 [0x0 0x0 0x0 0x0])
+(def key-128 [0x00000000 0x00000000 0x00000000 0x00000000])
 (def key-192 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677])
 (def key-256 [0x01234567 0x89ABCDEF 0xFEDCBA98 0x76543210 0x00112233 0x44556677 0x8899AABB 0xCCDDEEFF])
+
+(defn- bodds [mds mo]
+  (mapv #(<<< % 8) (mapv (h mds mo) sks1)))
+
+(def mbodds (memoize bodds))
+
+(defn- even-subkeys [mds [me mo]]
+  (mapv +modw (mapv (h mds me) sks0) (mbodds mds mo)))
+
+(def meven-subkeys (memoize even-subkeys))
+
+(defn- odd-subkeys [mds [me mo :as memo]]
+  (mapv #(<<< % 9) (mapv +modw (meven-subkeys mds memo) (mbodds mds mo))))
+
+(defn- generate-subkeys[mds memo]
+  (-> (meven-subkeys mds memo)
+      (interleave (odd-subkeys mds memo))
+      (vec)))
 
 (def evens (partial take-nth 2))
 (def odds (comp evens rest))
 
-(defn- expand-key [key mds]
-  (let [memo (-> (mapv reverse-bytes key)
-                 ((juxt evens odds)))
-        sbk (genSv memo)
-        _ (println (str "Me: " (mapv to-hex (first memo))))
-        _ (println (str "Mo: " (mapv to-hex (last memo))))
-        _ (println (str "S:  " (mapv to-hex sbk)))
-        stepsa (conj (reductions + (cycle [0x02020202])) 0)
-        stepsb (map (partial + 0x01010101) stepsa)
-        hfuncefn (hfunc mds (first memo))
-        hfuncofn (hfunc mds (last memo))
-        hfuncrng (range 20)
-        a (mapv hfuncefn stepsa hfuncrng)
-        b (mapv #(<<< % 8) (mapv hfuncofn stepsb hfuncrng))
-        a (mapv +modw a b)
-        subkeys a
-        a (mapv #(<<< % 9) (mapv +modw a b))
-        subkeys (vec (interleave subkeys a))]
-    subkeys))
+(defn- memo [key]
+  (-> (mapv reverse-bytes key)
+      ((juxt evens odds))))
+
+(def mmemo (memoize memo))
+
+(defn- expand-key [key]
+  [(generate-subkeys (mmds) (mmemo key))
+   (reverse (genSv (mmemo key)))])
+
+(defn- whiten 
+  ([block ks sidx]
+     (mapv bit-xor block (subvec ks sidx (+ 4 sidx))))
+  ([block ks]
+     (whiten block ks 0)))
+
+(defn- f [[w0 w1] [ks sv] round]
+  (let [t0 ((h (mmds) sv) w0) 
+        t1 ((h (mmds) sv) (<<< w1 8))]
+    [(+modw t0 t1 (nth ks (+ 8 (* 2 round))))
+     (+modw t0 (* 2 t1) (nth ks (+ 9 (* 2 round))))]))
+
+(defn- tfround [[ks sv :as rm]]
+  (fn [[w0 w1 w2 w3 :as in] round]
+    (let [[f0 f1 :as fs1] (f [w0 w1] rm round)]
+      (reduce conj [(>>> (bit-xor f0 w2) 1) (bit-xor (<<< w3 1) f1)] [w0 w1]))))
 
 (defn- process-block [block key enc]
-  (let [ks (expand-key key (mmds))
-        _ (println (str "KS: " (mapv to-hex ks)))]
-    block))
+  (let [[ks sv :as km] (expand-key key)]
+    (mapv reverse-bytes
+     (whiten
+      (->> (range 16)
+           (reduce (tfround km) (whiten (mapv reverse-bytes block) ks))
+           (partition 2)
+           ((juxt last first))
+           (reduce into [])) ks 4))))
 
 ;; ### Twofish
 ;; Extend the BlockCipher protocol thorough the Twofish record type

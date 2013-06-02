@@ -9,7 +9,7 @@
 ;;
 ;; Useful for testing
 (defn to-hex 
-  ([val len] (format (str "0x%0" len "x") val))
+  ([val len] (format (str "0x%0" len "X") val))
   ([val] (to-hex val 8)))
 
 ;; ### words-per-block
@@ -29,9 +29,14 @@
 
 ;; ### +modw
 ;; Add a and b mod 2<sup>32</sup>
-(defn +modw [a b]
-  (-> (+ a b)
-      (mod 0x100000000)))
+(defn +modw
+  ([] 0)
+  ([a] a)
+  ([a b]
+     (-> (+ a b)
+         (mod 0x100000000)))
+  ([a b & more]
+     (reduce +modw (+modw a b) more)))
 
 ;; ### -modw
 ;; Subtract a and b mod 2<sup>32</sup>
