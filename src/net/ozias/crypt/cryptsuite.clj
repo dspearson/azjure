@@ -67,8 +67,8 @@
 ;; and then encrypts the array with the given cipher and mode.
 ;;
 ;; Evaluates to a vector of 32-bit words.
-(defn- encryptor [[cipher mode padding] key iv bytearr]
-  (mode/encrypt-blocks mode cipher iv (padder/pad padding bytearr cipher) key))
+(defn- encryptor [[cipher mode padding] key iv bytev]
+  (mode/encrypt mode cipher key iv (padder/pad padding bytev cipher)))
 
 ;; ### decryptor
 ;; Helper function for decryption.  Decrypts the given vector of words with
@@ -76,7 +76,7 @@
 ;;
 ;; Evaluates to an array of bytes.
 (defn- decryptor [[cipher mode padding] key iv words]
-  (padder/unpad padding (mode/decrypt-blocks mode cipher iv words key) cipher))
+  (padder/unpad padding (mode/decrypt mode cipher key iv words) cipher))
 
 ;; ### AESECBX
 ;; AES cipher, Electronic Codebook Mode, various padding methods

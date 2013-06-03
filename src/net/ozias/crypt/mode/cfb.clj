@@ -44,7 +44,7 @@
 ;; Extend the ModeOfOperation protocol through the CipherFeedback record.
 (defrecord CipherFeedback []
   ModeOfOperation
-  (encrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks))))
-  (decrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((decrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks)))))
+  (encrypt [_ cipher key iv bytes]
+    (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) bytes))))
+  (decrypt [_ cipher key iv bytes]
+    (last (reduce #((decrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) bytes)))))

@@ -45,12 +45,12 @@
 ;; ## encrypt-blocks
 ;; Encrypt a vector of blocks.
 (defn- encrypt-blocks [[mode cipher iv key plaintext ciphertext]]
-  (is (= ciphertext (mode/encrypt-blocks mode cipher iv plaintext key))))
+  (is (= ciphertext (mode/encrypt mode cipher iv plaintext key))))
 
 ;; ## decrypt-blocks
 ;; Decrypt a vector of blocks.
 (defn- decrypt-blocks [[mode cipher iv key plaintext ciphertext]]
-  (is (= plaintext (mode/decrypt-blocks mode cipher iv ciphertext key))))
+  (is (= plaintext (mode/decrypt mode cipher iv ciphertext key))))
 
 ;; ## testModes
 ;; Test the blockcipher modes

@@ -48,7 +48,7 @@
 ;; Extend the ModeOfOperation protocol through the CipherBlockChaining record.
 (defrecord CipherBlockChaining []
   ModeOfOperation
-  (encrypt-blocks [_ cipher iv blocks key]
-    (reduce #((encrypt-block cipher iv key) %1 %2) [] (partition (mwpb cipher) blocks)))
-  (decrypt-blocks [_ cipher iv blocks key]
-    (reduce #((decrypt-block cipher blocks iv key) %1 %2) []  (range (/ (count blocks) (mwpb cipher))))))    
+  (encrypt [_ cipher key iv bytes]
+    (reduce #((encrypt-block cipher iv key) %1 %2) [] (partition (mwpb cipher) bytes)))
+  (decrypt [_ cipher key iv bytes]
+    (reduce #((decrypt-block cipher bytes iv key) %1 %2) []  (range (/ (count bytes) (mwpb cipher))))))    

@@ -69,6 +69,13 @@
   ([word]
      (word-bytes word false)))
 
+(defn dword-bytes 
+  ([dword le]
+     (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
+       (mapv #(last-byte (bit-shift-right dword %)) rng)))
+  ([dword]
+     (dword-bytes dword false)))
+
 ;; ### reverse-bytes
 ;; Reverse the bytes in a word
 ;;

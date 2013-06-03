@@ -3,7 +3,19 @@
 (ns net.ozias.crypt.cipher.salsa20
   (:require [net.ozias.crypt.cipher.streamcipher :refer [StreamCipher]]
             [net.ozias.crypt.libcrypt :refer (+modw to-hex)]
-            [net.ozias.crypt.libbyte :refer (<<< bytes-word word-bytes)]))
+            [net.ozias.crypt.libbyte :refer (<<< bytes-word word-bytes dword-bytes)]))
+
+(def sigma
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x33]
+   [0x32 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])
+
+(def tau
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x31]
+   [0x36 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])
 
 (def t1 
   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -103,11 +115,20 @@
          (mapv #(word-bytes % true))
          (reduce into))))
 
+(defn- key256? [key]
+  (= 32 (count key)))
+
+(defn- key-stream [key iv]
+  (let [c (if (key256? key) sigma tau)
+        k0 (subvec key 0 16)
+        k1 (if (key256? key) (subvec key 16 32) (subvec key 0 16))]
+    (salsa20 (reduce into [(nth c 0) k0 (nth c 1) iv (nth c 2) k1 (nth c 3)]))))
+
 ;; ### Salsa20
 ;; Extend the StreamCipher protocol thorough the Salsa20 record type
 (defrecord Salsa20 []
   StreamCipher
-  (process-byte [_ byte]
-    byte)
-  (process-bytes [_ bytes]
-    (salsa20 bytes)))
+  (generate-keystream [_ key iv]
+    (key-stream key iv))
+  (keystream-size-bytes [_] 64)
+  (iv-size-bytes [_] 16))

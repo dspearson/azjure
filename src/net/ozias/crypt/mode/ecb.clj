@@ -15,7 +15,7 @@
 ;; Extend the ModeOfOperation protocol through the ElectronicCodebook record
 (defrecord ElectronicCodebook []
   ModeOfOperation
-  (encrypt-blocks [_ cipher _ blocks key]
-    (reduce into (mapv #(bc/encrypt-block cipher % key) (partition (mwpb cipher) blocks))))
-  (decrypt-blocks [_ cipher _ blocks key]
-    (reduce into (mapv #(bc/decrypt-block cipher % key) (partition (mwpb cipher) blocks)))))
+  (encrypt [_ cipher key _ bytes]
+    (reduce into (mapv #(bc/encrypt-block cipher % key) (partition (mwpb cipher) bytes))))
+  (decrypt [_ cipher key _ bytes]
+    (reduce into (mapv #(bc/decrypt-block cipher % key) (partition (mwpb cipher) bytes)))))

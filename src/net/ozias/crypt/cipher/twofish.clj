@@ -2,7 +2,8 @@
 ;; Designed to meet the spec at
 ;; [https://www.schneier.com/paper-twofish-paper.pdf](https://www.schneier.com/paper-twofish-paper.pdf)
 (ns net.ozias.crypt.cipher.twofish
-  (:require [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]
+  (:require (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+                                    [streamcipher :refer (StreamCipher)])
             [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
             [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes <<< >>>)]))
 
@@ -470,4 +471,9 @@
   (decrypt-block [_ block key]
     (decrypt-block block key))
   (blocksize [_]
-    128))
+    128)
+  StreamCipher
+  (generate-keystream [_ key iv]
+    (reduce into (mapv word-bytes (encrypt-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key))))))
+  (keystream-size-bytes [_] 16)
+  (iv-size-bytes [_] 16))

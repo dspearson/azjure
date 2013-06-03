@@ -4,47 +4,25 @@
 ;; [Block Cipher Mode of Operation](http://en.wikipedia.org/wiki/Cipher_block_chaining)
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.ofb
-  (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
+  (:require [clojure.core.reducers :as r]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
-            [net.ozias.crypt.cipher.blockcipher :as bc]))
+            [net.ozias.crypt.cipher.streamcipher :as sc]))
 
-;; ### encrypt-block
-;; Evaluates to a function over the given cipher and key.
-;;
-;; * <em>[iv ct]</em> - The initialization vector for the current block and
-;; the ciphertext vector.
-;; * <em>block</em> - The block we are decrypting.
-;;
-;; Evaluates to a vector containing the IV to use with the next block and
-;; the current state of the ciphertext vector.
-(defn- encrypt-block [cipher key]
-  (fn [[iv ct] block]
-    (let [encrypted (bc/encrypt-block cipher iv key)
-          ciphertext (mapv #(bit-xor %1 %2) block encrypted)]
-      [encrypted
-       (reduce conj ct ciphertext)])))
+(defn- process-bytes [cipher key iv bytes]
+  (let [len (count bytes)
+        kb (sc/keystream-size-bytes cipher)
+        ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
+    (->> (range (inc ks))
+         (reductions (partial sc/generate-keystream cipher key) iv)
+         (rest)
+         (reduce into)
+         (mapv bit-xor bytes))))
 
-;; ### decrypt-block
-;; Evaluates to a function over the given cipher and key.
-;;
-;; * <em>[iv pt]</em> - The initialization vector for the current block and
-;; the plaintext vector.
-;; * <em>block</em> - The block we are decrypting.
-;;
-;; Evaluates to a vector containing the IV to use with the next block and
-;; the current state of the plaintext vector.
-(defn- decrypt-block [cipher key]
-  (fn [[iv pt] block]
-    (let [decrypted (bc/encrypt-block cipher iv key)
-          plaintext (mapv #(bit-xor %1 %2) decrypted block)]
-      [decrypted
-       (reduce conj pt plaintext)])))
-      
 ;; ### OutputFeedback
 ;; Extend the ModeOfOperation protocol through the OutputFeedback record.
 (defrecord OutputFeedback []
   ModeOfOperation
-  (encrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks))))
-  (decrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((decrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks)))))
+  (encrypt [_ cipher key iv bytes]
+    (process-bytes cipher key iv bytes))
+  (decrypt [_ cipher key iv bytes]
+    (process-bytes cipher key iv bytes)))
