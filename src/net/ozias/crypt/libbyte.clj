@@ -31,11 +31,12 @@
 ;; > 0x12ab1f3b
 ;;
 ;; This is the inverse of word-bytes.
-(defn bytes-word [vec]
-  (apply bit-or 
-         (map #(bit-shift-left (nth vec %1) %2) 
-              (range 4) 
-              (range 24 -1 -8))))        
+(defn bytes-word 
+  ([vec le]
+     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
+       (reduce bit-or (map #(bit-shift-left (nth vec %1) %2) (range 4) rng))))
+  ([vec]
+     (bytes-word vec false)))
 
 (defn bytes-dword [vec]
   (apply bit-or
@@ -45,25 +46,25 @@
 
 ;; ### word-bytes
 ;; Takes a 32-bit word and creates a vector of 
-;; the 4 bytes individually. If <em>lsf</em> is true,
-;; the order of the vector will be LSB to MSB.
-;; Otherwise, the order of the vector will be
-;; MSB to LSB.
+;; the 4 bytes individually. If <em>le</em> 
+;; (little endian) is true, the order of the vector
+;; will be LSB to MSB. Otherwise, the order of the
+;; vector will be MSB to LSB.
 ;;
 ;;     (word-bytes 0x12ab1f3b)
 ;;
 ;; evaluates to
 ;; > [0x12 0xab 0x1f 0x3b]
 ;;
-;;     (word-bytes 0x12ab1f3b)
+;;     (word-bytes 0x12ab1f3b true)
 ;;
 ;; evaluates to
 ;; > [0x3b 0x1f 0xab 0x12]
 ;;
 ;; This is the inverse of byte-words.
 (defn word-bytes 
-  ([word lsf]
-     (let [rng (if lsf (range 0 32 8) (range 24 -1 -8))]
+  ([word le]
+     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
        (mapv #(last-byte (bit-shift-right word %)) rng)))
   ([word]
      (word-bytes word false)))
