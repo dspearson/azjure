@@ -8,6 +8,11 @@
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
             [net.ozias.crypt.cipher.streamcipher :as sc]))
 
+;; ### process-bytes
+;; Encrypt the given bytes vector with the given
+;; cipher, key and IV.
+;;
+;; Evaluates to a vector of bytes.
 (defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
         kb (sc/keystream-size-bytes cipher)

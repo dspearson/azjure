@@ -597,7 +597,17 @@
   (decrypt [_ key iv bytes] (decryptor Twofish CTR key iv bytes)))
 
 ;; ### S20CTR
-;; Salsa20 cipher, Counter Mode
+;; Salsa20 cipher, Various stream modes
+(defrecord S20CFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor Salsa20 CFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor Salsa20 CFB key iv bytes)))
+
+(defrecord S20OFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor Salsa20 OFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor Salsa20 OFB key iv bytes)))
+
 (defrecord S20CTR []
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor Salsa20 CTR key iv bytes))
