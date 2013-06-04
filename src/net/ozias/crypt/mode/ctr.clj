@@ -8,13 +8,23 @@
   (:require [clojure.core.reducers :as r]
             [net.ozias.crypt.libbyte :refer (dword-bytes)]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
-            [net.ozias.crypt.cipher.streamcipher :as sc]
-            [net.ozias.crypt.cipher.twofish :refer (->Twofish)]))
+            [net.ozias.crypt.cipher.streamcipher :as sc]))
 
+;; ### pad-iv
+;; Add the counter bytes to the IV bytes up the the size
+;; of IV needed by the cipher. Currently,the counter will 
+;; max out at 8 bytes.
+;;
+;; Evaluates to a vector of bytes.
 (defn- pad-iv [cipher iv ctr]
   (let [diff (- (sc/iv-size-bytes cipher) (count iv))]
     (reduce conj iv (take diff (dword-bytes ctr)))))
 
+;; ### process-bytes
+;; Process the given byte vector with the given cipher,
+;; key, and IV.
+;;
+;; Evaluates to a vector of bytes.
 (defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
         kb (sc/keystream-size-bytes cipher)
@@ -30,8 +40,8 @@
 ;; Extend the ModeOfOperation protocol through the CounterMode record.
 (defrecord CounterMode []
   ModeOfOperation
-  (encrypt [_ cipher iv bytes key]
+  (encrypt [_ cipher key iv bytes]
     (process-bytes cipher key iv bytes))
-  (decrypt [_ cipher iv bytes key]
+  (decrypt [_ cipher key iv bytes]
     (process-bytes cipher key iv bytes)))
 

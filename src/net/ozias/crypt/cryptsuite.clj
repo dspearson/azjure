@@ -6,7 +6,8 @@
                                     [blowfish :refer (->Blowfish)]
                                     [cast5 :refer (->CAST5)]
                                     [cast6 :refer (->CAST6)]
-                                    [twofish :refer (->Twofish)])
+                                    [twofish :refer (->Twofish)]
+                                    [salsa20 :refer (->Salsa20)])
             (net.ozias.crypt.mode [modeofoperation :as mode]
                                   [ecb :refer (->ElectronicCodebook)]
                                   [cbc :refer (->CipherBlockChaining)]
@@ -25,19 +26,15 @@
 ;; This protocol defines two functions
 ;;
 ;; #### encrypt
-;; This function takes a cipher, mode, and padding
-;; method, and uses that suite with the supplied
-;; key and initialization vector to encrypt the
-;; given byte array.
+;; Encrypt the given bytes vector with the given
+;; key and initialization vector.
 ;;
 ;; #### decrypt
-;; This function takes a cipher, mode, and padding
-;; method, and uses that suite with the supplied
-;; key and initialization vector to decrypt the
-;; given words vector.
+;; Decrypt the given bytes vector with the given
+;; key and initialization vector.
 (defprotocol CryptSuite
-  (encrypt [_ key iv bytearr])
-  (decrypt [_ key iv words]))
+  (encrypt [_ key iv bytes])
+  (decrypt [_ key iv bytes]))
 
 ;; #### PKCS7, Zeropad, ISO10126, X923, ISO7816
 ;; Setup the padding records
@@ -51,9 +48,10 @@
 ;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
+(def Twofish (->Twofish))
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
-(def Twofish (->Twofish))
+(def Salsa20 (->Salsa20))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB,CTR
 ;; Setup the mode for use in testing
@@ -68,7 +66,7 @@
 ;; Helper function for encryption.  Pads the bytearr with the given padder
 ;; and then encrypts the array with the given cipher and mode.
 ;;
-;; Evaluates to a vector of 32-bit words.
+;; Evaluates to a vector of bytes.
 (defn- encryptor 
   ([cipher mode key iv bytes]
      (mode/encrypt mode cipher key iv bytes))
@@ -77,15 +75,16 @@
 
 ;; ### decryptor
 ;; Helper function for decryption.  Decrypts the given vector of bytes with
-;; the cipher and mode given.  
+;; the cipher and mode given.
+;;
 ;; If a padding was supplied, unpads the result with the given padder.
 ;;
-;; Evaluates to an array of bytes.
+;; Evaluates to a vector of bytes.
 (defn- decryptor 
   ([cipher mode key iv bytes]
      (mode/decrypt mode cipher key iv bytes))
   ([cipher mode padding key iv words]
-     (padder/unpad padding (decryptor [cipher mode] key iv words) cipher)))
+     (padder/unpad padding (decryptor cipher mode key iv words) cipher)))
 
 ;; ### AESECBX
 ;; AES cipher, Electronic Codebook Mode, various padding methods
@@ -596,3 +595,10 @@
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor Twofish CTR key iv bytes))
   (decrypt [_ key iv bytes] (decryptor Twofish CTR key iv bytes)))
+
+;; ### S20CTR
+;; Salsa20 cipher, Counter Mode
+(defrecord S20CTR []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor Salsa20 CTR key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor Salsa20 CTR key iv bytes)))

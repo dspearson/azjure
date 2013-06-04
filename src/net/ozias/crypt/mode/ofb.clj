@@ -13,7 +13,7 @@
         kb (sc/keystream-size-bytes cipher)
         ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
     (->> (range (inc ks))
-         (reductions (partial sc/generate-keystream cipher key) iv)
+         (reductions (fn [iv _] (sc/generate-keystream cipher key iv)) iv)
          (rest)
          (reduce into)
          (mapv bit-xor bytes))))

@@ -19,16 +19,9 @@
                              [cryptsuite :refer (->AESPCBCISO10126)]
                              [cryptsuite :refer (->AESPCBCX923)]
                              [cryptsuite :refer (->AESPCBCISO7816)]
-                             [cryptsuite :refer (->AESCFBPKCS7)]
-                             [cryptsuite :refer (->AESCFBZERO)]
-                             [cryptsuite :refer (->AESCFBISO10126)]
-                             [cryptsuite :refer (->AESCFBX923)]
-                             [cryptsuite :refer (->AESCFBISO7816)]
-                             [cryptsuite :refer (->AESOFBPKCS7)]
-                             [cryptsuite :refer (->AESOFBZERO)]
-                             [cryptsuite :refer (->AESOFBISO10126)]
-                             [cryptsuite :refer (->AESOFBX923)]
-                             [cryptsuite :refer (->AESOFBISO7816)]
+                             [cryptsuite :refer (->AESCFB)]
+                             [cryptsuite :refer (->AESOFB)]
+                             [cryptsuite :refer (->AESCTR)]
                              [cryptsuite :refer (->BFECBPKCS7)]
                              [cryptsuite :refer (->BFECBZERO)]
                              [cryptsuite :refer (->BFECBISO10126)]
@@ -44,16 +37,9 @@
                              [cryptsuite :refer (->BFPCBCISO10126)]
                              [cryptsuite :refer (->BFPCBCX923)]
                              [cryptsuite :refer (->BFPCBCISO7816)]
-                             [cryptsuite :refer (->BFCFBPKCS7)]
-                             [cryptsuite :refer (->BFCFBZERO)]
-                             [cryptsuite :refer (->BFCFBISO10126)]
-                             [cryptsuite :refer (->BFCFBX923)]
-                             [cryptsuite :refer (->BFCFBISO7816)]
-                             [cryptsuite :refer (->BFOFBPKCS7)]
-                             [cryptsuite :refer (->BFOFBZERO)]
-                             [cryptsuite :refer (->BFOFBISO10126)]
-                             [cryptsuite :refer (->BFOFBX923)]
-                             [cryptsuite :refer (->BFOFBISO7816)]
+                             [cryptsuite :refer (->BFCFB)]
+                             [cryptsuite :refer (->BFOFB)]
+                             [cryptsuite :refer (->BFCTR)]
                              [cryptsuite :refer (->CAST5ECBPKCS7)]
                              [cryptsuite :refer (->CAST5ECBZERO)]
                              [cryptsuite :refer (->CAST5ECBISO10126)]
@@ -69,16 +55,9 @@
                              [cryptsuite :refer (->CAST5PCBCISO10126)]
                              [cryptsuite :refer (->CAST5PCBCX923)]
                              [cryptsuite :refer (->CAST5PCBCISO7816)]
-                             [cryptsuite :refer (->CAST5CFBPKCS7)]
-                             [cryptsuite :refer (->CAST5CFBZERO)]
-                             [cryptsuite :refer (->CAST5CFBISO10126)]
-                             [cryptsuite :refer (->CAST5CFBX923)]
-                             [cryptsuite :refer (->CAST5CFBISO7816)]
-                             [cryptsuite :refer (->CAST5OFBPKCS7)]
-                             [cryptsuite :refer (->CAST5OFBZERO)]
-                             [cryptsuite :refer (->CAST5OFBISO10126)]
-                             [cryptsuite :refer (->CAST5OFBX923)]
-                             [cryptsuite :refer (->CAST5OFBISO7816)]
+                             [cryptsuite :refer (->CAST5CFB)]
+                             [cryptsuite :refer (->CAST5OFB)]
+                             [cryptsuite :refer (->CAST5CTR)]
                              [cryptsuite :refer (->CAST6ECBPKCS7)]
                              [cryptsuite :refer (->CAST6ECBZERO)]
                              [cryptsuite :refer (->CAST6ECBISO10126)]
@@ -94,16 +73,9 @@
                              [cryptsuite :refer (->CAST6PCBCISO10126)]
                              [cryptsuite :refer (->CAST6PCBCX923)]
                              [cryptsuite :refer (->CAST6PCBCISO7816)]
-                             [cryptsuite :refer (->CAST6CFBPKCS7)]
-                             [cryptsuite :refer (->CAST6CFBZERO)]
-                             [cryptsuite :refer (->CAST6CFBISO10126)]
-                             [cryptsuite :refer (->CAST6CFBX923)]
-                             [cryptsuite :refer (->CAST6CFBISO7816)]
-                             [cryptsuite :refer (->CAST6OFBPKCS7)]
-                             [cryptsuite :refer (->CAST6OFBZERO)]
-                             [cryptsuite :refer (->CAST6OFBISO10126)]
-                             [cryptsuite :refer (->CAST6OFBX923)]
-                             [cryptsuite :refer (->CAST6OFBISO7816)]
+                             [cryptsuite :refer (->CAST6CFB)]
+                             [cryptsuite :refer (->CAST6OFB)]
+                             [cryptsuite :refer (->CAST6CTR)]
                              [cryptsuite :refer (->TFECBPKCS7)]
                              [cryptsuite :refer (->TFECBZERO)]
                              [cryptsuite :refer (->TFECBISO10126)]
@@ -119,17 +91,11 @@
                              [cryptsuite :refer (->TFPCBCISO10126)]
                              [cryptsuite :refer (->TFPCBCX923)]
                              [cryptsuite :refer (->TFPCBCISO7816)]
-                             [cryptsuite :refer (->TFCFBPKCS7)]
-                             [cryptsuite :refer (->TFCFBZERO)]
-                             [cryptsuite :refer (->TFCFBISO10126)]
-                             [cryptsuite :refer (->TFCFBX923)]
-                             [cryptsuite :refer (->TFCFBISO7816)]
-                             [cryptsuite :refer (->TFOFBPKCS7)]
-                             [cryptsuite :refer (->TFOFBZERO)]
-                             [cryptsuite :refer (->TFOFBISO10126)]
-                             [cryptsuite :refer (->TFOFBX923)]
-                             [cryptsuite :refer (->TFOFBISO7816)])
-            (net.ozias.crypt [testivs :refer (iv-128)]
+                             [cryptsuite :refer (->TFCFB)]
+                             [cryptsuite :refer (->TFOFB)]
+                             [cryptsuite :refer (->TFCTR)]
+                             [cryptsuite :refer (->S20CTR)])
+            (net.ozias.crypt [testivs :refer (iv-128 iv-128b iv-64b)]
                              [testkeys :refer (key-128 key-128b)])))
 
 ;; #### AESXX
@@ -149,16 +115,9 @@
 (def AESPCBCISO10126 (->AESPCBCISO10126))
 (def AESPCBCX923 (->AESCBCX923))
 (def AESPCBCISO7816 (->AESPCBCISO7816))
-(def AESCFBPKCS7 (->AESCFBPKCS7))
-(def AESCFBZERO (->AESCFBZERO))
-(def AESCFBISO10126 (->AESCFBISO10126))
-(def AESCFBX923 (->AESCFBX923))
-(def AESCFBISO7816 (->AESCFBISO7816))
-(def AESOFBPKCS7 (->AESOFBPKCS7))
-(def AESOFBZERO (->AESOFBZERO))
-(def AESOFBISO10126 (->AESOFBISO10126))
-(def AESOFBX923 (->AESOFBX923))
-(def AESOFBISO7816 (->AESOFBISO7816))
+(def AESCFB (->AESCFB))
+(def AESOFB (->AESOFB))
+(def AESCTR (->AESCTR))
 
 ;; #### BFXX
 ;; Setup the Blowfish suites for use in testing.
@@ -177,16 +136,9 @@
 (def BFPCBCISO10126 (->BFPCBCISO10126))
 (def BFPCBCX923 (->BFPCBCX923))
 (def BFPCBCISO7816 (->BFPCBCISO7816))
-(def BFCFBPKCS7 (->BFCFBPKCS7))
-(def BFCFBZERO (->BFCFBZERO))
-(def BFCFBISO10126 (->BFCFBISO10126))
-(def BFCFBX923 (->BFCFBX923))
-(def BFCFBISO7816 (->BFCFBISO7816))
-(def BFOFBPKCS7 (->BFOFBPKCS7))
-(def BFOFBZERO (->BFOFBZERO))
-(def BFOFBISO10126 (->BFOFBISO10126))
-(def BFOFBX923 (->BFOFBX923))
-(def BFOFBISO7816 (->BFOFBISO7816))
+(def BFCFB (->BFCFB))
+(def BFOFB (->BFOFB))
+(def BFCTR (->BFCTR))
 
 ;; #### CAST5XX
 ;; Setup the Blowfish suites for use in testing.
@@ -205,16 +157,9 @@
 (def CAST5PCBCISO10126 (->CAST5PCBCISO10126))
 (def CAST5PCBCX923 (->CAST5PCBCX923))
 (def CAST5PCBCISO7816 (->CAST5PCBCISO7816))
-(def CAST5CFBPKCS7 (->CAST5CFBPKCS7))
-(def CAST5CFBZERO (->CAST5CFBZERO))
-(def CAST5CFBISO10126 (->CAST5CFBISO10126))
-(def CAST5CFBX923 (->CAST5CFBX923))
-(def CAST5CFBISO7816 (->CAST5CFBISO7816))
-(def CAST5OFBPKCS7 (->CAST5OFBPKCS7))
-(def CAST5OFBZERO (->CAST5OFBZERO))
-(def CAST5OFBISO10126 (->CAST5OFBISO10126))
-(def CAST5OFBX923 (->CAST5OFBX923))
-(def CAST5OFBISO7816 (->CAST5OFBISO7816))
+(def CAST5CFB (->CAST5CFB))
+(def CAST5OFB (->CAST5OFB))
+(def CAST5CTR (->CAST5CTR))
 
 ;; #### CAST6XX
 ;; Setup the Blowfish suites for use in testing.
@@ -233,16 +178,9 @@
 (def CAST6PCBCISO10126 (->CAST6PCBCISO10126))
 (def CAST6PCBCX923 (->CAST6PCBCX923))
 (def CAST6PCBCISO7816 (->CAST6PCBCISO7816))
-(def CAST6CFBPKCS7 (->CAST6CFBPKCS7))
-(def CAST6CFBZERO (->CAST6CFBZERO))
-(def CAST6CFBISO10126 (->CAST6CFBISO10126))
-(def CAST6CFBX923 (->CAST6CFBX923))
-(def CAST6CFBISO7816 (->CAST6CFBISO7816))
-(def CAST6OFBPKCS7 (->CAST6OFBPKCS7))
-(def CAST6OFBZERO (->CAST6OFBZERO))
-(def CAST6OFBISO10126 (->CAST6OFBISO10126))
-(def CAST6OFBX923 (->CAST6OFBX923))
-(def CAST6OFBISO7816 (->CAST6OFBISO7816))
+(def CAST6CFB (->CAST6CFB))
+(def CAST6OFB (->CAST6OFB))
+(def CAST6CTR (->CAST6CTR))
 
 ;; #### TFXX
 ;; Setup the Twofish suites for use in testing.
@@ -261,16 +199,13 @@
 (def TFPCBCISO10126 (->TFPCBCISO10126))
 (def TFPCBCX923 (->TFPCBCX923))
 (def TFPCBCISO7816 (->TFPCBCISO7816))
-(def TFCFBPKCS7 (->TFCFBPKCS7))
-(def TFCFBZERO (->TFCFBZERO))
-(def TFCFBISO10126 (->TFCFBISO10126))
-(def TFCFBX923 (->TFCFBX923))
-(def TFCFBISO7816 (->TFCFBISO7816))
-(def TFOFBPKCS7 (->TFOFBPKCS7))
-(def TFOFBZERO (->TFOFBZERO))
-(def TFOFBISO10126 (->TFOFBISO10126))
-(def TFOFBX923 (->TFOFBX923))
-(def TFOFBISO7816 (->TFOFBISO7816))
+(def TFCFB (->TFCFB))
+(def TFOFB (->TFOFB))
+(def TFCTR (->TFCTR))
+
+;; #### S20X
+;; Setup the Salsa20 suites for use in testing.
+(def S20CTR (->S20CTR))
 
 ;; #### phrase
 ;; A phrase to test encryption/decryption
@@ -315,30 +250,10 @@
    [AESPCBCISO7816 phrase [0x6f40de04 0xce96f342 0x6280fc4c 0x87d9209a
                            0x8d8ed276 0xb6970681 0x95830e5f 0x468add9f
                            0x6d546556 0xcf704c73 0xa81672e7 0x63a686a6]]
-   [AESCFBPKCS7    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0xf962aa68]]
-   [AESCFBZERO     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae6c]]
-   [AESCFBX923     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a 
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d 
-                           0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae68]]
-   [AESCFBISO7816  phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0x7d66ae6c]]
-   [AESOFBPKCS7    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x44458b99]]
-   [AESOFBZERO     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f9d]]
-   [AESOFBX923     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f99]]
-   [AESOFBISO7816  phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0xc0418f9d]]])
+;;   [AESCFB         phrase []]
+;;   [AESOFB         phrase []]
+;;   [AESCTR         phrase []]
+])
 
 ;; #### bf-test-vectors
 ;; Test vectors for each supported Blowfish suite
@@ -379,30 +294,10 @@
    [BFPCBCISO7816 phrase [0xbdf91633 0xc1068045 0x564caf9d 0x9795d0b1
                           0x19e5fc29 0x519accef 0x4c79fe3e 0xf44f0eba
                           0x6c52a2ba 0x7dbcbf67 0xf13abe40 0x12fa8b32]]
-   [BFCFBPKCS7    phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf344a7cf]]
-   [BFCFBZERO     phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf740a3cb]]
-   [BFCFBX923     phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf740a3cf]]
-   [BFCFBISO7816  phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0x7740a3cb]]
-   [BFOFBPKCS7    phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xfba2ad1b]]
-   [BFOFBZERO     phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xffa6a91f]]
-   [BFOFBX923     phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xffa6a91b]]
-   [BFOFBISO7816  phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0x7fa6a91f]]])
+;;   [BFCFB         phrase []]
+;;   [BFOFB         phrase []]
+;;   [BFCTR         phrase []]
+])
 
 ;; #### cast5-test-vectors
 ;; Test vectors for each supported CAST5 suite
@@ -418,7 +313,7 @@
                              0x561c926f 0x8fcedd2b 0xfef0bd65 0xb791c4a0]]
    [CAST5ECBISO7816  phrase [0x34e1b3fc 0x0d72f1d8 0x5d837126 0x6e69cc65
                              0x77222960 0x6685b5d2 0x03822655 0xfffd9170
-                             0x561c926f 0x8fcedd2b 0x78ec9bd 0x3afea3b1]]
+                             0x561c926f 0x8fcedd2b 0x078ec9bd 0x3afea3b1]]
    [CAST5CBCPKCS7    phrase [0x7bfb801a 0x5c6e9c36 0xc9282d18 0x5069149b
                              0x8f1cd593 0xbc84d9f9 0x29bf9de9 0x3c07f9a3
                              0xfb5f3523 0x9aea1a6a 0xf32df9da 0xd8a447e8]]
@@ -433,7 +328,7 @@
                              0xfb5f3523 0x9aea1a6a 0x3013af87 0x261bea0a]]
    [CAST5PCBCPKCS7   phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
-                             0x1fc7865d 0x0ca1371b 0x23404ed 0xead34e2a]]
+                             0x1fc7865d 0x0ca1371b 0x023404ed 0xead34e2a]]
    [CAST5PCBCZERO    phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xcb2d2cf9 0x21ec8f86]]
@@ -443,30 +338,10 @@
    [CAST5PCBCISO7816 phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xdf93ffe8 0x5a976927]]
-   [CAST5CFBPKCS7    phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6b3cc237]]
-   [CAST5CFBZERO     phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6f38c633]]
-   [CAST5CFBX923     phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6f38c637]]
-   [CAST5CFBISO7816  phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0xef38c633]]
-   [CAST5OFBPKCS7    phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x96808fa9]]
-   [CAST5OFBZERO     phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x92848bad]]
-   [CAST5OFBX923     phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x92848ba9]]
-   [CAST5OFBISO7816  phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x12848bad]]])
+;;   [CAST5CFB         phrase []]
+;;   [CAST5OFB         phrase []]
+;;   [CAST5CTR         phrase []]
+])
 
 ;; #### cast6-test-vectors
 ;; Test vectors for each supported CAST6 suite
@@ -507,33 +382,13 @@
    [CAST6PCBCISO7816 phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
                              0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
                              0x8a91d9d0 0x0b6c3527 0x02876a9c 0x00ee1032]]
-   [CAST6CFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xfbb3c775]]
-   [CAST6CFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c371]]
-   [CAST6CFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c375]]
-   [CAST6CFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0x7fb7c371]]
-   [CAST6OFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x106437ef]]
-   [CAST6OFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033eb]]
-   [CAST6OFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033ef]]
-   [CAST6OFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])
+;;   [CAST6CFB         phrase []]
+;;   [CAST6OFB         phrase []]
+;;   [CAST6CTR         phrase []]
+])
 
 ;; #### tf-test-vectors
-;; Test vectors for each supported Blowfish suite
+;; Test vectors for each supported Twofish suite
 (def tf-test-vectors
   [[TFECBPKCS7    phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
                           0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
@@ -571,30 +426,51 @@
    [TFPCBCISO7816 phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
                           0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
                           0x3D9A63D1 0x75B06C26 0x278FF5E1 0xF97E7D05]]
-   [TFCFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x95B5B8BF]]
-   [TFCFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBB]]
-   [TFCFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBF]]
-   [TFCFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x11B1BCBB]]
-   [TFOFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x636FD62B]]
-   [TFOFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22F]]
-   [TFOFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22B]]
-   [TFOFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0xE76BD22F]]])
+;;   [TFCFB         phrase []]
+;;   [TFOFB         phrase []]
+])
+
+;; #### tfs-test-vectors
+;; Test vectors for Twofish (Stream)
+(def tfs-test-vectors
+  [[TFOFB phrase [0x8F 0x51 0x45 0xDF 0x67 0x07 0xD2 0xCE 0xD4
+                  0xCB 0x7D 0x57 0xFF 0x71 0x62 0x0B 0xB5 0xA3
+                  0x79 0x17 0xEB 0xFE 0xE9 0x99 0x13 0x99 0x30
+                  0x15 0x62 0x61 0xAC 0x21 0xEF 0x8B 0x30 0xE3
+                  0x50 0x59 0xA7 0xD2 0x52 0xA5 0xEB 0x54]]
+   [TFCTR phrase [0x4B 0x16 0x7D 0x44 0x0D 0x06 0x4F 0x04 0xFD
+                  0x07 0xDA 0xC4 0xEF 0x87 0x53 0x44 0x65 0x78
+                  0x05 0xF5 0x04 0x8D 0xD3 0x9D 0x28 0xED 0xA2
+                  0x40 0x9E 0x8E 0x2E 0x47 0x87 0xC1 0xB7 0xC5
+                  0x3E 0x4D 0xE7 0xC8 0xE2 0x27 0x8A 0xC8]]])
+
+;; #### s20-test-vectors
+;; Test vectors for the Salsa20 suite
+(def s20-test-vectors
+  [[S20CTR phrase [0x6D 0x5E 0xE6 0x3D 0x2B 0xE3 0x3D 0x3D 0x84
+                   0x46 0xB1 0xBD 0xFF 0xCF 0x02 0xB2 0x9E 0x1A
+                   0x57 0x2C 0x93 0x34 0x76 0x20 0x47 0xBC 0x66
+                   0xE4 0x2B 0x50 0xC9 0x86 0xCF 0xFB 0x69 0x28
+                   0x3A 0x1A 0x44 0x47 0xC6 0xBC 0x2C 0x64]]])
+
+;; #### array-of-bytes-type
+;; Used in byte-array? for comparison
+(def array-of-bytes-type (Class/forName "[B")) 
+
+;; ### byte-array?
+;; Is the given object a byte-array (type [B)
+(defn- byte-array? [obj]
+  (= (type obj) array-of-bytes-type))
+
+;; ### to-bytearray
+;; Convert the given vector of bytes to a [B
+;; if it is not already converted.
+;;
+;; Evaluates to a [B over the given byte vector
+(defn- to-bytearray [bytes]
+  (if (not (byte-array? bytes))
+    (byte-array (mapv byte bytes))
+    bytes))
 
 ;; ### encryptor
 ;; Helper function for testing encryption
@@ -604,7 +480,7 @@
 ;; ### decryptor
 ;; Helper function for testing decryption
 (defn- decryptor [[suite pt ct] & {:keys [key iv] :or {key key-128 iv iv-128}}]
-  (is (= pt (String. (cs/decrypt suite key iv ct) "UTF-8"))))
+  (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) "UTF-8"))))
 
 ;; ### testSuites
 ;; Test the various cipher suites.
@@ -623,4 +499,10 @@
     (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors)))))
   (testing "Twofish"
     (is (= true (every? true? (map #(encryptor %) tf-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %) tf-test-vectors))))))
+    (is (= true (every? true? (map #(decryptor %) tf-test-vectors)))))
+  (testing "Twofish (Stream)"
+    (is (= true (every? true? (map #(encryptor % :iv iv-64b) tfs-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-64b) tfs-test-vectors)))))
+  (testing "Salsa20"
+    (is (= true (every? true? (map #(encryptor % :key key-128b :iv iv-64b) s20-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key key-128b :iv iv-64b) s20-test-vectors))))))
