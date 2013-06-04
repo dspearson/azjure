@@ -3050,16 +3050,9 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;AESPCBCISO10126)]
                              [cryptsuite :refer (-&gt;AESPCBCX923)]
                              [cryptsuite :refer (-&gt;AESPCBCISO7816)]
-                             [cryptsuite :refer (-&gt;AESCFBPKCS7)]
-                             [cryptsuite :refer (-&gt;AESCFBZERO)]
-                             [cryptsuite :refer (-&gt;AESCFBISO10126)]
-                             [cryptsuite :refer (-&gt;AESCFBX923)]
-                             [cryptsuite :refer (-&gt;AESCFBISO7816)]
-                             [cryptsuite :refer (-&gt;AESOFBPKCS7)]
-                             [cryptsuite :refer (-&gt;AESOFBZERO)]
-                             [cryptsuite :refer (-&gt;AESOFBISO10126)]
-                             [cryptsuite :refer (-&gt;AESOFBX923)]
-                             [cryptsuite :refer (-&gt;AESOFBISO7816)]
+                             [cryptsuite :refer (-&gt;AESCFB)]
+                             [cryptsuite :refer (-&gt;AESOFB)]
+                             [cryptsuite :refer (-&gt;AESCTR)]
                              [cryptsuite :refer (-&gt;BFECBPKCS7)]
                              [cryptsuite :refer (-&gt;BFECBZERO)]
                              [cryptsuite :refer (-&gt;BFECBISO10126)]
@@ -3075,16 +3068,9 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;BFPCBCISO10126)]
                              [cryptsuite :refer (-&gt;BFPCBCX923)]
                              [cryptsuite :refer (-&gt;BFPCBCISO7816)]
-                             [cryptsuite :refer (-&gt;BFCFBPKCS7)]
-                             [cryptsuite :refer (-&gt;BFCFBZERO)]
-                             [cryptsuite :refer (-&gt;BFCFBISO10126)]
-                             [cryptsuite :refer (-&gt;BFCFBX923)]
-                             [cryptsuite :refer (-&gt;BFCFBISO7816)]
-                             [cryptsuite :refer (-&gt;BFOFBPKCS7)]
-                             [cryptsuite :refer (-&gt;BFOFBZERO)]
-                             [cryptsuite :refer (-&gt;BFOFBISO10126)]
-                             [cryptsuite :refer (-&gt;BFOFBX923)]
-                             [cryptsuite :refer (-&gt;BFOFBISO7816)]
+                             [cryptsuite :refer (-&gt;BFCFB)]
+                             [cryptsuite :refer (-&gt;BFOFB)]
+                             [cryptsuite :refer (-&gt;BFCTR)]
                              [cryptsuite :refer (-&gt;CAST5ECBPKCS7)]
                              [cryptsuite :refer (-&gt;CAST5ECBZERO)]
                              [cryptsuite :refer (-&gt;CAST5ECBISO10126)]
@@ -3100,16 +3086,9 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;CAST5PCBCISO10126)]
                              [cryptsuite :refer (-&gt;CAST5PCBCX923)]
                              [cryptsuite :refer (-&gt;CAST5PCBCISO7816)]
-                             [cryptsuite :refer (-&gt;CAST5CFBPKCS7)]
-                             [cryptsuite :refer (-&gt;CAST5CFBZERO)]
-                             [cryptsuite :refer (-&gt;CAST5CFBISO10126)]
-                             [cryptsuite :refer (-&gt;CAST5CFBX923)]
-                             [cryptsuite :refer (-&gt;CAST5CFBISO7816)]
-                             [cryptsuite :refer (-&gt;CAST5OFBPKCS7)]
-                             [cryptsuite :refer (-&gt;CAST5OFBZERO)]
-                             [cryptsuite :refer (-&gt;CAST5OFBISO10126)]
-                             [cryptsuite :refer (-&gt;CAST5OFBX923)]
-                             [cryptsuite :refer (-&gt;CAST5OFBISO7816)]
+                             [cryptsuite :refer (-&gt;CAST5CFB)]
+                             [cryptsuite :refer (-&gt;CAST5OFB)]
+                             [cryptsuite :refer (-&gt;CAST5CTR)]
                              [cryptsuite :refer (-&gt;CAST6ECBPKCS7)]
                              [cryptsuite :refer (-&gt;CAST6ECBZERO)]
                              [cryptsuite :refer (-&gt;CAST6ECBISO10126)]
@@ -3125,16 +3104,9 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;CAST6PCBCISO10126)]
                              [cryptsuite :refer (-&gt;CAST6PCBCX923)]
                              [cryptsuite :refer (-&gt;CAST6PCBCISO7816)]
-                             [cryptsuite :refer (-&gt;CAST6CFBPKCS7)]
-                             [cryptsuite :refer (-&gt;CAST6CFBZERO)]
-                             [cryptsuite :refer (-&gt;CAST6CFBISO10126)]
-                             [cryptsuite :refer (-&gt;CAST6CFBX923)]
-                             [cryptsuite :refer (-&gt;CAST6CFBISO7816)]
-                             [cryptsuite :refer (-&gt;CAST6OFBPKCS7)]
-                             [cryptsuite :refer (-&gt;CAST6OFBZERO)]
-                             [cryptsuite :refer (-&gt;CAST6OFBISO10126)]
-                             [cryptsuite :refer (-&gt;CAST6OFBX923)]
-                             [cryptsuite :refer (-&gt;CAST6OFBISO7816)]
+                             [cryptsuite :refer (-&gt;CAST6CFB)]
+                             [cryptsuite :refer (-&gt;CAST6OFB)]
+                             [cryptsuite :refer (-&gt;CAST6CTR)]
                              [cryptsuite :refer (-&gt;TFECBPKCS7)]
                              [cryptsuite :refer (-&gt;TFECBZERO)]
                              [cryptsuite :refer (-&gt;TFECBISO10126)]
@@ -3150,17 +3122,13 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;TFPCBCISO10126)]
                              [cryptsuite :refer (-&gt;TFPCBCX923)]
                              [cryptsuite :refer (-&gt;TFPCBCISO7816)]
-                             [cryptsuite :refer (-&gt;TFCFBPKCS7)]
-                             [cryptsuite :refer (-&gt;TFCFBZERO)]
-                             [cryptsuite :refer (-&gt;TFCFBISO10126)]
-                             [cryptsuite :refer (-&gt;TFCFBX923)]
-                             [cryptsuite :refer (-&gt;TFCFBISO7816)]
-                             [cryptsuite :refer (-&gt;TFOFBPKCS7)]
-                             [cryptsuite :refer (-&gt;TFOFBZERO)]
-                             [cryptsuite :refer (-&gt;TFOFBISO10126)]
-                             [cryptsuite :refer (-&gt;TFOFBX923)]
-                             [cryptsuite :refer (-&gt;TFOFBISO7816)])
-            (net.ozias.crypt [testivs :refer (iv-128)]
+                             [cryptsuite :refer (-&gt;TFCFB)]
+                             [cryptsuite :refer (-&gt;TFOFB)]
+                             [cryptsuite :refer (-&gt;TFCTR)]
+                             [cryptsuite :refer (-&gt;S20CFB)]
+                             [cryptsuite :refer (-&gt;S20OFB)]
+                             [cryptsuite :refer (-&gt;S20CTR)])
+            (net.ozias.crypt [testivs :refer (iv-128 iv-128b iv-64b)]
                              [testkeys :refer (key-128 key-128b)])))</pre></td></tr><tr><td class="docs"><h4>AESXX</h4>
 
 <p>Setup the AES suites for use in testing.</p>
@@ -3179,16 +3147,9 @@ net.brehaut.ClojureTools = (function (SH) {
 (def AESPCBCISO10126 (-&gt;AESPCBCISO10126))
 (def AESPCBCX923 (-&gt;AESCBCX923))
 (def AESPCBCISO7816 (-&gt;AESPCBCISO7816))
-(def AESCFBPKCS7 (-&gt;AESCFBPKCS7))
-(def AESCFBZERO (-&gt;AESCFBZERO))
-(def AESCFBISO10126 (-&gt;AESCFBISO10126))
-(def AESCFBX923 (-&gt;AESCFBX923))
-(def AESCFBISO7816 (-&gt;AESCFBISO7816))
-(def AESOFBPKCS7 (-&gt;AESOFBPKCS7))
-(def AESOFBZERO (-&gt;AESOFBZERO))
-(def AESOFBISO10126 (-&gt;AESOFBISO10126))
-(def AESOFBX923 (-&gt;AESOFBX923))
-(def AESOFBISO7816 (-&gt;AESOFBISO7816))</pre></td></tr><tr><td class="docs"><h4>BFXX</h4>
+(def AESCFB (-&gt;AESCFB))
+(def AESOFB (-&gt;AESOFB))
+(def AESCTR (-&gt;AESCTR))</pre></td></tr><tr><td class="docs"><h4>BFXX</h4>
 
 <p>Setup the Blowfish suites for use in testing.</p>
 </td><td class="codes"><pre class="brush: clojure">(def BFECBPKCS7 (-&gt;BFECBPKCS7))
@@ -3206,16 +3167,9 @@ net.brehaut.ClojureTools = (function (SH) {
 (def BFPCBCISO10126 (-&gt;BFPCBCISO10126))
 (def BFPCBCX923 (-&gt;BFPCBCX923))
 (def BFPCBCISO7816 (-&gt;BFPCBCISO7816))
-(def BFCFBPKCS7 (-&gt;BFCFBPKCS7))
-(def BFCFBZERO (-&gt;BFCFBZERO))
-(def BFCFBISO10126 (-&gt;BFCFBISO10126))
-(def BFCFBX923 (-&gt;BFCFBX923))
-(def BFCFBISO7816 (-&gt;BFCFBISO7816))
-(def BFOFBPKCS7 (-&gt;BFOFBPKCS7))
-(def BFOFBZERO (-&gt;BFOFBZERO))
-(def BFOFBISO10126 (-&gt;BFOFBISO10126))
-(def BFOFBX923 (-&gt;BFOFBX923))
-(def BFOFBISO7816 (-&gt;BFOFBISO7816))</pre></td></tr><tr><td class="docs"><h4>CAST5XX</h4>
+(def BFCFB (-&gt;BFCFB))
+(def BFOFB (-&gt;BFOFB))
+(def BFCTR (-&gt;BFCTR))</pre></td></tr><tr><td class="docs"><h4>CAST5XX</h4>
 
 <p>Setup the Blowfish suites for use in testing.</p>
 </td><td class="codes"><pre class="brush: clojure">(def CAST5ECBPKCS7 (-&gt;CAST5ECBPKCS7))
@@ -3233,16 +3187,9 @@ net.brehaut.ClojureTools = (function (SH) {
 (def CAST5PCBCISO10126 (-&gt;CAST5PCBCISO10126))
 (def CAST5PCBCX923 (-&gt;CAST5PCBCX923))
 (def CAST5PCBCISO7816 (-&gt;CAST5PCBCISO7816))
-(def CAST5CFBPKCS7 (-&gt;CAST5CFBPKCS7))
-(def CAST5CFBZERO (-&gt;CAST5CFBZERO))
-(def CAST5CFBISO10126 (-&gt;CAST5CFBISO10126))
-(def CAST5CFBX923 (-&gt;CAST5CFBX923))
-(def CAST5CFBISO7816 (-&gt;CAST5CFBISO7816))
-(def CAST5OFBPKCS7 (-&gt;CAST5OFBPKCS7))
-(def CAST5OFBZERO (-&gt;CAST5OFBZERO))
-(def CAST5OFBISO10126 (-&gt;CAST5OFBISO10126))
-(def CAST5OFBX923 (-&gt;CAST5OFBX923))
-(def CAST5OFBISO7816 (-&gt;CAST5OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>CAST6XX</h4>
+(def CAST5CFB (-&gt;CAST5CFB))
+(def CAST5OFB (-&gt;CAST5OFB))
+(def CAST5CTR (-&gt;CAST5CTR))</pre></td></tr><tr><td class="docs"><h4>CAST6XX</h4>
 
 <p>Setup the Blowfish suites for use in testing.</p>
 </td><td class="codes"><pre class="brush: clojure">(def CAST6ECBPKCS7 (-&gt;CAST6ECBPKCS7))
@@ -3260,16 +3207,9 @@ net.brehaut.ClojureTools = (function (SH) {
 (def CAST6PCBCISO10126 (-&gt;CAST6PCBCISO10126))
 (def CAST6PCBCX923 (-&gt;CAST6PCBCX923))
 (def CAST6PCBCISO7816 (-&gt;CAST6PCBCISO7816))
-(def CAST6CFBPKCS7 (-&gt;CAST6CFBPKCS7))
-(def CAST6CFBZERO (-&gt;CAST6CFBZERO))
-(def CAST6CFBISO10126 (-&gt;CAST6CFBISO10126))
-(def CAST6CFBX923 (-&gt;CAST6CFBX923))
-(def CAST6CFBISO7816 (-&gt;CAST6CFBISO7816))
-(def CAST6OFBPKCS7 (-&gt;CAST6OFBPKCS7))
-(def CAST6OFBZERO (-&gt;CAST6OFBZERO))
-(def CAST6OFBISO10126 (-&gt;CAST6OFBISO10126))
-(def CAST6OFBX923 (-&gt;CAST6OFBX923))
-(def CAST6OFBISO7816 (-&gt;CAST6OFBISO7816))</pre></td></tr><tr><td class="docs"><h4>TFXX</h4>
+(def CAST6CFB (-&gt;CAST6CFB))
+(def CAST6OFB (-&gt;CAST6OFB))
+(def CAST6CTR (-&gt;CAST6CTR))</pre></td></tr><tr><td class="docs"><h4>TFXX</h4>
 
 <p>Setup the Twofish suites for use in testing.</p>
 </td><td class="codes"><pre class="brush: clojure">(def TFECBPKCS7 (-&gt;TFECBPKCS7))
@@ -3287,16 +3227,14 @@ net.brehaut.ClojureTools = (function (SH) {
 (def TFPCBCISO10126 (-&gt;TFPCBCISO10126))
 (def TFPCBCX923 (-&gt;TFPCBCX923))
 (def TFPCBCISO7816 (-&gt;TFPCBCISO7816))
-(def TFCFBPKCS7 (-&gt;TFCFBPKCS7))
-(def TFCFBZERO (-&gt;TFCFBZERO))
-(def TFCFBISO10126 (-&gt;TFCFBISO10126))
-(def TFCFBX923 (-&gt;TFCFBX923))
-(def TFCFBISO7816 (-&gt;TFCFBISO7816))
-(def TFOFBPKCS7 (-&gt;TFOFBPKCS7))
-(def TFOFBZERO (-&gt;TFOFBZERO))
-(def TFOFBISO10126 (-&gt;TFOFBISO10126))
-(def TFOFBX923 (-&gt;TFOFBX923))
-(def TFOFBISO7816 (-&gt;TFOFBISO7816))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
+(def TFCFB (-&gt;TFCFB))
+(def TFOFB (-&gt;TFOFB))
+(def TFCTR (-&gt;TFCTR))</pre></td></tr><tr><td class="docs"><h4>S20X</h4>
+
+<p>Setup the Salsa20 suites for use in testing.</p>
+</td><td class="codes"><pre class="brush: clojure">(def S20CFB (-&gt;S20CFB))
+(def S20OFB (-&gt;S20OFB))
+(def S20CTR (-&gt;S20CTR))</pre></td></tr><tr><td class="docs"><h4>phrase</h4>
 
 <p>A phrase to test encryption/decryption</p>
 </td><td class="codes"><pre class="brush: clojure">(def phrase &quot;The quick brown fox jumps over the lazy dog.&quot;)</pre></td></tr><tr><td class="docs"><h4>aes-test-vectors</h4>
@@ -3339,30 +3277,10 @@ net.brehaut.ClojureTools = (function (SH) {
    [AESPCBCISO7816 phrase [0x6f40de04 0xce96f342 0x6280fc4c 0x87d9209a
                            0x8d8ed276 0xb6970681 0x95830e5f 0x468add9f
                            0x6d546556 0xcf704c73 0xa81672e7 0x63a686a6]]
-   [AESCFBPKCS7    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0xf962aa68]]
-   [AESCFBZERO     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae6c]]
-   [AESCFBX923     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a 
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d 
-                           0x507955a2 0x7cb036be 0x384b28ae 0xfd66ae68]]
-   [AESCFBISO7816  phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x909aaeaf 0xd74ac79e 0xa57df7ec 0x2335425d
-                           0x507955a2 0x7cb036be 0x384b28ae 0x7d66ae6c]]
-   [AESOFBPKCS7    phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x44458b99]]
-   [AESOFBZERO     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f9d]]
-   [AESOFBX923     phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0x40418f99]]
-   [AESOFBISO7816  phrase [0x74c19cb2 0xc539328b 0x6f3f9eae 0x03d9f74a
-                           0x8261554f 0x2d17cdb5 0xf72444fd 0xb046503f
-                           0xe3f93f7e 0x5616fedd 0xd4e45260 0xc0418f9d]]])</pre></td></tr><tr><td class="docs"><h4>bf-test-vectors</h4>
+;;   [AESCFB         phrase []]
+;;   [AESOFB         phrase []]
+;;   [AESCTR         phrase []]
+])</pre></td></tr><tr><td class="docs"><h4>bf-test-vectors</h4>
 
 <p>Test vectors for each supported Blowfish suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def bf-test-vectors
@@ -3402,30 +3320,10 @@ net.brehaut.ClojureTools = (function (SH) {
    [BFPCBCISO7816 phrase [0xbdf91633 0xc1068045 0x564caf9d 0x9795d0b1
                           0x19e5fc29 0x519accef 0x4c79fe3e 0xf44f0eba
                           0x6c52a2ba 0x7dbcbf67 0xf13abe40 0x12fa8b32]]
-   [BFCFBPKCS7    phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf344a7cf]]
-   [BFCFBZERO     phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf740a3cb]]
-   [BFCFBX923     phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0xf740a3cf]]
-   [BFCFBISO7816  phrase [0x42ad61bf 0x4f4fba35 0xda835c75 0x04448db7
-                          0x0f7e4bc9 0x1c790660 0xa69b927b 0x1813d5f6
-                          0x57dede33 0xf9b441b5 0x185cfecc 0x7740a3cb]]
-   [BFOFBPKCS7    phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xfba2ad1b]]
-   [BFOFBZERO     phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xffa6a91f]]
-   [BFOFBX923     phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0xffa6a91b]]
-   [BFOFBISO7816  phrase [0x42ad61bf 0x4f4fba35 0x478c2c29 0xf7ac8328
-                          0x8f6ec424 0xbbc7b53f 0x73c27ac4 0x07bb37a9
-                          0x939d3bc4 0x507cc229 0x96c15780 0x7fa6a91f]]])</pre></td></tr><tr><td class="docs"><h4>cast5-test-vectors</h4>
+;;   [BFCFB         phrase []]
+;;   [BFOFB         phrase []]
+;;   [BFCTR         phrase []]
+])</pre></td></tr><tr><td class="docs"><h4>cast5-test-vectors</h4>
 
 <p>Test vectors for each supported CAST5 suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def cast5-test-vectors
@@ -3440,7 +3338,7 @@ net.brehaut.ClojureTools = (function (SH) {
                              0x561c926f 0x8fcedd2b 0xfef0bd65 0xb791c4a0]]
    [CAST5ECBISO7816  phrase [0x34e1b3fc 0x0d72f1d8 0x5d837126 0x6e69cc65
                              0x77222960 0x6685b5d2 0x03822655 0xfffd9170
-                             0x561c926f 0x8fcedd2b 0x78ec9bd 0x3afea3b1]]
+                             0x561c926f 0x8fcedd2b 0x078ec9bd 0x3afea3b1]]
    [CAST5CBCPKCS7    phrase [0x7bfb801a 0x5c6e9c36 0xc9282d18 0x5069149b
                              0x8f1cd593 0xbc84d9f9 0x29bf9de9 0x3c07f9a3
                              0xfb5f3523 0x9aea1a6a 0xf32df9da 0xd8a447e8]]
@@ -3455,7 +3353,7 @@ net.brehaut.ClojureTools = (function (SH) {
                              0xfb5f3523 0x9aea1a6a 0x3013af87 0x261bea0a]]
    [CAST5PCBCPKCS7   phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
-                             0x1fc7865d 0x0ca1371b 0x23404ed 0xead34e2a]]
+                             0x1fc7865d 0x0ca1371b 0x023404ed 0xead34e2a]]
    [CAST5PCBCZERO    phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xcb2d2cf9 0x21ec8f86]]
@@ -3465,30 +3363,10 @@ net.brehaut.ClojureTools = (function (SH) {
    [CAST5PCBCISO7816 phrase [0x7bfb801a 0x5c6e9c36 0x6952d07b 0x4877feb3
                              0xe62349f8 0xbdfb4b21 0x0fe7c58d 0x5f6c3049
                              0x1fc7865d 0x0ca1371b 0xdf93ffe8 0x5a976927]]
-   [CAST5CFBPKCS7    phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6b3cc237]]
-   [CAST5CFBZERO     phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6f38c633]]
-   [CAST5CFBX923     phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0x6f38c637]]
-   [CAST5CFBISO7816  phrase [0x1b1b0029 0x3700bcf8 0x5f57dd4a 0x98b85534
-                             0xfe2be48b 0x68c22a89 0xb8792968 0x2b2762a7
-                             0xcd881d55 0x8f8143dc 0x9344e8d7 0xef38c633]]
-   [CAST5OFBPKCS7    phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x96808fa9]]
-   [CAST5OFBZERO     phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x92848bad]]
-   [CAST5OFBX923     phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x92848ba9]]
-   [CAST5OFBISO7816  phrase [0x1b1b0029 0x3700bcf8 0xa1e11ce6 0xf2396b6a
-                             0xbd573907 0x08750c22 0xcb96decf 0x05aa54bc
-                             0x663c9740 0xac905ad5 0xa0157086 0x12848bad]]])</pre></td></tr><tr><td class="docs"><h4>cast6-test-vectors</h4>
+;;   [CAST5CFB         phrase []]
+;;   [CAST5OFB         phrase []]
+;;   [CAST5CTR         phrase []]
+])</pre></td></tr><tr><td class="docs"><h4>cast6-test-vectors</h4>
 
 <p>Test vectors for each supported CAST6 suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def cast6-test-vectors
@@ -3528,32 +3406,12 @@ net.brehaut.ClojureTools = (function (SH) {
    [CAST6PCBCISO7816 phrase [0x1df5aff3 0xf5b0a7cf 0x037de8da 0xfb6fad9f
                              0xcc4ab7e2 0x8e425de0 0x5d1688e4 0xe1d24403
                              0x8a91d9d0 0x0b6c3527 0x02876a9c 0x00ee1032]]
-   [CAST6CFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xfbb3c775]]
-   [CAST6CFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c371]]
-   [CAST6CFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0xffb7c375]]
-   [CAST6CFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0x511f1f9b 0xf830f7ea 0x338f588d 0xcee47d83
-                             0x6e379438 0x2ffd710a 0xf7919f09 0x7fb7c371]]
-   [CAST6OFBPKCS7    phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x106437ef]]
-   [CAST6OFBZERO     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033eb]]
-   [CAST6OFBX923     phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x146033ef]]
-   [CAST6OFBISO7816  phrase [0x52201908 0x40cc0eaf 0x251f7d82 0xbec73aa4
-                             0xf10d2790 0xd792895a 0xdb36b0b3 0xfcfb45dd
-                             0xe8b19cf1 0x1526c200 0x01704bde 0x946033eb]]])</pre></td></tr><tr><td class="docs"><h4>tf-test-vectors</h4>
+;;   [CAST6CFB         phrase []]
+;;   [CAST6OFB         phrase []]
+;;   [CAST6CTR         phrase []]
+])</pre></td></tr><tr><td class="docs"><h4>tf-test-vectors</h4>
 
-<p>Test vectors for each supported Blowfish suite</p>
+<p>Test vectors for each supported Twofish suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def tf-test-vectors
   [[TFECBPKCS7    phrase [0x8CC4BDF2 0x3238AA72 0xC414702B 0xF1E746CA
                           0x0AA44ECC 0x965706D3 0x02A36C85 0x2F12DED3
@@ -3590,31 +3448,65 @@ net.brehaut.ClojureTools = (function (SH) {
                           0xEB172D7C 0x191BBCF2 0x75940A4C 0x8B85CB16]]
    [TFPCBCISO7816 phrase [0xC82A136C 0x5909486E 0x8441FDDD 0xC117459E
                           0x20E95A38 0xE401C7E7 0x23E630EB 0x67038354
-                          0x3D9A63D1 0x75B06C26 0x278FF5E1 0xF97E7D05]]
-   [TFCFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x95B5B8BF]]
-   [TFCFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBB]]
-   [TFCFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x91B1BCBF]]
-   [TFCFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x3E857671 0xB6B8D170 0x8A4B9744 0x19783A44
-                          0xE2F89EF7 0xDDF334EF 0xC3BC21E7 0x11B1BCBB]]
-   [TFOFBPKCS7    phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x636FD62B]]
-   [TFOFBZERO     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22F]]
-   [TFOFBX923     phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0x676BD22B]]
-   [TFOFBISO7816  phrase [0x595A79E6 0xC852061B 0xA7F87BE7 0xED47E306
-                          0x4A1BB676 0x84351FAA 0xAA414ED1 0xDA36863A
-                          0xBDE87BC9 0xAFD15E9E 0x3725F9F0 0xE76BD22F]]])</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
+                          0x3D9A63D1 0x75B06C26 0x278FF5E1 0xF97E7D05]]])</pre></td></tr><tr><td class="docs"><h4>tfs-test-vectors</h4>
+
+<p>Test vectors for Twofish (Stream)</p>
+</td><td class="codes"><pre class="brush: clojure">(def tfs-test-vectors
+  [[TFCFB phrase [0x8F 0x25 0x51 0xEB 0x35 0x08 0x26 0x7E 0x68
+                  0x81 0x50 0x27 0x2E 0x21 0x4C 0xB6 0x3D 0x89
+                  0xC0 0x5A 0x28 0xD8 0xFB 0x57 0x2E 0x9F 0x72
+                  0x03 0x0E 0xED 0x0B 0x6F 0x9C 0x2B 0x78 0x84
+                  0x36 0xBA 0xE4 0xDD 0xFD 0x97 0xF3 0x6C]]
+   [TFOFB phrase [0x8F 0x51 0x45 0xDF 0x67 0x07 0xD2 0xCE 0xD4
+                  0xCB 0x7D 0x57 0xFF 0x71 0x62 0x0B 0xB5 0xA3
+                  0x79 0x17 0xEB 0xFE 0xE9 0x99 0x13 0x99 0x30
+                  0x15 0x62 0x61 0xAC 0x21 0xEF 0x8B 0x30 0xE3
+                  0x50 0x59 0xA7 0xD2 0x52 0xA5 0xEB 0x54]]])</pre></td></tr><tr><td class="docs"><h4>tfctr-test-vectors</h4>
+
+<p>Test vectors for the Twofish suite, Counter mode</p>
+</td><td class="codes"><pre class="brush: clojure">(def tfctr-test-vectors
+  [[TFCTR phrase [0xA3 0xAA 0xDE 0x29 0xC2 0x7A 0x2A 0xEB 0x50
+                  0x3F 0xF2 0xC2 0x1D 0x40 0xFA 0xFE 0xAB 0x7D
+                  0x59 0xC3 0x87 0x5D 0x9C 0x86 0x61 0x29 0xDF
+                  0x4F 0xF8 0x48 0xBC 0xEE 0x55 0x3A 0x62 0x44
+                  0x8B 0x2E 0xCF 0x7B 0xDE 0xAC 0xFE 0xBF]]])</pre></td></tr><tr><td class="docs"><h4>s20s-test-vectors</h4>
+
+<p>Test vectors for Salsa20 (Stream)</p>
+</td><td class="codes"><pre class="brush: clojure">(def s20s-test-vectors
+  [[S20CFB phrase [0xDD 0xC8 0xD4 0xCC 0x9E 0x0D 0x46 0x37 0x14
+                   0xEE 0xC4 0x9E 0xB1 0x24 0x07 0x75 0xB8 0x12
+                   0xF2 0x66 0x79 0x90 0xBA 0xE6 0x30 0x26 0x83
+                   0x59 0x0F 0x46 0x03 0xE8 0x4D 0x7F 0x80 0x74
+                   0x23 0x0B 0x5A 0x8E 0xFB 0xA5 0x26 0xFB]]
+   [S20OFB phrase [0xDD 0x72 0x6A 0xDD 0x26 0x6D 0x64 0xA9 0x36
+                   0xD0 0x5B 0xFE 0x01 0xE1 0x85 0xCF 0xD8 0x50
+                   0x15 0xB5 0x86 0x81 0x44 0xAB 0x80 0x57 0x5B
+                   0x58 0x16 0x99 0xED 0x01 0x42 0x93 0xBE 0x6C
+                   0x06 0x2D 0xEF 0x11 0x51 0xC8 0xE9 0x99]]])</pre></td></tr><tr><td class="docs"><h4>s20ctr-test-vectors</h4>
+
+<p>Test vectors for the Salsa20 suite, Counter mode</p>
+</td><td class="codes"><pre class="brush: clojure">(def s20ctr-test-vectors
+  [[S20CTR phrase [0x6D 0x5E 0xE6 0x3D 0x2B 0xE3 0x3D 0x3D 0x84
+                   0x46 0xB1 0xBD 0xFF 0xCF 0x02 0xB2 0x9E 0x1A
+                   0x57 0x2C 0x93 0x34 0x76 0x20 0x47 0xBC 0x66
+                   0xE4 0x2B 0x50 0xC9 0x86 0xCF 0xFB 0x69 0x28
+                   0x3A 0x1A 0x44 0x47 0xC6 0xBC 0x2C 0x64]]])</pre></td></tr><tr><td class="docs"><h4>array-of-bytes-type</h4>
+
+<p>Used in byte-array? for comparison</p>
+</td><td class="codes"><pre class="brush: clojure">(def array-of-bytes-type (Class/forName &quot;[B&quot;)) </pre></td></tr><tr><td class="docs"><h3>byte-array?</h3>
+
+<p>Is the given object a byte-array (type [B)</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- byte-array? [obj]
+  (= (type obj) array-of-bytes-type))</pre></td></tr><tr><td class="docs"><h3>to-bytearray</h3>
+
+<p>Convert the given vector of bytes to a [B
+if it is not already converted.</p>
+
+<p>Evaluates to a [B over the given byte vector</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- to-bytearray [bytes]
+  (if (not (byte-array? bytes))
+    (byte-array (mapv byte bytes))
+    bytes))</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
 
 <p>Helper function for testing encryption</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128 iv iv-128}}]
@@ -3622,7 +3514,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>Helper function for testing decryption</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- decryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128 iv iv-128}}]
-  (is (= pt (String. (cs/decrypt suite key iv ct) &quot;UTF-8&quot;))))</pre></td></tr><tr><td class="docs"><h3>testSuites</h3>
+  (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) &quot;UTF-8&quot;))))</pre></td></tr><tr><td class="docs"><h3>testSuites</h3>
 
 <p>Test the various cipher suites.</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest testSuites
@@ -3640,5 +3532,17 @@ net.brehaut.ClojureTools = (function (SH) {
     (is (= true (every? true? (map #(decryptor %1 :key key-128b) cast6-test-vectors)))))
   (testing &quot;Twofish&quot;
     (is (= true (every? true? (map #(encryptor %) tf-test-vectors))))
-    (is (= true (every? true? (map #(decryptor %) tf-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+    (is (= true (every? true? (map #(decryptor %) tf-test-vectors)))))
+  (testing &quot;Twofish (Stream)&quot;
+    (is (= true (every? true? (map #(encryptor % :key key-128b :iv iv-128b) tfs-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key key-128b :iv iv-128b) tfs-test-vectors)))))
+  (testing &quot;Twofish (CTR)&quot;
+    (is (= true (every? true? (map #(encryptor % :key key-128b :iv iv-64b) tfctr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key key-128b :iv iv-64b) tfctr-test-vectors)))))
+  (testing &quot;Salsa20 (Stream)&quot;
+    (is (= true (every? true? (map #(encryptor % :key key-128b :iv iv-128b) s20s-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key key-128b :iv iv-128b) s20s-test-vectors)))))
+  (testing &quot;Salsa20 (CTR)&quot;
+    (is (= true (every? true? (map #(encryptor % :key key-128b :iv iv-64b) s20ctr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key key-128b :iv iv-64b) s20ctr-test-vectors))))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

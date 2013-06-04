@@ -3030,54 +3030,64 @@ net.brehaut.ClojureTools = (function (SH) {
 })(SyntaxHighlighter);
 </script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.mode.cfb" name="net.ozias.crypt.mode.cfb"><h1 class="project-name">net.ozias.crypt.mode.cfb</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Cipher Feedback</h2>
 
-<p>Cipher Feedback mode</p>
+<p>Cipher Feedback mode (CFB-8) where 8 bits (1 byte) are encrypted/decrypted
+per round.</p>
 
 <p><a href="http://en.wikipedia.org/wiki/Cipher_block_chaining">Block Cipher Mode of Operation</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   net.ozias.crypt.mode.cfb
   (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
-            [net.ozias.crypt.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-block</h3>
+            [net.ozias.crypt.cipher.streamcipher :as sc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-byte</h3>
 
-<p>Evaluates to a function over the given cipher and key.</p>
+<p>Encrypt a single byte given the cipher,
+key, and initialization vector.  The
+first byte is pulled from the keystream
+in and xor'd with the given byte to form
+the encrypted byte.</p>
 
-<ul>
-<li><em>[iv ct]</em> - The initialization vector for the current block and
-the ciphertext vector.</li>
-<li><em>block</em> - The block we are decrypting.</li>
-</ul>
+<p>Evaluates to a byte value (0-255)</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-byte [cipher key iv byte]
+  (-&gt;&gt; (sc/generate-keystream cipher key iv)
+       (first)
+       (bit-xor byte)))</pre></td></tr><tr><td class="docs"><h3>shift-in</h3>
 
-<p>Evaluates to a vector containing the IV to use with the next block and
-the current state of the ciphertext vector.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [cipher key]
-  (fn [[iv ct] block]
-    (let [encrypted (bc/encrypt-block cipher iv key)
-          ciphertext (mapv #(bit-xor %1 %2) block encrypted)]
-      [ciphertext
-       (reduce conj ct ciphertext)])))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
+<p>For the given cipher shift <em>val</em>
+into the last position.</p>
 
-<p>Evaluates to a function over the given cipher and key.</p>
+<p>Evaluates to a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- shift-in [cipher reg val]
+  (-&gt;&gt; (conj reg val)
+       (take-last (sc/iv-size-bytes cipher))
+       (vec)))</pre></td></tr><tr><td class="docs"><h3>cfb-round</h3>
 
-<ul>
-<li><em>[iv pt]</em> - The initialization vector for the current block and
-the plaintext vector.</li>
-<li><em>block</em> - The block we are decrypting.</li>
-</ul>
+<p>Function representing a Cipher Feedback round
+over a given key and cipher.  <em>enc</em> is true
+if encrypting, false if decrypting.</p>
 
-<p>Evaluates to a vector containing the IV to use with the next block and
-the current state of the plaintext vector.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [cipher key]
-  (fn [[iv pt] block]
-    (let [decrypted (bc/encrypt-block cipher iv key)
-          plaintext (mapv #(bit-xor %1 %2) decrypted block)]
-      [block
-       (reduce conj pt plaintext)])))</pre></td></tr><tr><td class="docs"><h3>CipherFeedback</h3>
+<p>Evaluates to a vector of 2 vectors. The first vector
+represents the running state of each encrypt round.
+The second vector represents the next value to use
+as an IV.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- cfb-round [cipher key enc] 
+  (fn [[out iv] byte]
+    (let [ebyte (encrypt-byte cipher key iv byte)
+          sval (if enc ebyte byte)]
+      [(conj out ebyte) (shift-in cipher iv sval)])))</pre></td></tr><tr><td class="docs"><h3>process-bytes</h3>
+
+<p>Process the given bytes vector with the given key and
+initialization vector. <em>enc</em> is true if you are
+encrypting, false otherwise.</p>
+
+<p>Evaluates to a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- process-bytes [cipher key iv bytes enc]
+  (first (reduce (cfb-round cipher key enc) [[] iv] bytes)))</pre></td></tr><tr><td class="docs"><h3>CipherFeedback</h3>
 
 <p>Extend the ModeOfOperation protocol through the CipherFeedback record.</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord CipherFeedback []
   ModeOfOperation
-  (encrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks))))
-  (decrypt-blocks [_ cipher iv blocks key]
-    (last (reduce #((decrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) blocks)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  (encrypt [_ cipher key iv bytes]
+    (process-bytes cipher key iv bytes true))
+  (decrypt [_ cipher key iv bytes]
+    (process-bytes cipher key iv bytes false)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

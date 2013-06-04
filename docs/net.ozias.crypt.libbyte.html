@@ -3064,11 +3064,12 @@ one 32-bit word composed of the 4 bytes.</p>
 </blockquote>
 
 <p>This is the inverse of word-bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bytes-word [vec]
-  (apply bit-or 
-         (map #(bit-shift-left (nth vec %1) %2) 
-              (range 4) 
-              (range 24 -1 -8))))        </pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn bytes-word 
+  ([vec le]
+     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
+       (reduce bit-or (map #(bit-shift-left (nth vec %1) %2) (range 4) rng))))
+  ([vec]
+     (bytes-word vec false)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn bytes-dword [vec]
   (apply bit-or
          (map #(bit-shift-left (nth vec %1) %2)
@@ -3076,10 +3077,10 @@ one 32-bit word composed of the 4 bytes.</p>
               (range 56 -1 -8))))</pre></td></tr><tr><td class="docs"><h3>word-bytes</h3>
 
 <p>Takes a 32-bit word and creates a vector of 
-the 4 bytes individually. If <em>lsf</em> is true,
-the order of the vector will be LSB to MSB.
-Otherwise, the order of the vector will be
-MSB to LSB.</p>
+the 4 bytes individually. If <em>le</em> 
+(little endian) is true, the order of the vector
+will be LSB to MSB. Otherwise, the order of the
+vector will be MSB to LSB.</p>
 
 <pre><code>(word-bytes 0x12ab1f3b)
 </code></pre>
@@ -3090,7 +3091,7 @@ MSB to LSB.</p>
   <p>[0x12 0xab 0x1f 0x3b]</p>
 </blockquote>
 
-<pre><code>(word-bytes 0x12ab1f3b)
+<pre><code>(word-bytes 0x12ab1f3b true)
 </code></pre>
 
 <p>evaluates to</p>
@@ -3101,11 +3102,17 @@ MSB to LSB.</p>
 
 <p>This is the inverse of byte-words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn word-bytes 
-  ([word lsf]
-     (let [rng (if lsf (range 0 32 8) (range 24 -1 -8))]
+  ([word le]
+     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
        (mapv #(last-byte (bit-shift-right word %)) rng)))
   ([word]
-     (word-bytes word false)))</pre></td></tr><tr><td class="docs"><h3>reverse-bytes</h3>
+     (word-bytes word false)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn dword-bytes 
+  ([dword le]
+     (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
+       (mapv #(last-byte (bit-shift-right dword %)) rng)))
+  ([dword]
+     (dword-bytes dword false)))</pre></td></tr><tr><td class="docs"><h3>reverse-bytes</h3>
 
 <p>Reverse the bytes in a word</p>
 
