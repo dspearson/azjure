@@ -87,3 +87,5 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 * Camellia
 * Standardize API to work with vectors of bytes (not bytearray as the Java byte is signed
 and we need to work with bytes from 0-255).
+* Separate initialization from encryption/decryption.  Initialization can be expensive
+and doesn't have to be reperformed for every block.
