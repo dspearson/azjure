@@ -131,7 +131,8 @@
 (def mgetq (memoize getq))
 
 ;; ### lfsr1
-;; Used during MDS generation
+;; Linear feedback shift register 
+;; used during MDS generation
 ;;
 ;; Evaluates to a byte
 (defn- lfsr1 [byte]
@@ -140,7 +141,8 @@
    (if (bit-test byte 0) 0xb4 0)))
 
 ;; ### lfsr2
-;; Used during MDS generation
+;; Linear feedback shift register 
+;; used during MDS generation
 ;;
 ;; Evaluates to a byte
 (defn- lfsr2 [byte]
@@ -466,10 +468,16 @@
 ;; Extend the BlockCipher protocol thorough the Twofish record type
 (defrecord Twofish []
   BlockCipher
-  (encrypt-block [_ block key]
-    (encrypt-block block key))
-  (decrypt-block [_ block key]
-    (decrypt-block block key))
+  (encrypt-block [_ bytes key]
+    (->> (mapv bytes-word (partition 4 key))
+         (encrypt-block (mapv bytes-word (partition 4 bytes)))
+         (mapv word-bytes)
+         (reduce into)))
+  (decrypt-block [_ bytes key]
+    (->> (mapv bytes-word (partition 4 key))
+         (decrypt-block (mapv bytes-word (partition 4 bytes)))
+         (mapv word-bytes)
+         (reduce into)))
   (blocksize [_]
     128)
   StreamCipher

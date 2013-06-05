@@ -9,35 +9,30 @@
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
 ;; ### pad-bytes
-;; Pad the given byte array to the appropriate block size
+;; Pad the given vector of bytes to the appropriate block size
 ;; as defined by the cipher.
 ;;
-;; Evaluates to a vector of <em>N</em> 32-bit words, where
-;; <em>N</em> is the number of words per block.
-(defn- pad-bytes [unpadded cipher]
-  (let [words-per-block (/ (bc/blocksize cipher) 32)
-        bytes-per-block (/ (bc/blocksize cipher) 8)
-        bytes-per-word (/ bytes-per-block words-per-block)
-        rem (remaining (count unpadded) bytes-per-block)
-        rempad (reduce conj unpadded (take rem (cycle [rem])))]
-    (mapv #(bytes-word %) (partition bytes-per-word rempad))))
+;; Evaluates to a vector of bytes padded to the blocksize of
+;; the given cipher
+(defn- pad-bytes [bytes cipher]
+  (let [bytes-per-block (/ (bc/blocksize cipher) 8)
+        rem (remaining (count bytes) bytes-per-block)]
+    (reduce conj bytes (take rem (cycle [rem])))))
 
-;; ### unpad-blocks
-;; Unpad the given vector of words.
+;; ### unpad-bytes
+;; Unpad the given vector of bytes.
 ;;
-;; Evaluates to a byte array.
+;; Evaluates to a vector of bytes.
 ;;
 ;; This is the inverse of pad-bytes.
-(defn- unpad-blocks [padded cipher]
-  (let [pl (last-byte (last padded))
-        flat (reduce into (mapv #(word-bytes %) padded))]
-    (byte-array (map byte (subvec flat 0 (- (count flat) pl))))))
+(defn- unpad-bytes [bytes cipher]
+  (subvec bytes 0 (- (count bytes) (last bytes))))
 
 ;; ### PKCS7pad
 ;; Extend the Pad protocol through the PKCS7pad record type.
 (defrecord PKCS7pad []
   Pad
-  (pad [_ unpadded cipher]
-    (pad-bytes (vec unpadded) cipher))
-  (unpad [_ padded cipher]
-    (unpad-blocks padded cipher)))
+  (pad [_ bytes cipher]
+    (pad-bytes bytes cipher))
+  (unpad [_ bytes cipher]
+    (unpad-bytes bytes cipher)))
