@@ -4,7 +4,7 @@
 ;; bytes of value <em>N</em>
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.padding.pkcs7pad
-  (:require [net.ozias.crypt.libbyte :refer :all]
+  (:require [net.ozias.crypt.libcrypt :refer (mbpb)]
             [net.ozias.crypt.padding.pad :refer (Pad remaining)]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -15,8 +15,7 @@
 ;; Evaluates to a vector of bytes padded to the blocksize of
 ;; the given cipher
 (defn- pad-bytes [bytes cipher]
-  (let [bytes-per-block (/ (bc/blocksize cipher) 8)
-        rem (remaining (count bytes) bytes-per-block)]
+  (let [rem (remaining (count bytes) (mbpb cipher))]
     (reduce conj bytes (take rem (cycle [rem])))))
 
 ;; ### unpad-bytes
@@ -25,7 +24,7 @@
 ;; Evaluates to a vector of bytes.
 ;;
 ;; This is the inverse of pad-bytes.
-(defn- unpad-bytes [bytes cipher]
+(defn- unpad-bytes [bytes]
   (subvec bytes 0 (- (count bytes) (last bytes))))
 
 ;; ### PKCS7pad
@@ -34,5 +33,5 @@
   Pad
   (pad [_ bytes cipher]
     (pad-bytes bytes cipher))
-  (unpad [_ bytes cipher]
-    (unpad-bytes bytes cipher)))
+  (unpad [_ bytes]
+    (unpad-bytes bytes)))

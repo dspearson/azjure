@@ -3110,7 +3110,7 @@ the cipher and mode given.</p>
   ([cipher mode key iv bytes]
      (mode/decrypt mode cipher key iv bytes))
   ([cipher mode padding key iv words]
-     (padder/unpad padding (decryptor cipher mode key iv words) cipher)))</pre></td></tr><tr><td class="docs"><h3>AESECBX</h3>
+     (padder/unpad padding (decryptor cipher mode key iv words))))</pre></td></tr><tr><td class="docs"><h3>AESECBX</h3>
 
 <p>AES cipher, Electronic Codebook Mode, various padding methods</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord AESECBPKCS7 []

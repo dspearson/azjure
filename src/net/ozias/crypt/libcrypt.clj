@@ -21,6 +21,14 @@
 ;; Memoization of words-per-block
 (def mwpb (memoize words-per-block))
 
+;; ### bytes-per-block
+(defn- bytes-per-block [cipher]
+  (/ (bc/blocksize cipher) 8))
+
+;; ### mbpb
+;; Memoization of bytes-per-block
+(def mbpb (memoize bytes-per-block))
+
 ;; ### +mod32
 ;; Add a and b mod 32
 (defn +mod32 [a b]

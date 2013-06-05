@@ -84,7 +84,7 @@
   ([cipher mode key iv bytes]
      (mode/decrypt mode cipher key iv bytes))
   ([cipher mode padding key iv words]
-     (padder/unpad padding (decryptor cipher mode key iv words) cipher)))
+     (padder/unpad padding (decryptor cipher mode key iv words))))
 
 ;; ### AESECBX
 ;; AES cipher, Electronic Codebook Mode, various padding methods

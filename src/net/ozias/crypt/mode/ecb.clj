@@ -7,7 +7,7 @@
 ;; <em>Note</em>:  This block cipher mode is not recommended for encryption as
 ;; the result can expose patterns.  It is however useful for testing purposes.
 (ns net.ozias.crypt.mode.ecb
-  (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
+  (:require [net.ozias.crypt.libcrypt :refer [mbpb]]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -16,6 +16,6 @@
 (defrecord ElectronicCodebook []
   ModeOfOperation
   (encrypt [_ cipher key _ bytes]
-    (reduce into (mapv #(bc/encrypt-block cipher % key) (partition (mwpb cipher) bytes))))
+    (reduce into (mapv #(bc/encrypt-block cipher % key) (partition (mbpb cipher) bytes))))
   (decrypt [_ cipher key _ bytes]
-    (reduce into (mapv #(bc/decrypt-block cipher % key) (partition (mwpb cipher) bytes)))))
+    (reduce into (mapv #(bc/decrypt-block cipher % key) (partition (mbpb cipher) bytes)))))

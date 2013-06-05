@@ -3153,7 +3153,8 @@ when substituting a value.</p>
 <p>Memoization of getq</p>
 </td><td class="codes"><pre class="brush: clojure">(def mgetq (memoize getq))</pre></td></tr><tr><td class="docs"><h3>lfsr1</h3>
 
-<p>Used during MDS generation</p>
+<p>Linear feedback shift register 
+used during MDS generation</p>
 
 <p>Evaluates to a byte</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- lfsr1 [byte]
@@ -3161,7 +3162,8 @@ when substituting a value.</p>
    (bit-shift-right byte 1)
    (if (bit-test byte 0) 0xb4 0)))</pre></td></tr><tr><td class="docs"><h3>lfsr2</h3>
 
-<p>Used during MDS generation</p>
+<p>Linear feedback shift register 
+used during MDS generation</p>
 
 <p>Evaluates to a byte</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- lfsr2 [byte]
@@ -3458,10 +3460,16 @@ the plaintext of the block</p>
 <p>Extend the BlockCipher protocol thorough the Twofish record type</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord Twofish []
   BlockCipher
-  (encrypt-block [_ block key]
-    (encrypt-block block key))
-  (decrypt-block [_ block key]
-    (decrypt-block block key))
+  (encrypt-block [_ bytes key]
+    (-&gt;&gt; (mapv bytes-word (partition 4 key))
+         (encrypt-block (mapv bytes-word (partition 4 bytes)))
+         (mapv word-bytes)
+         (reduce into)))
+  (decrypt-block [_ bytes key]
+    (-&gt;&gt; (mapv bytes-word (partition 4 key))
+         (decrypt-block (mapv bytes-word (partition 4 bytes)))
+         (mapv word-bytes)
+         (reduce into)))
   (blocksize [_]
     128)
   StreamCipher

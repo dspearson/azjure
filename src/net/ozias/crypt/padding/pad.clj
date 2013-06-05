@@ -23,15 +23,12 @@
 ;; This protocol defines two function
 ;;
 ;; #### pad
-;; This function takes an array of bytes and pads those bytes to the 
-;; appropriate blocksize as defined by the given cipher.  This
-;; function should evaluate to a vector of 32-bit words.
+;; This function takes a vector of bytes and pads those bytes to the 
+;; appropriate blocksize as defined by the given cipher.
 ;;
 ;; #### unpad
-;; This function take a vector of 32-bit words an removes any padding
-;; from the vector.  This function should evalutate to an array of 
-;; bytes.
-;; 
+;; This function take a vector of bytes and removes any padding
+;; from the vector.
 (defprotocol Pad
-  (pad [_ unpadded cipher])
-  (unpad [_ padded cipher]))
+  (pad [_ bytes cipher])
+  (unpad [_ bytes]))
