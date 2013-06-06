@@ -1,5 +1,9 @@
 (ns net.ozias.crypt.testplaintext)
 
+;; #### phrase
+;; A phrase to test encryption/decryption
+(def phrase "The quick brown fox jumps over the lazy dog.")
+
 ;; ### pt-msg
 ;; A sample plaintext message.  In this case it is my name as 11 
 ;; UTF-8 bytes (0x4a61736f63204f7a696173) repeated 16 times to make 11 blocks.
