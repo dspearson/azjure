@@ -7,7 +7,8 @@
             (net.ozias.crypt [libtest :refer :all]
                              [testivs :refer :all]
                              [testkeys :refer :all]
-                             [testplaintext :refer (phrase)]
+                             [testplaintext :refer :all]
+                             [testciphertext :refer :all]
                              [cryptsuite :as cs]
                              [cryptsuite :refer (->TFECBPKCS7)]
                              [cryptsuite :refer (->TFECBZERO)]
@@ -27,7 +28,7 @@
                              [cryptsuite :refer (->TFCFB)]
                              [cryptsuite :refer (->TFOFB)]
                              [cryptsuite :refer (->TFCTR)])
-            (net.ozias.crypt.cipher [cipher :as c]
+            (net.ozias.crypt.cipher [cipher :as cipher]
                                     [blockcipher :as bc]
                                     [streamcipher :as sc]
                                     [twofish :refer (->Twofish)])))
@@ -59,16 +60,24 @@
 ;; The Twofish counter mode suite.
 (def TFCTR (->TFCTR))
 
-;; ### Test Vectors
+;; ### Specification Test Vectors
+;; Each row is
+;;
+;;     [cipher initmap plaintext ciphertext]
+;;
+
+(def ^{:doc "Test vectors from the Twofish spec"} tfspec-test-vectors
+  [[TF (cipher/initialize TF tf-128-key) tf-128-pt tf-128-ct]
+   [TF (cipher/initialize TF tf-192-key) tf-192-pt tf-192-ct]
+   [TF (cipher/initialize TF tf-256-key) tf-256-pt tf-256-ct]])
+
+;; ### Suite Test Vectors
 ;; Each row is
 ;;
 ;;     [suite plaintext ciphertext]
 ;;
 
-(def ^{:doc "Test vectors from the Twofish spec"} tfspec-test-vectors
-  [])
-
-(def ^{:doc "Test vectors for Twofish block modes"} tfblock-test-vectors
+(def ^{:doc "Test vectors for Twofish block suites"} tfblock-test-vectors
   [[TFECBPKCS7    phrase [0x62 0xD6 0x24 0x29 0x1F 0x51 0xD8 0xD4
                           0x18 0x40 0x96 0x09 0x8F 0xB4 0x06 0xAE
                           0xDD 0x7B 0x55 0x4C 0x93 0x54 0xAE 0x8C
@@ -142,7 +151,7 @@
                           0x2C 0xD5 0xAC 0x37 0x74 0x6C 0x1C 0xEE
                           0x03 0x59 0x64 0x1F 0x2C 0x24 0xAC 0x33]]])
 
-(def ^{:doc "Test vectors for Twofish stream modes"} tfs-test-vectors
+(def ^{:doc "Test vectors for Twofish stream suites"} tfs-test-vectors
   [[TFCFB phrase [0x8F 0x25 0x51 0xEB 0x35 0x08 0x26 0x7E 0x68
                   0x81 0x50 0x27 0x2E 0x21 0x4C 0xB6 0x3D 0x89
                   0xC0 0x5A 0x28 0xD8 0xFB 0x57 0x2E 0x9F 0x72
@@ -154,7 +163,7 @@
                   0x15 0x62 0x61 0xAC 0x21 0xEF 0x8B 0x30 0xE3
                   0x50 0x59 0xA7 0xD2 0x52 0xA5 0xEB 0x54]]])
 
-(def ^{:doc "Test vectors for Twofish counter mode"} tfctr-test-vectors
+(def ^{:doc "Test vectors for Twofish counter mode suite"} tfctr-test-vectors
   [[TFCTR phrase [0xA3 0xAA 0xDE 0x29 0xC2 0x7A 0x2A 0xEB 0x50
                   0x3F 0xF2 0xC2 0x1D 0x40 0xFA 0xFE 0xAB 0x7D
                   0x59 0xC3 0x87 0x5D 0x9C 0x86 0x61 0x29 0xDF
@@ -163,40 +172,27 @@
 
 ;; ### Twofish Initialization
 
-(def ^{:doc "Initialization map to be used in the tests."} initmap
-  (c/initialize TF key-128b))
-
-(def tf-128b [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-              0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
-
-(def tf-192b [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
-              0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10
-              0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])
-
-(def tf-256b (into tf-192b [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))
-
-(def spec128 (c/initialize TF tf-128b))
-(def spec192 (c/initialize TF tf-192b))
-(def spec256 (c/initialize TF tf-256b))
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap
+  (cipher/initialize TF key-128b))
 
 ;; ### Twofish Tests
 
-(deftest ^{:doc "Test Twofish spec vectors."} testSpec
+(deftest ^{:doc "Test Twofish spec test vectors"} testSpec
   (testing "Spec"
-    (is (= true (every? true? (map #(encryptor % :key initmap) tfspec-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :key initmap) tfspec-test-vectors))))))
+    (is (= true (every? true? (map encrypt-block tfspec-test-vectors))))
+    (is (= true (every? true? (map decrypt-block tfspec-test-vectors))))))
 
-(deftest ^{:doc "Test Twofish block modes."} testBlock
+(deftest ^{:doc "Test Twofish block suites"} testBlock
   (testing "Block"
     (is (= true (every? true? (map #(encryptor % :key initmap) tfblock-test-vectors))))
     (is (= true (every? true? (map #(decryptor % :key initmap) tfblock-test-vectors))))))
 
-(deftest ^{:doc "Test Twofish stream modes."} testStream
+(deftest ^{:doc "Test Twofish stream suites"} testStream
   (testing "Stream"
     (is (= true (every? true? (map #(encryptor % :key initmap) tfs-test-vectors))))
     (is (= true (every? true? (map #(decryptor % :key initmap) tfs-test-vectors))))))
 
-(deftest ^{:doc "Test Twofish counter mode."} testCounter
+(deftest ^{:doc "Test Twofish counter mode suite"} testCounter
   (testing "Counter"
     (is (= true (every? true? (map #(encryptor % :key initmap :iv iv-64b) tfctr-test-vectors))))
     (is (= true (every? true? (map #(decryptor % :key initmap :iv iv-64b) tfctr-test-vectors))))))

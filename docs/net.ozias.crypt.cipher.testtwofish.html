@@ -3037,7 +3037,8 @@ net.brehaut.ClojureTools = (function (SH) {
             (net.ozias.crypt [libtest :refer :all]
                              [testivs :refer :all]
                              [testkeys :refer :all]
-                             [testplaintext :refer (phrase)]
+                             [testplaintext :refer :all]
+                             [testciphertext :refer :all]
                              [cryptsuite :as cs]
                              [cryptsuite :refer (-&gt;TFECBPKCS7)]
                              [cryptsuite :refer (-&gt;TFECBZERO)]
@@ -3057,7 +3058,7 @@ net.brehaut.ClojureTools = (function (SH) {
                              [cryptsuite :refer (-&gt;TFCFB)]
                              [cryptsuite :refer (-&gt;TFOFB)]
                              [cryptsuite :refer (-&gt;TFCTR)])
-            (net.ozias.crypt.cipher [cipher :as c]
+            (net.ozias.crypt.cipher [cipher :as cipher]
                                     [blockcipher :as bc]
                                     [streamcipher :as sc]
                                     [twofish :refer (-&gt;Twofish)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
@@ -3080,15 +3081,23 @@ net.brehaut.ClojureTools = (function (SH) {
 (def TFPCBCISO7816 (-&gt;TFPCBCISO7816))</pre></td></tr><tr><td class="docs"><p>The Twofish stream mode suites.</p>
 </td><td class="codes"><pre class="brush: clojure">(def TFCFB (-&gt;TFCFB))
 (def TFOFB (-&gt;TFOFB))</pre></td></tr><tr><td class="docs"><p>The Twofish counter mode suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def TFCTR (-&gt;TFCTR))</pre></td></tr><tr><td class="docs"><h3>Test Vectors</h3>
+</td><td class="codes"><pre class="brush: clojure">(def TFCTR (-&gt;TFCTR))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
+
+<p>Each row is</p>
+
+<pre><code>[cipher initmap plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the Twofish spec</p>
+</td><td class="codes"><pre class="brush: clojure">(def  tfspec-test-vectors
+  [[TF (cipher/initialize TF tf-128-key) tf-128-pt tf-128-ct]
+   [TF (cipher/initialize TF tf-192-key) tf-192-pt tf-192-ct]
+   [TF (cipher/initialize TF tf-256-key) tf-256-pt tf-256-ct]])</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
 
 <p>Each row is</p>
 
 <pre><code>[suite plaintext ciphertext]
 </code></pre>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the Twofish spec</p>
-</td><td class="codes"><pre class="brush: clojure">(def  tfspec-test-vectors
-  [])</pre></td></tr><tr><td class="docs"><p>Test vectors for Twofish block modes</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors for Twofish block suites</p>
 </td><td class="codes"><pre class="brush: clojure">(def  tfblock-test-vectors
   [[TFECBPKCS7    phrase [0x62 0xD6 0x24 0x29 0x1F 0x51 0xD8 0xD4
                           0x18 0x40 0x96 0x09 0x8F 0xB4 0x06 0xAE
@@ -3161,7 +3170,7 @@ net.brehaut.ClojureTools = (function (SH) {
                           0x33 0xDC 0x65 0x87 0x2B 0xF8 0x0F 0x07
                           0x9D 0x7D 0xC7 0x6B 0xD1 0xA6 0xBD 0xE2
                           0x2C 0xD5 0xAC 0x37 0x74 0x6C 0x1C 0xEE
-                          0x03 0x59 0x64 0x1F 0x2C 0x24 0xAC 0x33]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for Twofish stream modes</p>
+                          0x03 0x59 0x64 0x1F 0x2C 0x24 0xAC 0x33]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for Twofish stream suites</p>
 </td><td class="codes"><pre class="brush: clojure">(def  tfs-test-vectors
   [[TFCFB phrase [0x8F 0x25 0x51 0xEB 0x35 0x08 0x26 0x7E 0x68
                   0x81 0x50 0x27 0x2E 0x21 0x4C 0xB6 0x3D 0x89
@@ -3172,38 +3181,29 @@ net.brehaut.ClojureTools = (function (SH) {
                   0xCB 0x7D 0x57 0xFF 0x71 0x62 0x0B 0xB5 0xA3
                   0x79 0x17 0xEB 0xFE 0xE9 0x99 0x13 0x99 0x30
                   0x15 0x62 0x61 0xAC 0x21 0xEF 0x8B 0x30 0xE3
-                  0x50 0x59 0xA7 0xD2 0x52 0xA5 0xEB 0x54]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for Twofish counter mode</p>
+                  0x50 0x59 0xA7 0xD2 0x52 0xA5 0xEB 0x54]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for Twofish counter mode suite</p>
 </td><td class="codes"><pre class="brush: clojure">(def  tfctr-test-vectors
   [[TFCTR phrase [0xA3 0xAA 0xDE 0x29 0xC2 0x7A 0x2A 0xEB 0x50
                   0x3F 0xF2 0xC2 0x1D 0x40 0xFA 0xFE 0xAB 0x7D
                   0x59 0xC3 0x87 0x5D 0x9C 0x86 0x61 0x29 0xDF
                   0x4F 0xF8 0x48 0xBC 0xEE 0x55 0x3A 0x62 0x44
                   0x8B 0x2E 0xCF 0x7B 0xDE 0xAC 0xFE 0xBF]]])</pre></td></tr><tr><td class="docs"><h3>Twofish Initialization</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the tests.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  initmap
-  (c/initialize TF key-128b))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def tf-128b [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-              0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def tf-192b [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
-              0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10
-              0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def tf-256b (into tf-192b [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def spec128 (c/initialize TF tf-128b))
-(def spec192 (c/initialize TF tf-192b))
-(def spec256 (c/initialize TF tf-256b))</pre></td></tr><tr><td class="docs"><h3>Twofish Tests</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Test Twofish spec vectors.</p>
+  (cipher/initialize TF key-128b))</pre></td></tr><tr><td class="docs"><h3>Twofish Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test Twofish spec test vectors</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testSpec
   (testing &quot;Spec&quot;
-    (is (= true (every? true? (map #(encryptor % :key initmap) tfspec-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :key initmap) tfspec-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish block modes.</p>
+    (is (= true (every? true? (map encrypt-block tfspec-test-vectors))))
+    (is (= true (every? true? (map decrypt-block tfspec-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish block suites</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testBlock
   (testing &quot;Block&quot;
     (is (= true (every? true? (map #(encryptor % :key initmap) tfblock-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :key initmap) tfblock-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish stream modes.</p>
+    (is (= true (every? true? (map #(decryptor % :key initmap) tfblock-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish stream suites</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testStream
   (testing &quot;Stream&quot;
     (is (= true (every? true? (map #(encryptor % :key initmap) tfs-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :key initmap) tfs-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish counter mode.</p>
+    (is (= true (every? true? (map #(decryptor % :key initmap) tfs-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Twofish counter mode suite</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testCounter
   (testing &quot;Counter&quot;
     (is (= true (every? true? (map #(encryptor % :key initmap :iv iv-64b) tfctr-test-vectors))))
