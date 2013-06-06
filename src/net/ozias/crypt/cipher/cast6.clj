@@ -5,7 +5,8 @@
     net.ozias.crypt.cipher.cast6
     (:require (net.ozias.crypt [libbyte :refer :all]
                                [libcrypt :refer (+modw -modw +mod32)])
-              [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
+              (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+                                      [streamcipher :refer (StreamCipher)])))
 
 ;; #### s1
 ;; S-Box 1
@@ -441,5 +442,9 @@
     (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
   (decrypt-block [_ block key]
     (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
-  (blocksize [_]
-    128))
+  (blocksize [_] 128)
+  StreamCipher
+  (generate-keystream [_ key iv]
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) key true))))
+  (keystream-size-bytes [_] 16)
+  (iv-size-bytes [_] 16))
