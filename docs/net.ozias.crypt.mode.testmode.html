@@ -3043,7 +3043,8 @@ net.brehaut.ClojureTools = (function (SH) {
                                   [cfb :refer (-&gt;CipherFeedback)]
                                   [ofb :refer (-&gt;OutputFeedback)]
                                   [ctr :refer (-&gt;CounterMode)])
-            (net.ozias.crypt.cipher [blockcipher :as bc]
+            (net.ozias.crypt.cipher [cipher :as c]
+                                    [blockcipher :as bc]
                                     [blowfish :refer (-&gt;Blowfish)]
                                     [twofish :refer (-&gt;Twofish)])))</pre></td></tr><tr><td class="docs"><h4>Modes</h4>
 
@@ -3071,11 +3072,13 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>Encrypt a vector of blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encrypt-blocks [[mode cipher plaintext ciphertext] &amp; {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= ciphertext (mode/encrypt mode cipher key iv plaintext))))</pre></td></tr><tr><td class="docs"><h2>decrypt-blocks</h2>
+  (let [initmap (c/initialize cipher key)]
+    (is (= ciphertext (mode/encrypt mode cipher initmap iv plaintext)))))</pre></td></tr><tr><td class="docs"><h2>decrypt-blocks</h2>
 
 <p>Decrypt a vector of blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- decrypt-blocks [[mode cipher plaintext ciphertext] &amp; {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= plaintext (mode/decrypt mode cipher key iv ciphertext))))</pre></td></tr><tr><td class="docs"><h2>testModes</h2>
+  (let [initmap (c/initialize cipher key)]
+    (is (= plaintext (mode/decrypt mode cipher initmap iv ciphertext)))))</pre></td></tr><tr><td class="docs"><h2>testModes</h2>
 
 <p>Test the blockcipher modes</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest testModes

@@ -12,6 +12,14 @@
   ([val len] (format (str "0x%0" len "X") val))
   ([val] (to-hex val 8)))
 
+(defmacro maybe
+  "Assuming that the body of code returns X, this macro returns [X nil] in the case of no error
+  and [nil E] in event of an exception object E."
+  [& body]
+  `(try [(do ~@body) nil]
+     (catch Error e#
+       [nil e#])))
+
 ;; ### words-per-block
 ;; Get the number of words per cipher block
 (defn- words-per-block [cipher]

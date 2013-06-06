@@ -3040,7 +3040,13 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>Useful for testing</p>
 </td><td class="codes"><pre class="brush: clojure">(defn to-hex 
   ([val len] (format (str &quot;0x%0&quot; len &quot;X&quot;) val))
-  ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs"><h3>words-per-block</h3>
+  ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs"><p>Assuming that the body of code returns X, this macro returns [X nil] in the case of no error
+  and [nil E] in event of an exception object E.</p>
+</td><td class="codes"><pre class="brush: clojure">(defmacro maybe
+  [&amp; body]
+  `(try [(do ~@body) nil]
+     (catch Error e#
+       [nil e#])))</pre></td></tr><tr><td class="docs"><h3>words-per-block</h3>
 
 <p>Get the number of words per cipher block</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- words-per-block [cipher]

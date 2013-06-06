@@ -3033,9 +3033,10 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>Designed to meet the spec at
 <a href="https://www.schneier.com/paper-twofish-paper.pdf">https://www.schneier.com/paper-twofish-paper.pdf</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns net.ozias.crypt.cipher.twofish
-  (:require (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+  (:require (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])
-            [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
+            [net.ozias.crypt.libcrypt :refer (to-hex maybe +modw)]
             [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes &lt;&lt;&lt; &gt;&gt;&gt;)]))</pre></td></tr><tr><td class="docs"><h4>q0</h4>
 
 <p>S-box used during key schedule and MDS creation.</p>
@@ -3358,17 +3359,34 @@ last vector contains the odd elements.</p>
       ((juxt evens odds))))</pre></td></tr><tr><td class="docs"><h4>mmemo</h4>
 
 <p>Memoization of the memo function</p>
-</td><td class="codes"><pre class="brush: clojure">(def mmemo (memoize memo))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
+</td><td class="codes"><pre class="brush: clojure">(def mmemo (memoize memo))</pre></td></tr><tr><td class="docs"><h3>pad-key</h3>
+
+<p>Pad the given key to the next appropriate
+key size</p>
+</td><td class="codes"><pre class="brush: clojure">(defn pad-key 
+  ([key] {:pre [(vector? key) (&gt; (count key) 15) (&lt; (count key) 33)]}
+     (let [len (count key)]
+       (if (or (= len 16) (= len 24) (= len 32))
+         key
+         (if (&lt; len 24)
+           (into key (take (- 24 len) (cycle [0])))
+           (into key (take (- 32 len) (cycle [0]))))))))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
 
 <p>Expand the key into the subkey vector
 and the S-box values</p>
 
-<p>Evaluates to a vector.  The first element
-is a vector of subkeys.  The last element
-is a vector of the S-box values.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- expand-key [key]
-  [(generate-subkeys (mmds) (mmemo key))
-   (reverse (genSv (mmemo key)))])</pre></td></tr><tr><td class="docs"><h3>whiten</h3>
+<p>Evaluates to a map of two vectors. The ks
+entry contains the key schedule.  The sv
+entry contains the S-box values.</p>
+
+<pre><code>{:ks [] :sv []}
+</code></pre>
+</td><td class="codes"><pre class="brush: clojure">(defn expand-key [key]
+  (let [[key error] (maybe (pad-key key))]
+    (if error (throw error))
+    (let [key (mapv bytes-word (partition 4 key))]
+      {:ks (generate-subkeys (mmds) (mmemo key))
+       :sv (vec (reverse (genSv (mmemo key))))})))</pre></td></tr><tr><td class="docs"><h3>whiten</h3>
 
 <p>Whiten the given block with material from the 
 given key schedule.</p>
@@ -3396,7 +3414,7 @@ of the Twofish paper.  Takes two input 32-bit words, the key schedule, the S-box
 and the round</p>
 
 <p>Evaluates to a vector of two 32-bit words.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- f [[w0 w1] [ks sv] round]
+</td><td class="codes"><pre class="brush: clojure">(defn- f [[w0 w1] {:keys [ks sv]} round]
   (let [t0 ((h (mmds) sv) w0) 
         t1 ((h (mmds) sv) (&lt;&lt;&lt; w1 8))]
     [(+modw t0 t1 (nth ks (+ 8 (* 2 round))))
@@ -3410,9 +3428,9 @@ algorithm is then applied to the block.</p>
 
 <p>Evaluates to four 32-bit words representing the state of the block after the
 given round</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-round [[ks sv :as rm]]
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-round [initmap]
   (fn [[w0 w1 w2 w3] round]
-    (let [[f0 f1] (f [w0 w1] rm round)]
+    (let [[f0 f1] (f [w0 w1] initmap round)]
       (reduce conj [(&gt;&gt;&gt; (bit-xor f0 w2) 1) (bit-xor (&lt;&lt;&lt; w3 1) f1)] [w0 w1]))))</pre></td></tr><tr><td class="docs"><h3>decrypt-round</h3>
 
 <p>Evaluates to a function over the given round material (the key schedule and
@@ -3423,58 +3441,65 @@ algorithm is then applied to the block.</p>
 
 <p>Evaluates to four 32-bit words representing the state of the block after the
 given round</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-round [[ks sv :as rm]]
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-round [initmap]
   (fn [[w0 w1 w2 w3] round]
-    (let [[f0 f1] (f [w2 w3] rm round)]
+    (let [[f0 f1] (f [w2 w3] initmap round)]
       (reduce conj [w2 w3] [(bit-xor (&lt;&lt;&lt; w0 1) f0) (&gt;&gt;&gt; (bit-xor f1 w1) 1)]))))</pre></td></tr><tr><td class="docs"><h3>encrypt-block</h3>
 
 <p>Encrypt the given block with the given key</p>
 
 <p>Evaluates to a vector of four 32-bit words that represent
 the ciphertext of the block</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [block key]
-  (let [[ks sv :as km] (expand-key key)]
-    (mapv reverse-bytes
-          (whiten
-           (-&gt;&gt; (range 16)
-                (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
-                (partition 2)
-                ((juxt last first))
-                (reduce into [])) ks 4))))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [block {:keys [ks] :as initmap}]
+  (mapv reverse-bytes
+        (whiten
+         (-&gt;&gt; (range 16)
+              (reduce (encrypt-round initmap) (whiten (mapv reverse-bytes block) ks))
+              (partition 2)
+              ((juxt last first))
+              (reduce into [])) ks 4)))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Decrypt the given block with the given key.
+  Evaluates to a vector of four 32-bit words that represent the plaintext of the block.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block 
+  [block {:keys [ks] :as initmap}]
+  (mapv reverse-bytes
+        (whiten
+         (reduce (decrypt-round initmap)
+                 (-&gt;&gt; (whiten (mapv reverse-bytes block) ks 4)
+                      (partition 2)
+                      ((juxt last first))
+                      (reduce into [])) 
+                 (range 15 -1 -1)) ks)))</pre></td></tr><tr><td class="docs"><h3>process-bytes</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Process the given vector of bytes using the values given in the initmap.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- process-bytes
+  ([bytes {:keys [enc] :as initmap}]
+     {:pre [(contains? initmap :ks) (contains? initmap :sv) (contains? initmap :enc)
+            (vector? (:ks initmap)) (vector? (:sv initmap))
+            (= 40 (count (:ks initmap)))
+            (&gt; (count (:sv initmap)) 1) (&lt; (count (:sv initmap)) 5)]}
+  (let [encfn (if enc encrypt-block decrypt-block)]
+    (-&gt;&gt; (encfn (mapv bytes-word (partition 4 bytes)) initmap)
+         (mapv word-bytes)
+         (reduce into)))))</pre></td></tr><tr><td class="docs"><h3>Twofish</h3>
 
-<p>Decrypt the given block with the given key</p>
-
-<p>Evaluates to a vector of four 32-bit words that represent
-the plaintext of the block</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [block key]
-  (let [[ks sv :as km] (expand-key key)]
-    (mapv reverse-bytes
-          (whiten
-           (reduce (decrypt-round km)
-                   (-&gt;&gt; (whiten (mapv reverse-bytes block) ks 4)
-                        (partition 2)
-                        ((juxt last first))
-                        (reduce into [])) 
-                   (range 15 -1 -1)) ks))))</pre></td></tr><tr><td class="docs"><h3>Twofish</h3>
-
-<p>Extend the BlockCipher protocol thorough the Twofish record type</p>
+<p>Extend the Cipher, BlockCipher, and StreamCipher protocols 
+thorough the Twofish record type</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defrecord Twofish []
+  Cipher
+  (initialize [_ key] 
+    (expand-key key))
+  (keysizes-bytes [_] 
+    (vec (range 16 33)))
   BlockCipher
-  (encrypt-block [_ bytes key]
-    (-&gt;&gt; (mapv bytes-word (partition 4 key))
-         (encrypt-block (mapv bytes-word (partition 4 bytes)))
-         (mapv word-bytes)
-         (reduce into)))
-  (decrypt-block [_ bytes key]
-    (-&gt;&gt; (mapv bytes-word (partition 4 key))
-         (decrypt-block (mapv bytes-word (partition 4 bytes)))
-         (mapv word-bytes)
-         (reduce into)))
-  (blocksize [_]
-    128)
+  (encrypt-block [_ bytes initmap]
+    (process-bytes bytes (conj {:enc true} initmap)))
+  (decrypt-block [_ bytes initmap]
+    (process-bytes bytes (conj {:enc false} initmap)))
+  (blocksize [_] 128)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (encrypt-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key))))))
+  (generate-keystream [_ initmap iv]
+    (process-bytes iv (conj {:enc true} initmap)))
   (keystream-size-bytes [_] 16)
   (iv-size-bytes [_] 16))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

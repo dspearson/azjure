@@ -3,8 +3,15 @@
   net.ozias.crypt.cipher.streamcipher)
 
 ;; ### StreamCipher
-;; This protocol defines two functions
+;; This protocol defines three functions
+;;
+;; #### generate-keystream
+;;
+;; #### keystream-size-bytes
+;;
+;; #### iv-size-bytes
+;;
 (defprotocol StreamCipher
-  (generate-keystream [_ key iv])
+  (generate-keystream [_ initmap iv])
   (keystream-size-bytes [_])
   (iv-size-bytes [_]))

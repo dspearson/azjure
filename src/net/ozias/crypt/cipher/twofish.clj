@@ -2,9 +2,10 @@
 ;; Designed to meet the spec at
 ;; [https://www.schneier.com/paper-twofish-paper.pdf](https://www.schneier.com/paper-twofish-paper.pdf)
 (ns net.ozias.crypt.cipher.twofish
-  (:require (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+  (:require (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])
-            [net.ozias.crypt.libcrypt :refer (to-hex +modw)]
+            [net.ozias.crypt.libcrypt :refer (to-hex maybe +modw)]
             [net.ozias.crypt.libbyte :refer (bytes-word word-bytes reverse-bytes <<< >>>)]))
 
 ;; #### q0
@@ -362,16 +363,34 @@
 ;; Memoization of the memo function
 (def mmemo (memoize memo))
 
+;; ### pad-key
+;; Pad the given key to the next appropriate
+;; key size
+(defn pad-key 
+  ([key] {:pre [(vector? key) (> (count key) 15) (< (count key) 33)]}
+     (let [len (count key)]
+       (if (or (= len 16) (= len 24) (= len 32))
+         key
+         (if (< len 24)
+           (into key (take (- 24 len) (cycle [0])))
+           (into key (take (- 32 len) (cycle [0]))))))))
+
 ;; ### expand-key
 ;; Expand the key into the subkey vector
 ;; and the S-box values
 ;;
-;; Evaluates to a vector.  The first element
-;; is a vector of subkeys.  The last element
-;; is a vector of the S-box values.
-(defn- expand-key [key]
-  [(generate-subkeys (mmds) (mmemo key))
-   (reverse (genSv (mmemo key)))])
+;; Evaluates to a map of two vectors. The ks
+;; entry contains the key schedule.  The sv
+;; entry contains the S-box values.
+;;
+;;     {:ks [] :sv []}
+;;
+(defn expand-key [key]
+  (let [[key error] (maybe (pad-key key))]
+    (if error (throw error))
+    (let [key (mapv bytes-word (partition 4 key))]
+      {:ks (generate-subkeys (mmds) (mmemo key))
+       :sv (vec (reverse (genSv (mmemo key))))})))
 
 ;; ### whiten
 ;; Whiten the given block with material from the 
@@ -399,7 +418,7 @@
 ;; and the round
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- f [[w0 w1] [ks sv] round]
+(defn- f [[w0 w1] {:keys [ks sv]} round]
   (let [t0 ((h (mmds) sv) w0) 
         t1 ((h (mmds) sv) (<<< w1 8))]
     [(+modw t0 t1 (nth ks (+ 8 (* 2 round))))
@@ -414,9 +433,9 @@
 ;;
 ;; Evaluates to four 32-bit words representing the state of the block after the
 ;; given round
-(defn- encrypt-round [[ks sv :as rm]]
+(defn- encrypt-round [initmap]
   (fn [[w0 w1 w2 w3] round]
-    (let [[f0 f1] (f [w0 w1] rm round)]
+    (let [[f0 f1] (f [w0 w1] initmap round)]
       (reduce conj [(>>> (bit-xor f0 w2) 1) (bit-xor (<<< w3 1) f1)] [w0 w1]))))
 
 ;; ### decrypt-round
@@ -428,60 +447,72 @@
 ;;
 ;; Evaluates to four 32-bit words representing the state of the block after the
 ;; given round
-(defn- decrypt-round [[ks sv :as rm]]
+(defn- decrypt-round [initmap]
   (fn [[w0 w1 w2 w3] round]
-    (let [[f0 f1] (f [w2 w3] rm round)]
+    (let [[f0 f1] (f [w2 w3] initmap round)]
       (reduce conj [w2 w3] [(bit-xor (<<< w0 1) f0) (>>> (bit-xor f1 w1) 1)]))))
 
 ;; ### encrypt-block
-;; Encrypt the given block with the given key
-;;
-;; Evaluates to a vector of four 32-bit words that represent
-;; the ciphertext of the block
-(defn- encrypt-block [block key]
-  (let [[ks sv :as km] (expand-key key)]
-    (mapv reverse-bytes
-          (whiten
-           (->> (range 16)
-                (reduce (encrypt-round km) (whiten (mapv reverse-bytes block) ks))
-                (partition 2)
-                ((juxt last first))
-                (reduce into [])) ks 4))))
+
+(defn- encrypt-block 
+  "Encrypt the given block with the given key.
+  Evaluates to a vector of four 32-bit words that represent the ciphertext of the block."
+  [block {:keys [ks] :as initmap}]
+  (mapv reverse-bytes
+        (whiten
+         (->> (range 16)
+              (reduce (encrypt-round initmap) (whiten (mapv reverse-bytes block) ks))
+              (partition 2)
+              ((juxt last first))
+              (reduce into [])) ks 4)))
 
 ;; ### decrypt-block
-;; Decrypt the given block with the given key
-;;
-;; Evaluates to a vector of four 32-bit words that represent
-;; the plaintext of the block
-(defn- decrypt-block [block key]
-  (let [[ks sv :as km] (expand-key key)]
-    (mapv reverse-bytes
-          (whiten
-           (reduce (decrypt-round km)
-                   (->> (whiten (mapv reverse-bytes block) ks 4)
-                        (partition 2)
-                        ((juxt last first))
-                        (reduce into [])) 
-                   (range 15 -1 -1)) ks))))
+
+(defn- decrypt-block 
+  "Decrypt the given block with the given key.
+  Evaluates to a vector of four 32-bit words that represent the plaintext of the block."
+  [block {:keys [ks] :as initmap}]
+  (mapv reverse-bytes
+        (whiten
+         (reduce (decrypt-round initmap)
+                 (->> (whiten (mapv reverse-bytes block) ks 4)
+                      (partition 2)
+                      ((juxt last first))
+                      (reduce into [])) 
+                 (range 15 -1 -1)) ks)))
+
+;; ### process-bytes
+
+(defn- process-bytes
+  "Process the given vector of bytes using the values given in the initmap."
+  ([bytes {:keys [enc] :as initmap}]
+     {:pre [(contains? initmap :ks) (contains? initmap :sv) (contains? initmap :enc)
+            (vector? (:ks initmap)) (vector? (:sv initmap))
+            (= 40 (count (:ks initmap)))
+            (> (count (:sv initmap)) 1) (< (count (:sv initmap)) 5)]}
+  (let [encfn (if enc encrypt-block decrypt-block)]
+    (->> (encfn (mapv bytes-word (partition 4 bytes)) initmap)
+         (mapv word-bytes)
+         (reduce into)))))
 
 ;; ### Twofish
-;; Extend the BlockCipher protocol thorough the Twofish record type
+;; Extend the Cipher, BlockCipher, and StreamCipher protocols 
+;; thorough the Twofish record type
+
 (defrecord Twofish []
+  Cipher
+  (initialize [_ key] 
+    (expand-key key))
+  (keysizes-bytes [_] 
+    (vec (range 16 33)))
   BlockCipher
-  (encrypt-block [_ bytes key]
-    (->> (mapv bytes-word (partition 4 key))
-         (encrypt-block (mapv bytes-word (partition 4 bytes)))
-         (mapv word-bytes)
-         (reduce into)))
-  (decrypt-block [_ bytes key]
-    (->> (mapv bytes-word (partition 4 key))
-         (decrypt-block (mapv bytes-word (partition 4 bytes)))
-         (mapv word-bytes)
-         (reduce into)))
-  (blocksize [_]
-    128)
+  (encrypt-block [_ bytes initmap]
+    (process-bytes bytes (conj {:enc true} initmap)))
+  (decrypt-block [_ bytes initmap]
+    (process-bytes bytes (conj {:enc false} initmap)))
+  (blocksize [_] 128)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (encrypt-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key))))))
+  (generate-keystream [_ initmap iv]
+    (process-bytes iv (conj {:enc true} initmap)))
   (keystream-size-bytes [_] 16)
   (iv-size-bytes [_] 16))

@@ -12,7 +12,8 @@
                                   [cfb :refer (->CipherFeedback)]
                                   [ofb :refer (->OutputFeedback)]
                                   [ctr :refer (->CounterMode)])
-            (net.ozias.crypt.cipher [blockcipher :as bc]
+            (net.ozias.crypt.cipher [cipher :as c]
+                                    [blockcipher :as bc]
                                     [blowfish :refer (->Blowfish)]
                                     [twofish :refer (->Twofish)])))
 
@@ -45,12 +46,14 @@
 ;; ## encrypt-blocks
 ;; Encrypt a vector of blocks.
 (defn- encrypt-blocks [[mode cipher plaintext ciphertext] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= ciphertext (mode/encrypt mode cipher key iv plaintext))))
+  (let [initmap (c/initialize cipher key)]
+    (is (= ciphertext (mode/encrypt mode cipher initmap iv plaintext)))))
 
 ;; ## decrypt-blocks
 ;; Decrypt a vector of blocks.
 (defn- decrypt-blocks [[mode cipher plaintext ciphertext] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= plaintext (mode/decrypt mode cipher key iv ciphertext))))
+  (let [initmap (c/initialize cipher key)]
+    (is (= plaintext (mode/decrypt mode cipher initmap iv ciphertext)))))
 
 ;; ## testModes
 ;; Test the blockcipher modes
