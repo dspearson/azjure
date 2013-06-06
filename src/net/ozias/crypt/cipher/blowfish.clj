@@ -3,8 +3,9 @@
 ;; [http://www.schneier.com/paper-blowfish-fse.html](http://www.schneier.com/paper-blowfish-fse.html)
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.blowfish
-  (:require [net.ozias.crypt.libbyte :refer [get-byte]]
-            [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
+  (:require [net.ozias.crypt.libbyte :refer [get-byte bytes-word word-bytes]]
+            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+                                    [streamcipher :refer (StreamCipher)])))
 
 ;; #### parr
 ;; The P-array.  As this is recalculated during generate-subkeys
@@ -285,15 +286,15 @@
   (reset! sbox1 sbox1_init)
   (reset! sbox2 sbox2_init)
   (reset! sbox3 sbox3_init)
-  (reset! parr (mapv #(bit-xor %1 %2) @parr (take 18 (cycle key))))
-  (reduce #(encrypt-subkey %1 %2) [0 0] (vector parr sbox0 sbox1 sbox2 sbox3)))
+  (reset! parr (mapv bit-xor @parr (mapv bytes-word (partition 4 (take 72 (cycle key))))))
+  (reduce encrypt-subkey [0 0] (vector parr sbox0 sbox1 sbox2 sbox3)))
 
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
 ;; 1. <em>block</em>: A vector of two 32-bit words representing a block.
-;; 2. <em>key</em>: A vector of 4 to 14 32-bit words representing a 
-;; key of 32 to 448 bits (currently only support multiples of 32).
+;; 2. <em>key</em>: A vector of 4 to 56 bytes representing a 
+;; key of 32 to 448 bits in 8-bit intervals.
 ;; 3. <em>enc</em>: true if you are encrypting the block, false
 ;; if you are decrypting the block.
 ;;
@@ -307,8 +308,13 @@
 (defrecord Blowfish []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
   (decrypt-block [_ block key]
-    (process-block block key false))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
   (blocksize [_]
-    64))
+    64)
+  StreamCipher
+  (generate-keystream [_ key iv]
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) key true))))
+  (keystream-size-bytes [_] 8)
+  (iv-size-bytes [_] 8))

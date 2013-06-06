@@ -438,8 +438,8 @@
 (defrecord CAST6 []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
   (decrypt-block [_ block key]
-    (process-block block key false))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
   (blocksize [_]
     128))

@@ -9,7 +9,7 @@
 ;;
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.cbc
-  (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
+  (:require [net.ozias.crypt.libcrypt :refer [mwpb mbpb]]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -19,13 +19,11 @@
 ;; The function takes the current ciphertext and the block to encrypt.
 ;; The block is encrypted and conj'd onto the ciphertext.
 (defn- encrypt-block [cipher iv key] 
-  (fn [ciphertext block]
+  (fn [ciphertext bytes]
     (let [civ (if (empty? ciphertext) 
                 iv 
-                (subvec ciphertext (- (count ciphertext) (mwpb cipher))))]
-      (reduce conj ciphertext 
-              (bc/encrypt-block cipher
-                                (mapv #(bit-xor %1 %2) block civ) key)))))
+                (subvec ciphertext (- (count ciphertext) (mbpb cipher))))]
+      (reduce conj ciphertext (bc/encrypt-block cipher (mapv bit-xor bytes civ) key)))))
 
 ;; ### decrypt-block
 ;; Evaluates to a function over the given cipher, ciphertext, 
@@ -35,20 +33,19 @@
 ;; we are decrypting. The block is decrypted and conj'd onto the plaintext.
 (defn- decrypt-block [cipher ciphertext iv key]
   (fn [plaintext idx]
-    (let [lower (* (mwpb cipher) idx)
-          upper (+ (mwpb cipher) lower)
+    (let [lower (* (mbpb cipher) idx)
+          upper (+ (mbpb cipher) lower)
           block (subvec ciphertext lower upper)
           civ (if (= 0 idx)
                 iv 
-                (subvec ciphertext (- lower (mwpb cipher)) (- upper (mwpb cipher))))]
-      (reduce conj plaintext (mapv #(bit-xor %1 %2) 
-                                   (bc/decrypt-block cipher block key) civ)))))
+                (subvec ciphertext (- lower (mbpb cipher)) (- upper (mbpb cipher))))]
+      (reduce conj plaintext (mapv bit-xor (bc/decrypt-block cipher block key) civ)))))
 
 ;; ### CipherBlockChaining
 ;; Extend the ModeOfOperation protocol through the CipherBlockChaining record.
 (defrecord CipherBlockChaining []
   ModeOfOperation
   (encrypt [_ cipher key iv bytes]
-    (reduce #((encrypt-block cipher iv key) %1 %2) [] (partition (mwpb cipher) bytes)))
+    (reduce (encrypt-block cipher iv key) [] (partition (mbpb cipher) bytes)))
   (decrypt [_ cipher key iv bytes]
-    (reduce #((decrypt-block cipher bytes iv key) %1 %2) []  (range (/ (count bytes) (mwpb cipher))))))    
+    (reduce (decrypt-block cipher bytes iv key) []  (range (/ (count bytes) (mbpb cipher))))))    

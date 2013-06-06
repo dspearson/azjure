@@ -31,9 +31,10 @@
 ;; </tr>
 ;; </table>
 (ns ^{:author "Jason Ozias"}
-     net.ozias.crypt.cipher.aes
-     (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
-               [net.ozias.crypt.cipher.blockcipher :refer [BlockCipher]]))
+  net.ozias.crypt.cipher.aes
+  (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
+            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+                                    [streamcipher :refer (StreamCipher)])))
 
 ;; #### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -792,8 +793,12 @@
 (defrecord Aes []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) true))))
   (decrypt-block [_ block key]
-    (process-block block key false))
-  (blocksize [_]
-    128))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) false))))
+  (blocksize [_] 128)
+  StreamCipher
+  (generate-keystream [_ key iv]
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key)) true))))
+  (keystream-size-bytes [_] 16)
+  (iv-size-bytes [_] 16))

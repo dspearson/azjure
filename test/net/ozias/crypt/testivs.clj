@@ -28,3 +28,7 @@
 ;; ### iv-64b
 ;; A sample 64-bit initialization vector as a vector of bytes.
 (def iv-64b [0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10])
+
+;; ### iv-32b
+;; A sample 32-bit initialization vector as a vector of bytes.
+(def iv-32b [0xFE 0xDC 0xBA 0x98])

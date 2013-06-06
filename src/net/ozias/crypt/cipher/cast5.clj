@@ -552,7 +552,6 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-;; [0x238B4FE5 0x847E44B2]
 (defn- process-block [block key enc]
   (let [rcnt (if (> (count key) 10) 16 12)
         ks (mkey-schedule key)]
@@ -566,8 +565,8 @@
 (defrecord CAST5 []
   BlockCipher
   (encrypt-block [_ block key]
-    (process-block block key true))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
   (decrypt-block [_ block key]
-    (process-block block key false))
+    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
   (blocksize [_]
     64))

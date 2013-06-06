@@ -89,3 +89,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 and we need to work with bytes from 0-255).
 * Separate initialization from encryption/decryption.  Initialization can be expensive
 and doesn't have to be reperformed for every block.
+* Consolidate cipher tests into testcipher.clj

@@ -8,7 +8,7 @@
 ;;
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.mode.pcbc
-  (:require [net.ozias.crypt.libcrypt :refer [mwpb]]
+  (:require [net.ozias.crypt.libcrypt :refer [mbpb]]
             [net.ozias.crypt.mode.modeofoperation :refer [ModeOfOperation]]
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
@@ -23,9 +23,9 @@
 ;; the current state of the ciphertext vector.
 (defn- encrypt-block [cipher key]
   (fn [[iv ct] block]
-    (let [encrypted (bc/encrypt-block cipher (mapv #(bit-xor %1 %2) iv block) key)
+    (let [encrypted (bc/encrypt-block cipher (mapv bit-xor iv block) key)
           ciphertext (reduce conj ct encrypted)]
-      [(mapv #(bit-xor %1 %2) block encrypted)
+      [(mapv bit-xor block encrypted)
        ciphertext])))
 
 ;; ### decrypt-block
@@ -40,8 +40,8 @@
 (defn- decrypt-block [cipher key]
   (fn [[iv pt] block]
     (let [decrypted (bc/decrypt-block cipher block key)
-          plaintext (mapv #(bit-xor %1 %2) iv decrypted)]
-      [(mapv #(bit-xor %1 %2) block plaintext)
+          plaintext (mapv bit-xor iv decrypted)]
+      [(mapv bit-xor block plaintext)
        (reduce conj pt plaintext)])))
 
 ;; ### PropagatingCipherBlockChaining
@@ -50,6 +50,6 @@
 (defrecord PropagatingCipherBlockChaining []
   ModeOfOperation
   (encrypt [_ cipher key iv bytes]
-    (last (reduce #((encrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) bytes))))
+    (last (reduce (encrypt-block cipher key) [iv []] (partition (mbpb cipher) bytes))))
   (decrypt [_ cipher key iv bytes]
-    (last (reduce #((decrypt-block cipher key) %1 %2) [iv []] (partition (mwpb cipher) bytes)))))
+    (last (reduce (decrypt-block cipher key) [iv []] (partition (mbpb cipher) bytes)))))

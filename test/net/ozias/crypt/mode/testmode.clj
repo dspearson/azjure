@@ -10,10 +10,11 @@
                                   [cbc :refer (->CipherBlockChaining)]
                                   [pcbc :refer (->PropagatingCipherBlockChaining)]
                                   [cfb :refer (->CipherFeedback)]
-                                  [ofb :refer (->OutputFeedback)])
+                                  [ofb :refer (->OutputFeedback)]
+                                  [ctr :refer (->CounterMode)])
             (net.ozias.crypt.cipher [blockcipher :as bc]
-                                    [aes :refer (->Aes)]
-                                    [blowfish :refer (->Blowfish)])))
+                                    [blowfish :refer (->Blowfish)]
+                                    [twofish :refer (->Twofish)])))
 
 ;; #### Modes
 ;; Setup the mode records for use in tests
@@ -22,38 +23,41 @@
 (def PCBC (->PropagatingCipherBlockChaining))
 (def CFB (->CipherFeedback))
 (def OFB (->OutputFeedback))
+(def CTR (->CounterMode))
 
 ;; #### Ciphers
 ;; Setup the cipher records for use in tests
-(def AES (->Aes))
 (def BF (->Blowfish))
+(def TF (->Twofish))
 
 ;; #### test-vectors
 ;; The mode test vectors 
 (def test-vectors
-  [[ECB  AES iv-128 key-128   pt-1 ecb-aes]
-   [ECB  BF  iv-128 key-128   pt-1 ecb-bf]
-   [CBC  AES iv-128 key-128   pt-1 cbc-aes]
-   [CBC  BF  iv-128 key-128   pt-1 cbc-bf]
-   [PCBC AES iv-128 key-128   pt-1 pcbc-aes]
-   [PCBC BF  iv-128 key-128   pt-1 pcbc-bf]
-   [CFB  AES iv-128 key-128   pt-1 cfb-aes]
-   [CFB  BF  iv-128 key-128   pt-1 cfb-bf]
-   [OFB  AES iv-128 key-128   pt-1 ofb-aes]
-   [CBC  BF  iv-64  key-128-1 pt-2 cbc-bf-1]])
+  [[ECB  TF pt-1 tf-ecb ]
+   [CBC  TF pt-1 tf-cbc ]
+   [PCBC TF pt-1 tf-pcbc]
+   [OFB  TF pt-1 tf-ofb ]
+   [CFB  TF pt-1 tf-cfb ]])
+
+(def ctr-test-vectors
+  [[CTR  TF pt-1 tf-ctr]])
 
 ;; ## encrypt-blocks
 ;; Encrypt a vector of blocks.
-(defn- encrypt-blocks [[mode cipher iv key plaintext ciphertext]]
-  (is (= ciphertext (mode/encrypt mode cipher iv plaintext key))))
+(defn- encrypt-blocks [[mode cipher plaintext ciphertext] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
+  (is (= ciphertext (mode/encrypt mode cipher key iv plaintext))))
 
 ;; ## decrypt-blocks
 ;; Decrypt a vector of blocks.
-(defn- decrypt-blocks [[mode cipher iv key plaintext ciphertext]]
-  (is (= plaintext (mode/decrypt mode cipher iv ciphertext key))))
+(defn- decrypt-blocks [[mode cipher plaintext ciphertext] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
+  (is (= plaintext (mode/decrypt mode cipher key iv ciphertext))))
 
 ;; ## testModes
 ;; Test the blockcipher modes
 (deftest testModes
-  (is (= true (every? true? (map #(encrypt-blocks %) test-vectors))))
-  (is (= true (every? true? (map #(decrypt-blocks %) test-vectors)))))
+  (testing "Modes"
+    (is (= true (every? true? (map encrypt-blocks test-vectors))))
+    (is (= true (every? true? (map decrypt-blocks test-vectors))))
+    (testing "CTR"
+      (is (= true (every? true? (map #(encrypt-blocks % :iv iv-64b) ctr-test-vectors))))
+      (is (= true (every? true? (map #(decrypt-blocks % :iv iv-64b) ctr-test-vectors)))))))
