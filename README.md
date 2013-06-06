@@ -32,6 +32,8 @@ Encrypt
 ;; Encrypt
 (cs/encrypt AESCBCPKCS7 key iv bytes)
 ```
+where key and iv are vectors of unsigned bytes (0-255) of lengths appropriate for the suite, and bytes
+is a vector of unsigned bytes you wish to encrypt.
 
 Decrypt
 
@@ -41,6 +43,8 @@ Decrypt
 ;; Decrypt
 (cs/decrypt AESCBCPKCS7 key iv bytes)
 ```
+where key and iv are vectors of unsigned bytes (0-255) of lengths appropriate for the suite, and bytes
+is a vector of unsigned bytes you wish to decrypt.
 
 See [testcryptsuite.clj](https://github.com/CraZySacX/azjure/blob/master/test/net/ozias/crypt/testcryptsuite.clj) for examples
 
