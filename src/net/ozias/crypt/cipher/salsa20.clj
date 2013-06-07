@@ -1,7 +1,8 @@
 ;; ## Salsa20
 ;; Designed to meet the [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf) spec
 (ns net.ozias.crypt.cipher.salsa20
-  (:require [net.ozias.crypt.cipher.streamcipher :refer [StreamCipher]]
+  (:require (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [streamcipher :refer [StreamCipher]])
             [net.ozias.crypt.libcrypt :refer (+modw to-hex)]
             [net.ozias.crypt.libbyte :refer (<<< bytes-word word-bytes dword-bytes)]))
 
@@ -52,7 +53,7 @@
 (defn- key256? [key]
   (= 32 (count key)))
 
-(defn- key-stream [key iv]
+(defn- key-stream [{:keys [key]} iv]
   (let [c (if (key256? key) sigma tau)
         k0 (subvec key 0 16)
         k1 (if (key256? key) (subvec key 16 32) (subvec key 0 16))]
@@ -61,8 +62,13 @@
 ;; ### Salsa20
 ;; Extend the StreamCipher protocol thorough the Salsa20 record type
 (defrecord Salsa20 []
+  Cipher
+  (initialize [_ key]
+    {:key key})
+  (keysizes-bytes [_]
+    [16 32])
   StreamCipher
-  (generate-keystream [_ key iv]
-    (key-stream key iv))
+  (generate-keystream [_ initmap iv]
+    (key-stream initmap iv))
   (keystream-size-bytes [_] 64)
   (iv-size-bytes [_] 16))

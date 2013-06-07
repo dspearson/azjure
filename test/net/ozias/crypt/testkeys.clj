@@ -7,6 +7,7 @@
 ;; [R2612_10]: http://tools.ietf.org/html/rfc2612#page-10
 ;; [BF]: http://www.schneier.com/code/vectors.txt
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
+;; [S20] http://cr.yp.to/snuffle/spec.pdf
 (ns ^{:author "Jason Ozias"
       :doc "Test keys vectors"}
   net.ozias.crypt.testkeys)

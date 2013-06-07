@@ -3028,72 +3028,69 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.testkeys" name="net.ozias.crypt.testkeys"><h1 class="project-name">net.ozias.crypt.testkeys</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Test Keys</h1>
-
-<p><em>WARNING!!!</em> Do not use these keys to encrypt
-anything you wish to keep secret.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Test keys vectors</p>
-
-<p>[S20] http://cr.yp.to/snuffle/spec.pdf</p>
+</script><title>net.ozias.crypt/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#net.ozias.crypt.cipher.testsalsa20" name="net.ozias.crypt.cipher.testsalsa20"><h1 class="project-name">net.ozias.crypt.cipher.testsalsa20</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Salsa20 Stream Cipher Tests</h1>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test suite for the Salsa20 stream cipher</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
       :doc }
-  net.ozias.crypt.testkeys)</pre></td></tr><tr><td class="docs"><h3>40-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 40-bit key as a vector of bytes
-as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-40-key
-  [0x01 0x23 0x45 0x67 0x12])</pre></td></tr><tr><td class="docs"><h3>80-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
-as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-80-key
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45])</pre></td></tr><tr><td class="docs"><h3>128-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 128-bit key as a vector of bytes as
-defined in Appendix C.1 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-128-key
-  [0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
-   0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f])</pre></td></tr><tr><td class="docs"><p>CAST5 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-128-key
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>CAST6 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-128-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-128-key
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 192-bit key as a vector of bytes as
-defined in Appendix C.2 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-192-key
-  (into aes-128-key [0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17]))</pre></td></tr><tr><td class="docs"><p>CAST6 192-bit key as a vector of bytes as
-defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-192-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
-   0xba 0xc7 0x7a 0x77 0x17 0x94 0x28 0x63])</pre></td></tr><tr><td class="docs"><p>Twofish 192-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-192-key
-  [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
-   0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10
-   0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])</pre></td></tr><tr><td class="docs"><h3>256-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 256-bit key as a vector of bytes as
-defined in Appendix C.3 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-256-key
-  (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))</pre></td></tr><tr><td class="docs"><p>CAST6 256-bit key as a vector of bytes as
-defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-256-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
-   0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
-   0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-256-key
-  (into tf-192-key [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))</pre></td></tr><tr><td class="docs"><h3>Blowfish Test Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 128-bit key as a vector of 4 32-bit words
-as defined <a href="http://www.schneier.com/code/vectors.txt">Blowfish vectors</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  key-128-1
-  [0x01234567 0x89ABCDEF 0xF0E1D2C3 0xB4A59687])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  net.ozias.crypt.cipher.testsalsa20
+  (:require [clojure.test :refer :all]
+            (net.ozias.crypt [libtest :refer :all]
+                             [testivs :refer :all]
+                             [testkeys :refer :all]
+                             [testplaintext :refer :all]
+                             [testciphertext :refer :all]
+                             [cryptsuite :as cs]
+                             [cryptsuite :refer (-&gt;S20CFB)]
+                             [cryptsuite :refer (-&gt;S20OFB)]
+                             [cryptsuite :refer (-&gt;S20CTR)])
+            (net.ozias.crypt.cipher [cipher :as cipher]
+                                    [streamcipher :as sc]
+                                    [salsa20 :refer (-&gt;Salsa20)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Salsa20 record to be used in the tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def  s20 (-&gt;Salsa20))</pre></td></tr><tr><td class="docs"><p>The Salsa20 stream mode suites.</p>
+</td><td class="codes"><pre class="brush: clojure">(def S20CFB (-&gt;S20CFB))
+(def S20OFB (-&gt;S20OFB))</pre></td></tr><tr><td class="docs"><p>The Salsa20 counter mode suite.</p>
+</td><td class="codes"><pre class="brush: clojure">(def S20CTR (-&gt;S20CTR))</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
+
+<p>Each row is</p>
+
+<pre><code>[suite plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors for Salsa20 stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(def  s20s-test-vectors
+  [[S20CFB phrase [0xDD 0xC8 0xD4 0xCC 0x9E 0x0D 0x46 0x37 0x14
+                   0xEE 0xC4 0x9E 0xB1 0x24 0x07 0x75 0xB8 0x12
+                   0xF2 0x66 0x79 0x90 0xBA 0xE6 0x30 0x26 0x83
+                   0x59 0x0F 0x46 0x03 0xE8 0x4D 0x7F 0x80 0x74
+                   0x23 0x0B 0x5A 0x8E 0xFB 0xA5 0x26 0xFB]]
+   [S20OFB phrase [0xDD 0x72 0x6A 0xDD 0x26 0x6D 0x64 0xA9 0x36
+                   0xD0 0x5B 0xFE 0x01 0xE1 0x85 0xCF 0xD8 0x50
+                   0x15 0xB5 0x86 0x81 0x44 0xAB 0x80 0x57 0x5B
+                   0x58 0x16 0x99 0xED 0x01 0x42 0x93 0xBE 0x6C
+                   0x06 0x2D 0xEF 0x11 0x51 0xC8 0xE9 0x99]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for Salsa20 counter mode suite</p>
+</td><td class="codes"><pre class="brush: clojure">(def  s20ctr-test-vectors
+  [[S20CTR phrase [0x6D 0x5E 0xE6 0x3D 0x2B 0xE3 0x3D 0x3D 0x84
+                   0x46 0xB1 0xBD 0xFF 0xCF 0x02 0xB2 0x9E 0x1A
+                   0x57 0x2C 0x93 0x34 0x76 0x20 0x47 0xBC 0x66
+                   0xE4 0x2B 0x50 0xC9 0x86 0xCF 0xFB 0x69 0x28
+                   0x3A 0x1A 0x44 0x47 0xC6 0xBC 0x2C 0x64]]])</pre></td></tr><tr><td class="docs"><h3>Salsa20 Initialization</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap
+  (cipher/initialize s20 key-128b))</pre></td></tr><tr><td class="docs"><h3>Salsa20 Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test Salsa20 stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testStream
+  (testing &quot;Stream&quot;
+    (is (= true (every? true? (map #(encryptor % :key initmap) s20s-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key initmap) s20s-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Salsa20 counter mode suite</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testCounter
+  (testing &quot;Counter&quot;
+    (is (= true (every? true? (map #(encryptor % :key initmap :iv iv-64b) s20ctr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :key initmap :iv iv-64b) s20ctr-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Salsa20</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testSalsa20
+  (testing &quot;Salsa20&quot;
+    (testStream)
+    (testCounter)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
+</td><td class="codes"><pre class="brush: clojure">(defn  test-ns-hook
+  []
+  (testSalsa20))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
