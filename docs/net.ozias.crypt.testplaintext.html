@@ -3045,6 +3045,10 @@ as defined in Appendix C.1, C.2, and C.3 in <a href="http://csrc.nist.gov/public
 </td><td class="codes"><pre class="brush: clojure">(def  aes-pt 
   [0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77
    0x88 0x99 0xaa 0xbb 0xcc 0xdd 0xee 0xff])</pre></td></tr><tr><td class="docs"><p>A sample plaintext block as a vector of 16 bytes
+as defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC2612</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  c6-pt
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>A sample plaintext block as a vector of 16 bytes
 as defined in <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-pt
   [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00

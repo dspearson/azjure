@@ -2,6 +2,7 @@
 
 ;; [F197]: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
 ;; [R2144]: http://tools.ietf.org/html/rfc2144#appendix-B.1
+;; [R2612_10]: http://tools.ietf.org/html/rfc2612#page-10
 ;; [BF]: http://www.schneier.com/code/vectors.txt
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 (ns ^{:author "Jason Ozias"
@@ -25,6 +26,11 @@ as defined at [RFC2144][R2144]"} c5-pt
 as defined in Appendix C.1, C.2, and C.3 in [FIPS 197][F197]"} aes-pt 
   [0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77
    0x88 0x99 0xaa 0xbb 0xcc 0xdd 0xee 0xff])
+
+(def ^{:doc "A sample plaintext block as a vector of 16 bytes
+as defined in [RFC2612][R2612_10]"} c6-pt
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
 
 (def ^{:doc "A sample plaintext block as a vector of 16 bytes
 as defined in [Twofish paper][TF]"} tf-pt

@@ -5,7 +5,8 @@
     net.ozias.crypt.cipher.cast6
     (:require (net.ozias.crypt [libbyte :refer :all]
                                [libcrypt :refer (+modw -modw +mod32)])
-              (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+              (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                      [blockcipher :refer (BlockCipher)]
                                       [streamcipher :refer (StreamCipher)])))
 
 ;; #### s1
@@ -283,11 +284,11 @@
 ;;
 (defn- key-schedule [[ai bi ci di ei fi gi hi :as words]]
   (let [trange (range 192)
-        tm (reduce #(gen-m %1 %2) [0x5A827999] trange)
-        tr (reduce #(gen-r %1 %2) [19] trange)
+        tm (reduce gen-m [0x5A827999] trange)
+        tr (reduce gen-r [19] trange)
         kappafn (kappa tm tr)]
     (->> (range 24)
-         (reduce #(kappafn %1 %2) [words])
+         (reduce kappafn [words])
          (take-nth 2)
          (rest)
          (reduce into)
@@ -304,7 +305,9 @@
 ;; converts to a vector of 32-bit words.
 ;;
 ;; Evaluates to a vector of 8 32-bit words
-(defn- expand-key [key]
+(defn- expand-key 
+  ([key]
+     {:pre [(vector? key) (> (count key) 15) (< (count key) 33)]}
   (let [l (count key)]
     (->> (if (< l 32)
            (->> (cycle [0])
@@ -312,7 +315,7 @@
                 (reduce conj key))
            key)
          (partition 4)
-         (mapv #(bytes-word %)))))
+         (mapv bytes-word)))))
 
 ;; ### q-word
 ;; Generates one q word
@@ -427,24 +430,39 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.
-(defn- process-block [block key enc]
-  (let [ks (mkey-schedule (expand-key key))
-        keys (if enc ks (flip-key-schedule ks))
+(defn- process-block 
+  ([block {:keys [km kr enc] :as initmap}]
+     {:pre [(contains? initmap :km) (contains? initmap :kr) (contains? initmap :enc)
+            (vector? km) (vector? kr)
+            (= (count km) 48)(= (count kr) 48)]}
+  (let [keys (if enc [km kr] (flip-key-schedule [km kr]))
         castfn (cast6 keys)]
     (->> (range 12)
-         (reduce #(castfn %1 %2) block))))
+         (reduce castfn block)))))
+
+(defn- process-bytes [block initmap]
+  (->> initmap
+       (process-block (mapv bytes-word (partition 4 block)))
+       (mapv word-bytes)
+       (reduce into)))
 
 ;; ### CAST6
 ;; Extend the BlockCipher protocol through the CAST6 record type.
 (defrecord CAST6 []
+  Cipher
+  (initialize [_ key]
+    (let [ks (key-schedule (expand-key key))]
+      {:km (first ks) :kr (last ks)}))
+  (keysizes-bytes [_]
+    (vec (range 16 33 4)))
   BlockCipher
-  (encrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
-  (decrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
+  (encrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc true} initmap)))
+  (decrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc false} initmap)))
   (blocksize [_] 128)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) key true))))
+  (generate-keystream [_ initmap iv]
+    (process-bytes iv (conj {:enc true} initmap)))
   (keystream-size-bytes [_] 16)
   (iv-size-bytes [_] 16))

@@ -3049,11 +3049,15 @@ as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144
 defined in Appendix C.1 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-128-key
   [0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
-   0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f])</pre></td></tr><tr><td class="docs"><p>A sample 128-bit key as a vector of bytes 
-as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
+   0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f])</pre></td></tr><tr><td class="docs"><p>CAST5 128-bit key as a vector of bytes as
+defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  c5-128-key
   [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
+   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>CAST6 128-bit key as a vector of bytes as
+defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  c6-128-key
+  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+   0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-128-key
   [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
@@ -3062,7 +3066,12 @@ defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish pap
 </td><td class="codes"></td></tr><tr><td class="docs"><p>AES 192-bit key as a vector of bytes as
 defined in Appendix C.2 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-192-key
-  (into aes-128-key [0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17]))</pre></td></tr><tr><td class="docs"><p>Twofish 192-bit key as a vector of bytes as
+  (into aes-128-key [0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17]))</pre></td></tr><tr><td class="docs"><p>CAST6 192-bit key as a vector of bytes as
+defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  c6-192-key
+  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
+   0xba 0xc7 0x7a 0x77 0x17 0x94 0x28 0x63])</pre></td></tr><tr><td class="docs"><p>Twofish 192-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-192-key
   [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
@@ -3071,7 +3080,13 @@ defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish pap
 </td><td class="codes"></td></tr><tr><td class="docs"><p>AES 256-bit key as a vector of bytes as
 defined in Appendix C.3 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-256-key
-  (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
+  (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))</pre></td></tr><tr><td class="docs"><p>CAST6 256-bit key as a vector of bytes as
+defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  c6-256-key
+  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
+   0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
+   0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-256-key
   (into tf-192-key [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))</pre></td></tr><tr><td class="docs"><h3>Blowfish Test Keys</h3>
