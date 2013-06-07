@@ -60,7 +60,7 @@ See [testcryptsuite.clj](https://github.com/CraZySacX/azjure/blob/master/test/ne
 1. Salsa20 (S20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
 
 ## Supported Modes
-Cipher modes describe the method for encrypting multiple bytes.
+Cipher modes describe the method for encrypting multiple blocks.
 
 See [Mode of Operation](http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation) for
 descriptions
@@ -89,8 +89,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 ## In Progress
 * Camellia
-* Standardize API to work with vectors of bytes (not bytearray as the Java byte is signed
-and we need to work with bytes from 0-255).
-* Separate initialization from encryption/decryption.  Initialization can be expensive
-and doesn't have to be reperformed for every block.
-* Consolidate cipher tests into testcipher.clj
+* Change Blowfish initialization to be more streamlined.
