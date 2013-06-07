@@ -5,7 +5,8 @@
   net.ozias.crypt.cipher.cast5
   (:require (net.ozias.crypt [libbyte :refer :all]
                              [libcrypt :refer (+modw -modw)])
-            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+            (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])))
 
 ;; #### s1
@@ -530,16 +531,18 @@
           (roundfn ri (nth km round) (nth kr round))
           (bit-xor li))]))
 
-(defn- key-schedule [key]
+(defn- key-schedule 
+  ([key]
+     {:pre [(vector? key) (and (> (count key) 4) (< (count key) 17))]}
   (->> (cycle [0])
        (take (- 16 (count key)))
        (reduce conj key)
        (partition 4)
-       (mapv #(bytes-word %))
+       (mapv bytes-word)
        (mgen-subkeys)
        ((juxt 
          #(subvec % 0 16) 
-         #(mapv (partial bit-and 0x1f) (subvec % 16 (count %)))))))
+         #(mapv (partial bit-and 0x1f) (subvec % 16 (count %))))))))
 
 (def mkey-schedule (memoize key-schedule))
 
@@ -557,13 +560,21 @@
   (let [rcnt (if (> (count key) 10) 16 12)
         ks (mkey-schedule key)]
     (->> (if enc (range rcnt) (range (dec rcnt) -1 -1))
-         (reduce #((cast5 ks) %1 %2) block)
+         (reduce (cast5 ks) block)
          reverse
          (into []))))
 
 ;; ### CAST5
-;; Extend the BlockCipher protocol through the CAST5 record type.
+;; Extend the Cipher, BlockCipher, and StreamCipher protocols 
+;; thorough the CAST5 record type
+
 (defrecord CAST5 []
+  Cipher
+  (initialize [_ key]
+    (let [ks (key-schedule key)]
+      {:km (first ks) :kr (last ks)}))
+  (keysizes-bytes [_]
+    (vec (range 5 17)))
   BlockCipher
   (encrypt-block [_ block key]
     (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
