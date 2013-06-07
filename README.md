@@ -90,3 +90,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 ## In Progress
 * Camellia
 * Change Blowfish initialization to be more streamlined.
+* Change base namespace to org.azjure
