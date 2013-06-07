@@ -8,20 +8,20 @@ Add the following in the dependencies section of your project.clj file
 
 ```Clojure
 :dependencies [...
-               [net.ozias.crypt/azjure "0.1.0"]
+               [org.azjure/azjure "0.1.0"]
                ...]
 ```
 
 Require the CryptSuite protocol
 
 ```Clojure
-(:require [net.ozias.crypt.cryptsuite :as cs])
+(:require [org.azjure.cryptsuite :as cs])
 ```
 
 Then require the suite you wish to use (a suite is a combination of cipher, mode, and padding method)
 
 ```Clojure
-(:require [net.ozias.crypt.cryptsuite :refer (->AESECBPKCS7)]
+(:require [org.azjure.cryptsuite :refer (->AESECBPKCS7)]
 ```
 
 Encrypt

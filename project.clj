@@ -1,4 +1,4 @@
-(defproject net.ozias.crypt/azjure "0.1.0-SNAPSHOT"
+(defproject org.azjure/azjure "0.1.0-SNAPSHOT"
   :description "Encryption Library in Clojure"
   :url "https://github.com/CraZySacX/azjure"
   :license {:name "GPLv3"
