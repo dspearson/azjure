@@ -3035,7 +3035,11 @@ net.brehaut.ClojureTools = (function (SH) {
   net.ozias.crypt.testplaintext)</pre></td></tr><tr><td class="docs"><h3>Plaintext Strings</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>A phrase used in suite tests</p>
 </td><td class="codes"><pre class="brush: clojure">(def  phrase
-  &quot;The quick brown fox jumps over the lazy dog.&quot;)</pre></td></tr><tr><td class="docs"><h3>128-bit Plaintext Blocks</h3>
+  &quot;The quick brown fox jumps over the lazy dog.&quot;)</pre></td></tr><tr><td class="docs"><h3>64-bit Plaintext Blocks</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample plaintext block as a vector of bytes
+as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC2144</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  c5-pt
+  [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF])</pre></td></tr><tr><td class="docs"><h3>128-bit Plaintext Blocks</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>A sample plaintext block as a vector of 16 bytes
 as defined in Appendix C.1, C.2, and C.3 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-pt 

@@ -556,13 +556,24 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- process-block [block key enc]
-  (let [rcnt (if (> (count key) 10) 16 12)
-        ks (mkey-schedule key)]
-    (->> (if enc (range rcnt) (range (dec rcnt) -1 -1))
-         (reduce (cast5 ks) block)
-         reverse
-         (into []))))
+(defn- process-block 
+  ([block {:keys [km kr rc enc] :as initmap}]
+     {:pre [(contains? initmap :km)(contains? initmap :kr)
+            (contains? initmap :rc)(contains? initmap :enc)
+            (vector? km)(vector? kr)
+            (number? rc)
+            (or (= 12 rc)(= 16 rc))
+            (= 16 (count km))(= 16 (count kr))]}
+  (->> (if enc (range rc) (range (dec rc) -1 -1))
+       (reduce (cast5 [km kr]) block)
+       reverse
+       (into []))))
+
+(defn- process-bytes [block initmap]
+  (->> initmap
+       (process-block (mapv bytes-word (partition 4 block)))
+       (mapv word-bytes)
+       (reduce into)))
 
 ;; ### CAST5
 ;; Extend the Cipher, BlockCipher, and StreamCipher protocols 
@@ -572,17 +583,17 @@
   Cipher
   (initialize [_ key]
     (let [ks (key-schedule key)]
-      {:km (first ks) :kr (last ks)}))
+      {:km (first ks) :kr (last ks) :rc (if (> (count key) 10) 16 12)}))
   (keysizes-bytes [_]
     (vec (range 5 17)))
   BlockCipher
-  (encrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
-  (decrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
+  (encrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc true} initmap)))
+  (decrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc false} initmap)))
   (blocksize [_] 64)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) key true))))
+  (generate-keystream [_ initmap iv]
+    (process-bytes iv (conj {:enc true} initmap)))
   (keystream-size-bytes [_] 8)
   (iv-size-bytes [_] 8))

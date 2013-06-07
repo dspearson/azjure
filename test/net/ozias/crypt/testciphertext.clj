@@ -6,12 +6,28 @@
       :doc "Test ciphertext vectors."}
   net.ozias.crypt.testciphertext)
 
+;; ### Ciphertext generated with 40-bit keys.
+
+(def ^{:doc "A sample ciphertext block encrypted with the sample 40-bit key
+as a vector of bytes as defined in XXX"} c5-40-ct
+  [0x7A 0xC8 0x16 0xD1 0x6E 0x9B 0x30 0x2E])
+
+;; ### Ciphertext generated with 80-bit keys.
+
+(def ^{:doc "A sample ciphertext block encrypted with the sample 80-bit key
+as a vector of bytes as defined in XXX"} c5-80-ct
+  [0xEB 0x6A 0x71 0x1A 0x2C 0x02 0x27 0x1B])
+
 ;; ### Ciphertext generated with 128-bit keys.
 
 (def ^{:doc "A sample ciphertext block encrypted with the sample 128-bit key
 as a vector of bytes as defined in Appendix C.1 in [FIPS 197][F197]"} aes-128-ct
   [0x69 0xc4 0xe0 0xd8 0x6a 0x7b 0x04 0x30
    0xd8 0xcd 0xb7 0x80 0x70 0xb4 0xc5 0x5a])
+
+(def ^{:doc "A sample ciphertext block encrypted with the sample 128-bit key
+as a vector of bytes as defined in XXX"} c5-128-ct
+  [0x23 0x8B 0x4F 0xE5 0x84 0x7E 0x44 0xB2])
 
 (def ^{:doc "A sample ciphertext block encrypted with the sample 128-bit key 
 as a vector of bytes as defined in [Twofish paper][TF]"} tf-128-ct

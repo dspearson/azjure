@@ -1,6 +1,7 @@
 ;; # Test Plaintext
 
 ;; [F197]: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+;; [R2144]: http://tools.ietf.org/html/rfc2144#appendix-B.1
 ;; [BF]: http://www.schneier.com/code/vectors.txt
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 (ns ^{:author "Jason Ozias"
@@ -11,6 +12,12 @@
 
 (def ^{:doc "A phrase used in suite tests"} phrase
   "The quick brown fox jumps over the lazy dog.")
+
+;; ### 64-bit Plaintext Blocks
+
+(def ^{:doc "A sample plaintext block as a vector of bytes
+as defined at [RFC2144][R2144]"} c5-pt
+  [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF])
 
 ;; ### 128-bit Plaintext Blocks
  
