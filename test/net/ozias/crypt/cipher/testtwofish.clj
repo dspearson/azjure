@@ -67,9 +67,9 @@
 ;;
 
 (def ^{:doc "Test vectors from the Twofish spec"} tfspec-test-vectors
-  [[TF (cipher/initialize TF tf-128-key) tf-128-pt tf-128-ct]
-   [TF (cipher/initialize TF tf-192-key) tf-192-pt tf-192-ct]
-   [TF (cipher/initialize TF tf-256-key) tf-256-pt tf-256-ct]])
+  [[TF (cipher/initialize TF tf-128-key) tf-pt tf-128-ct]
+   [TF (cipher/initialize TF tf-192-key) tf-pt tf-192-ct]
+   [TF (cipher/initialize TF tf-256-key) tf-pt tf-256-ct]])
 
 ;; ### Suite Test Vectors
 ;; Each row is

@@ -33,7 +33,8 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.aes
   (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
-            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+            (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])))
 
 ;; #### Sbox
@@ -550,11 +551,12 @@
 ;; * Evaluates to a 52 word vector for a 192-bit key.
 ;; * Evaluates to a 60 word vector for a 256-bit key.
 ;;
-(defn- expand-key [key]
-  (let [nb 4
-        nk (count key)
-        nr (+ nk 6)]
-    (reduce #((next-word nk) %1 %2) key (range nk (* nb (+ nr 1))))))
+(defn- expand-key 
+  ([key] {:pre [(vector? key) (or (= (count key) 4)(= (count key) 6)(= (count key) 8))]}
+     (let [nb 4
+           nk (count key)
+           nr (+ nk 6)]
+       (reduce (next-word nk) key (range nk (* nb (+ nr 1)))))))
 
 ;; ### mexpand-key
 ;; expand-key memoization
@@ -574,12 +576,12 @@
 ;; ### to-matrix
 ;; Converts a vector of 4 words into a vector of 4x4 byte vectors.
 (defn- to-matrix [state]
-  (mapv #(word-bytes %) state))
+  (mapv word-bytes state))
 
 ;; ### to-words
 ;; Converts a vector of 4x4 byte vectors into a vector of 4 words.
 (defn- to-words [matrix]
-  (mapv #(bytes-word %) matrix))
+  (mapv bytes-word matrix))
 
 ;; ### shift-rows
 ;; Shift the last three rows in the state matrix by 1, 2, and 3 bytes
@@ -780,25 +782,42 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.
-(defn- process-block [block key enc]
-  (let [nk (count key)
-        nr (+ nk 6)
-        ek (mexpand-key key)
+(defn- process-block 
+  ([block {:keys [ks nk enc] :as initmap}]
+     {:pre [(contains? initmap :ks) (contains? initmap :nk) (contains? initmap :enc)
+            (vector? (:ks initmap)) (number? (:nk initmap))
+            (or (= 44 (count (:ks initmap)))(= 52 (count (:ks initmap)))(= 60 (count (:ks initmap))))
+            (or (= 4 (:nk initmap))(= 6 (:nk initmap))(= 8 (:nk initmap)))]}
+  (let [nr (+ nk 6)
         encfn (if enc cipher inv-cipher)
         rv (if enc (range (+ nr 1)) (range nr -1 -1))]
-    (into [] (reduce #((encfn ek nr) %1 %2) block rv))))
+    (into [] (reduce (encfn ks nr) block rv)))))
 
 ;; ### Aes
 ;; Extend the BlockCipher protocol through the Aes record type.
 (defrecord Aes []
+  Cipher
+  (initialize [_ key]
+    (let [key-words (mapv bytes-word (partition 4 key))]
+      {:ks (expand-key key-words) :nk (count key-words)}))
+  (keysizes-bytes [_] [16 24 32])
   BlockCipher
-  (encrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) true))))
-  (decrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) false))))
+  (encrypt-block [_ block initmap]
+    (->> (conj {:enc true} initmap)
+         (process-block (mapv bytes-word (partition 4 block)))
+         (mapv word-bytes)
+         (reduce into)))
+  (decrypt-block [_ block initmap]
+    (->> (conj {:enc false} initmap)
+         (process-block (mapv bytes-word (partition 4 block)))
+         (mapv word-bytes)
+         (reduce into)))
   (blocksize [_] 128)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key)) true))))
+  (generate-keystream [_ initmap iv]
+    (->> (conj {:enc true} initmap)
+         (process-block (mapv bytes-word (partition 4 iv)))
+         (mapv word-bytes)
+         (reduce into)))
   (keystream-size-bytes [_] 16)
   (iv-size-bytes [_] 16))

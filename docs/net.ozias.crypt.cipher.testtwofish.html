@@ -3089,9 +3089,9 @@ net.brehaut.ClojureTools = (function (SH) {
 </code></pre>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the Twofish spec</p>
 </td><td class="codes"><pre class="brush: clojure">(def  tfspec-test-vectors
-  [[TF (cipher/initialize TF tf-128-key) tf-128-pt tf-128-ct]
-   [TF (cipher/initialize TF tf-192-key) tf-192-pt tf-192-ct]
-   [TF (cipher/initialize TF tf-256-key) tf-256-pt tf-256-ct]])</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
+  [[TF (cipher/initialize TF tf-128-key) tf-pt tf-128-ct]
+   [TF (cipher/initialize TF tf-192-key) tf-pt tf-192-ct]
+   [TF (cipher/initialize TF tf-256-key) tf-pt tf-256-ct]])</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
 
 <p>Each row is</p>
 

@@ -3035,7 +3035,8 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   net.ozias.crypt.cipher.blowfish
   (:require [net.ozias.crypt.libbyte :refer [get-byte bytes-word word-bytes]]
-            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+            (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])))</pre></td></tr><tr><td class="docs"><h4>parr</h4>
 
 <p>The P-array.  As this is recalculated during generate-subkeys
@@ -3330,6 +3331,9 @@ if you are decrypting the block.</li>
 
 <p>Extend the BlockCipher protocol through the Blowfish record type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord Blowfish []
+  Cipher
+  (initialize [_ key])
+  (keysizes-bytes [_])
   BlockCipher
   (encrypt-block [_ block key]
     (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))

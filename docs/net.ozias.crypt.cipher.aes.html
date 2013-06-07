@@ -3065,7 +3065,8 @@ AES specification.  You will see nk, nb and nr in the code.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   net.ozias.crypt.cipher.aes
   (:require [net.ozias.crypt.libbyte :refer [bytes-word word-bytes]] 
-            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+            (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])))</pre></td></tr><tr><td class="docs"><h4>Sbox</h4>
 
 <p>Substitution box used during encryption as a vector of 256 bytes.</p>
@@ -3595,11 +3596,12 @@ a key of 128, 192, or 256 bits.</p>
 <li>Evaluates to a 52 word vector for a 192-bit key.</li>
 <li>Evaluates to a 60 word vector for a 256-bit key.</li>
 </ul>
-</td><td class="codes"><pre class="brush: clojure">(defn- expand-key [key]
-  (let [nb 4
-        nk (count key)
-        nr (+ nk 6)]
-    (reduce #((next-word nk) %1 %2) key (range nk (* nb (+ nr 1))))))</pre></td></tr><tr><td class="docs"><h3>mexpand-key</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- expand-key 
+  ([key] {:pre [(vector? key) (or (= (count key) 4)(= (count key) 6)(= (count key) 8))]}
+     (let [nb 4
+           nk (count key)
+           nr (+ nk 6)]
+       (reduce (next-word nk) key (range nk (* nb (+ nr 1)))))))</pre></td></tr><tr><td class="docs"><h3>mexpand-key</h3>
 
 <p>expand-key memoization</p>
 </td><td class="codes"><pre class="brush: clojure">(def mexpand-key (memoize expand-key))</pre></td></tr><tr><td class="docs"><h3>transpose</h3>
@@ -3615,11 +3617,11 @@ between the state and the key material.</p>
 
 <p>Converts a vector of 4 words into a vector of 4x4 byte vectors.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- to-matrix [state]
-  (mapv #(word-bytes %) state))</pre></td></tr><tr><td class="docs"><h3>to-words</h3>
+  (mapv word-bytes state))</pre></td></tr><tr><td class="docs"><h3>to-words</h3>
 
 <p>Converts a vector of 4x4 byte vectors into a vector of 4 words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- to-words [matrix]
-  (mapv #(bytes-word %) matrix))</pre></td></tr><tr><td class="docs"><h3>shift-rows</h3>
+  (mapv bytes-word matrix))</pre></td></tr><tr><td class="docs"><h3>shift-rows</h3>
 
 <p>Shift the last three rows in the state matrix by 1, 2, and 3 bytes
 left for encoding, right for decoding.</p>
@@ -3854,25 +3856,42 @@ if you are decrypting the block.</li>
 </ol>
 
 <p>Evaluates to a vector of four 32-bit words.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- process-block [block key enc]
-  (let [nk (count key)
-        nr (+ nk 6)
-        ek (mexpand-key key)
+</td><td class="codes"><pre class="brush: clojure">(defn- process-block 
+  ([block {:keys [ks nk enc] :as initmap}]
+     {:pre [(contains? initmap :ks) (contains? initmap :nk) (contains? initmap :enc)
+            (vector? (:ks initmap)) (number? (:nk initmap))
+            (or (= 44 (count (:ks initmap)))(= 52 (count (:ks initmap)))(= 60 (count (:ks initmap))))
+            (or (= 4 (:nk initmap))(= 6 (:nk initmap))(= 8 (:nk initmap)))]}
+  (let [nr (+ nk 6)
         encfn (if enc cipher inv-cipher)
         rv (if enc (range (+ nr 1)) (range nr -1 -1))]
-    (into [] (reduce #((encfn ek nr) %1 %2) block rv))))</pre></td></tr><tr><td class="docs"><h3>Aes</h3>
+    (into [] (reduce (encfn ks nr) block rv)))))</pre></td></tr><tr><td class="docs"><h3>Aes</h3>
 
 <p>Extend the BlockCipher protocol through the Aes record type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defrecord Aes []
+  Cipher
+  (initialize [_ key]
+    (let [key-words (mapv bytes-word (partition 4 key))]
+      {:ks (expand-key key-words) :nk (count key-words)}))
+  (keysizes-bytes [_] [16 24 32])
   BlockCipher
-  (encrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) true))))
-  (decrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) (mapv bytes-word (partition 4 key)) false))))
+  (encrypt-block [_ block initmap]
+    (-&gt;&gt; (conj {:enc true} initmap)
+         (process-block (mapv bytes-word (partition 4 block)))
+         (mapv word-bytes)
+         (reduce into)))
+  (decrypt-block [_ block initmap]
+    (-&gt;&gt; (conj {:enc false} initmap)
+         (process-block (mapv bytes-word (partition 4 block)))
+         (mapv word-bytes)
+         (reduce into)))
   (blocksize [_] 128)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) (mapv bytes-word (partition 4 key)) true))))
+  (generate-keystream [_ initmap iv]
+    (-&gt;&gt; (conj {:enc true} initmap)
+         (process-block (mapv bytes-word (partition 4 iv)))
+         (mapv word-bytes)
+         (reduce into)))
   (keystream-size-bytes [_] 16)
   (iv-size-bytes [_] 16))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

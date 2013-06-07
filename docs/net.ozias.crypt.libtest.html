@@ -3062,9 +3062,9 @@ if it is not already converted.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn bdecryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128b iv iv-128b}}]
   (is (= pt (cs/decrypt suite key iv ct))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn decryptor [[suite pt ct] &amp; {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) &quot;UTF-8&quot;))))</pre></td></tr><tr><td class="docs"><h2>test-encrypt</h2>
+  (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) &quot;UTF-8&quot;))))</pre></td></tr><tr><td class="docs"><h2>encrypt-block</h2>
 
-<p>Helper function for Blowfish encryption testing</p>
+<p>Helper function for BlockCipher encryption testing</p>
 </td><td class="codes"><pre class="brush: clojure">(defn encrypt-block [[cipher initmap cleartext ciphertext]]
   (is (= ciphertext (bc/encrypt-block cipher cleartext initmap))))</pre></td></tr><tr><td class="docs"><h2>decrypt-block</h2>
 
