@@ -5,47 +5,37 @@
                              [cryptsuite :as cs])
             [net.ozias.crypt.cipher.blockcipher :as bc]))
 
-;; #### array-of-bytes-type
-;; Used in byte-array? for comparison
-(def array-of-bytes-type (Class/forName "[B")) 
+(def ^{:doc "For type comparison"} array-of-bytes-type
+  (Class/forName "[B")) 
 
-;; ### byte-array?
-;; Is the given object a byte-array (type [B)
-(defn- byte-array? [obj]
+;; ### Testing helper functions
+
+(defn- ^{:doc "Is the given object a byte-array (type [B)"} byte-array?
+  [obj]
   (= (type obj) array-of-bytes-type))
 
-;; ### to-bytearray
-;; Convert the given vector of bytes to a [B
-;; if it is not already converted.
-;;
-;; Evaluates to a [B over the given byte vector
-(defn- to-bytearray [bytes]
+(defn- ^{:doc "Convert a vector of bytes to a bytearray"} b->barr 
+  [bytes]
   (if (not (byte-array? bytes))
     (byte-array (mapv byte bytes))
     bytes))
 
-;; ### bencryptor
-;; Helper function for testing encryption
-(defn bencryptor [[suite pt ct] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= ct (cs/encrypt suite key iv pt))))
+;; ### Suite Testing helper functions
 
-(defn encryptor [[suite pt ct] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= ct (cs/encrypt suite key iv (vec (.getBytes pt "UTF-8"))))))
+(defn ^{:doc "Helper function for suite encryption testing"} encryptor
+  [[suite initmap pt ct] & {:keys [iv] :or {iv iv-128b}}]
+  (is (= ct (cs/encrypt suite initmap iv (vec (.getBytes pt "UTF-8"))))))
 
-;; ### decryptor
-;; Helper function for testing decryption
-(defn bdecryptor [[suite pt ct] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= pt (cs/decrypt suite key iv ct))))
+(defn ^{:doc "Helper function for suite encryption testing"} decryptor
+  [[suite initmap pt ct] & {:keys [iv] :or {iv iv-128b}}]
+  (is (= pt (String. (b->barr (cs/decrypt suite initmap iv ct)) "UTF-8"))))
 
-(defn decryptor [[suite pt ct] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
-  (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) "UTF-8"))))
+;; ### Block Cipher testing helper functions
 
-;; ## encrypt-block
-;; Helper function for BlockCipher encryption testing
-(defn encrypt-block [[cipher initmap cleartext ciphertext]]
+(defn ^{:doc "Helper function for BlockCipher encryption testing"} encrypt-block 
+  [[cipher initmap cleartext ciphertext]]
   (is (= ciphertext (bc/encrypt-block cipher cleartext initmap))))
 
-;; ## decrypt-block
-;; Helper function for BlockCipher decryption testing
-(defn decrypt-block [[cipher initmap plaintext ciphertext]]
+(defn ^{:doc "Helper function for BlockCipher decryption testing"} decrypt-block
+  [[cipher initmap plaintext ciphertext]]
   (is (= plaintext (bc/decrypt-block cipher ciphertext initmap))))
