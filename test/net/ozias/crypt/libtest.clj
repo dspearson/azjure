@@ -40,8 +40,8 @@
 (defn decryptor [[suite pt ct] & {:keys [key iv] :or {key key-128b iv iv-128b}}]
   (is (= pt (String. (to-bytearray (cs/decrypt suite key iv ct)) "UTF-8"))))
 
-;; ## test-encrypt
-;; Helper function for Blowfish encryption testing
+;; ## encrypt-block
+;; Helper function for BlockCipher encryption testing
 (defn encrypt-block [[cipher initmap cleartext ciphertext]]
   (is (= ciphertext (bc/encrypt-block cipher cleartext initmap))))
 

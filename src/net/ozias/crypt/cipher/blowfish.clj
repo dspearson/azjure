@@ -4,7 +4,8 @@
 (ns ^{:author "Jason Ozias"}
   net.ozias.crypt.cipher.blowfish
   (:require [net.ozias.crypt.libbyte :refer [get-byte bytes-word word-bytes]]
-            (net.ozias.crypt.cipher [blockcipher :refer (BlockCipher)]
+            (net.ozias.crypt.cipher [cipher :refer (Cipher)]
+                                    [blockcipher :refer (BlockCipher)]
                                     [streamcipher :refer (StreamCipher)])))
 
 ;; #### parr
@@ -306,6 +307,9 @@
 ;; ### Blowfish
 ;; Extend the BlockCipher protocol through the Blowfish record type.
 (defrecord Blowfish []
+  Cipher
+  (initialize [_ key])
+  (keysizes-bytes [_])
   BlockCipher
   (encrypt-block [_ block key]
     (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
