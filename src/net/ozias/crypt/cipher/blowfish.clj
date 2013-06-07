@@ -267,7 +267,7 @@
 ;; vector for the given subkey.  This is used as the seed for 
 ;; the next subkey usually.
 (defn- encrypt-subkey [[left right :as both] subkey]
-  (reduce #((encrypt-subkey-block subkey) %1 %2) both (range 0 (count @subkey) 2)))
+  (reduce (encrypt-subkey-block subkey) both (range 0 (count @subkey) 2)))
 
 ;; ### generate-subkeys
 ;; Generate the P-array and 4 S-box vectors based on the given key.
@@ -300,25 +300,33 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- process-block [block key enc]
+(defn- process-block [block {:keys [key enc]}]
   (generate-subkeys key)
   (blowfish block enc))
+
+(defn- process-bytes [block initmap]
+  (->> initmap
+       (process-block (mapv bytes-word (partition 4 block)))
+       (mapv word-bytes)
+       (reduce into)))
 
 ;; ### Blowfish
 ;; Extend the BlockCipher protocol through the Blowfish record type.
 (defrecord Blowfish []
   Cipher
-  (initialize [_ key])
-  (keysizes-bytes [_])
+  (initialize [_ key]
+    {:key key})
+  (keysizes-bytes [_]
+    (vec (range 4 57)))
   BlockCipher
-  (encrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key true))))
-  (decrypt-block [_ block key]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 block)) key false))))
+  (encrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc true} initmap)))
+  (decrypt-block [_ block initmap]
+    (process-bytes block (conj {:enc false} initmap)))
   (blocksize [_]
     64)
   StreamCipher
-  (generate-keystream [_ key iv]
-    (reduce into (mapv word-bytes (process-block (mapv bytes-word (partition 4 iv)) key true))))
+  (generate-keystream [_ initmap iv]
+    (process-bytes iv (conj {:enc true} initmap)))
   (keystream-size-bytes [_] 8)
   (iv-size-bytes [_] 8))
