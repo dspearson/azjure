@@ -3,22 +3,11 @@
 ;; [http://www.schneier.com/paper-blowfish-fse.html](http://www.schneier.com/paper-blowfish-fse.html)
 (ns ^{:author "Jason Ozias"}
   org.azjure.cipher.blowfish
-  (:require [org.azjure.libbyte :refer [get-byte bytes-word word-bytes]]
+  (:require [org.azjure.libbyte :refer (get-byte bytes-word word-bytes)]
+            [org.azjure.libcrypt :refer (+modw)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [blockcipher :refer (BlockCipher)]
                                [streamcipher :refer (StreamCipher)])))
-
-;; #### parr
-;; The P-array.  As this is recalculated during generate-subkeys
-;; an atom is used.
-(def parr (atom []))
-;; #### sbox0 - sbox4
-;; The S-boxes.  As these are recalculated during generate-subkeys
-;; atoms are used.
-(def sbox0 (atom []))
-(def sbox1 (atom []))
-(def sbox2 (atom []))
-(def sbox3 (atom []))
 
 ;; #### parr_init
 ;; The initial values for the P-array.
@@ -171,12 +160,9 @@
    0x85cbfe4e 0x8ae88dd8 0x7aaaf9b0 0x4cf9aa7e 0x1948c25c 0x02fb8a8c 0x01c36ae4 0xd6ebe1f9
    0x90d4f869 0xa65cdea0 0x3f09252d 0xc208e69f 0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])
 
-;; ### +mod32
-;; Add a and b  mod 2<sup>32</sup><br/>
-;; (Note that 2<sup>32</sup> is 0x100000000, not 0xFFFFFFFF as 
-;; I originally had.  Annoying bug to find.)
-(defn- +mod32 [a b]
-  (mod (+ a b) 0x100000000))
+(def ks-init {:parr parr_init
+              :sbox0 sbox0_init :sbox1 sbox1_init
+              :sbox2 sbox2_init :sbox3 sbox3_init})
 
 ;; ### roundfn
 ;;
@@ -193,13 +179,13 @@
 ;; 7. Add mod 2<sup>32</sup> the results from 5. and 6.
 ;;
 ;; Evaluates to a 32-bit word.
-(defn- roundfn [word]
-  (+mod32
+(defn- roundfn [word ks]
+  (+modw
    (bit-xor
-    (+mod32 (nth @sbox0 (get-byte 4 word))
-            (nth @sbox1 (get-byte 3 word)))
-    (nth @sbox2 (get-byte 2 word)))
-   (nth @sbox3 (get-byte 1 word))))
+    (+modw (nth (:sbox0 ks) (get-byte 4 word))
+            (nth (:sbox1 ks) (get-byte 3 word)))
+    (nth (:sbox2 ks) (get-byte 2 word)))
+   (nth (:sbox3 ks) (get-byte 1 word))))
 
 ;; ### feistel-round
 ;; 
@@ -210,10 +196,10 @@
 ;; and l in the right spot).
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- feistel-round [[left right] idx]
-  (let [l (bit-xor left (nth @parr idx))
-        r (bit-xor (roundfn l) right)]
-  [r l]))
+(defn- feistel-round [[left right ks] idx]
+  (let [l (bit-xor left (nth (:parr ks) idx))
+        r (bit-xor (roundfn l ks) right)]
+  [r l ks]))
 
 ;; ### blowfish
 ;; The Blowfish cipher.
@@ -235,12 +221,12 @@
 ;;
 ;; Evaluates to a vector of two 32-bit words representing
 ;; the encrypted or decrypted 64-bit block.
-(defn- blowfish [[left right :as both] enc]
+(defn- blowfish [[left right ks :as all] enc]
   (let [r (if enc (range 0 16) (range 17 1 -1))
         li (if enc 17 0)
         ri (if enc 16 1)
-        cro (reduce #(feistel-round %1 %2) both r)]
-    [(bit-xor (nth cro 1) (nth @parr li)) (bit-xor (nth cro 0) (nth @parr ri))]))
+        cro (reduce feistel-round all r)]
+    [(bit-xor (nth cro 1) (nth (:parr ks) li)) (bit-xor (nth cro 0) (nth (:parr ks) ri))]))
 
 ;; ### encrypt-subkey-block
 ;; Evaluates to a function over the given subkey.
@@ -252,10 +238,10 @@
 ;; Evaluates to the result of the Blowfish cipher on the block as
 ;; a vector of two 32-bit words.
 (defn- encrypt-subkey-block [subkey]
-  (fn [[left right :as both] idx]
-    (let [enc (blowfish both true)]
-      (reset! subkey (assoc (assoc @subkey idx (nth enc 0)) (inc idx) (nth enc 1)))
-      enc)))
+  (fn [[left right ks :as all] idx]
+    (let [enc (blowfish all true)
+          nval (assoc (assoc (subkey ks) idx (first enc)) (inc idx) (last enc))]
+      (conj enc (assoc ks subkey nval)))))
 
 ;; ### encrypt-subkey
 ;; Encrypt the given subkey starting with the given block
@@ -266,29 +252,20 @@
 ;; Evaluates to the last generated pair of 32-bit words in a 
 ;; vector for the given subkey.  This is used as the seed for 
 ;; the next subkey usually.
-(defn- encrypt-subkey [[left right :as both] subkey]
-  (reduce (encrypt-subkey-block subkey) both (range 0 (count @subkey) 2)))
+(defn- encrypt-subkey [[left right ks :as all] subkey]
+  (reduce (encrypt-subkey-block subkey) all (range 0 (count (subkey ks)) 2)))
 
-;; ### generate-subkeys
-;; Generate the P-array and 4 S-box vectors based on the given key.
-;;
-;; 1. All 4 vectors are initialized with the values in the various
-;; init vectors (hex digits of pi per the spec).
-;; 2. The key is cycled out to 18 words and xor'd with each value 
-;; in the P-array.
-;; 3. Each subkey is progressively encrypted via encrypt-subkey.
-;; [0 0] is used as the starting seed value.
-;;
-;; Evaluates to the last generated pair of 32-bit words in a vector.
-;; This value can generally be ignored. 
+(defn- xor-parr-key [key]
+  (->> (cycle key)
+       (take 72)
+       (partition 4)
+       (mapv bytes-word)
+       (mapv bit-xor (:parr ks-init))
+       (assoc ks-init :parr)))
+
 (defn- generate-subkeys [key]
-  (reset! parr parr_init)
-  (reset! sbox0 sbox0_init)
-  (reset! sbox1 sbox1_init)
-  (reset! sbox2 sbox2_init)
-  (reset! sbox3 sbox3_init)
-  (reset! parr (mapv bit-xor @parr (mapv bytes-word (partition 4 (take 72 (cycle key))))))
-  (reduce encrypt-subkey [0 0] (vector parr sbox0 sbox1 sbox2 sbox3)))
+  (let [ki (xor-parr-key key)]
+    (last (reduce encrypt-subkey [0 0 ki] (keys ki)))))
 
 ;; ### process-block
 ;; Process a block for encryption or decryption.
@@ -300,9 +277,8 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- process-block [block {:keys [key enc]}]
-  (generate-subkeys key)
-  (blowfish block enc))
+(defn- process-block [block {:keys [enc] :as ks}]
+  (blowfish (conj block ks) enc))
 
 (defn- process-bytes [block initmap]
   (->> initmap
@@ -315,7 +291,7 @@
 (defrecord Blowfish []
   Cipher
   (initialize [_ key]
-    {:key key})
+    (generate-subkeys key))
   (keysizes-bytes [_]
     (vec (range 4 57)))
   BlockCipher
