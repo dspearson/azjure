@@ -9,7 +9,7 @@
 ;;
 (ns ^{:author "Jason Ozias"}
   org.azjure.mode.cbc
-  (:require [org.azjure.libcrypt :refer [mwpb mbpb]]
+  (:require [org.azjure.libcrypt :refer [mbpb]]
             [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
             [org.azjure.cipher.blockcipher :as bc]))
 

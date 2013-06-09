@@ -20,15 +20,6 @@
      (catch Error e#
        [nil e#])))
 
-;; ### words-per-block
-;; Get the number of words per cipher block
-(defn- words-per-block [cipher]
-  (/ (bc/blocksize cipher) 32))
-
-;; #### mwpb
-;; Memoization of words-per-block
-(def mwpb (memoize words-per-block))
-
 ;; ### bytes-per-block
 (defn- bytes-per-block [cipher]
   (/ (bc/blocksize cipher) 8))
@@ -37,15 +28,18 @@
 ;; Memoization of bytes-per-block
 (def mbpb (memoize bytes-per-block))
 
-;; ### +mod32
-;; Add a and b mod 32
-(defn +mod32 [a b]
-  (-> (+ a b)
-      (mod 32)))
+;; ### Modulus math
 
-;; ### +modw
-;; Add a and b mod 2<sup>32</sup>
-(defn +modw
+(defn ^{:doc "a + b mod 32"} +mod32
+  ([] 0)
+  ([a] a)
+  ([a b]
+     (-> (+ a b)
+         (mod 32)))
+  ([a b & more]
+     (reduce +mod32 (+mod32 a b) more)))
+
+(defn ^{:doc "a + b mod mod 2^32"} +modw
   ([] 0)
   ([a] a)
   ([a b]
@@ -54,8 +48,20 @@
   ([a b & more]
      (reduce +modw (+modw a b) more)))
 
-;; ### -modw
-;; Subtract a and b mod 2<sup>32</sup>
-(defn -modw [a b]
-  (-> (- a b)
-      (mod 0x100000000)))
+(defn ^{:doc "a - b mod 512"} -mod512
+  ([] 0)
+  ([a] a)
+  ([a b]
+     (-> (- a b)
+         (mod 512)))
+  ([a b & more]
+     (reduce -mod512 (-mod512 a b) more)))
+
+(defn ^{:doc "a - b mod 2^32"} -modw
+  ([] 0)
+  ([a] a)
+  ([a b]
+     (-> (- a b)
+         (mod 0x100000000)))
+  ([a b & more]
+     (reduce -modw (-modw a b) more)))

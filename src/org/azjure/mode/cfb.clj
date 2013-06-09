@@ -5,8 +5,7 @@
 ;; [Block Cipher Mode of Operation](http://en.wikipedia.org/wiki/Cipher_block_chaining)
 (ns ^{:author "Jason Ozias"}
   org.azjure.mode.cfb
-  (:require [org.azjure.libcrypt :refer [mwpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
+  (:require [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
             [org.azjure.cipher.streamcipher :as sc]))
 
 ;; ### encrypt-byte

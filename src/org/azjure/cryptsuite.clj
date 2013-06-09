@@ -7,7 +7,8 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [twofish :refer (->Twofish)]
-                               [salsa20 :refer (->Salsa20)])
+                               [salsa20 :refer (->Salsa20)]
+                               [hc128 :refer (->HC128)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (->ElectronicCodebook)]
                              [cbc :refer (->CipherBlockChaining)]
@@ -52,6 +53,7 @@
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
 (def Salsa20 (->Salsa20))
+(def HC128 (->HC128))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB,CTR
 ;; Setup the mode for use in testing
@@ -612,3 +614,20 @@
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor Salsa20 CTR key iv bytes))
   (decrypt [_ key iv bytes] (decryptor Salsa20 CTR key iv bytes)))
+
+;; ### HC128XX
+;; HC-128 cipher, Various stream modes
+(defrecord HC128CFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor HC128 CFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor HC128 CFB key iv bytes)))
+
+(defrecord HC128OFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor HC128 OFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor HC128 OFB key iv bytes)))
+
+(defrecord HC128CTR []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor HC128 CTR key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor HC128 CTR key iv bytes)))

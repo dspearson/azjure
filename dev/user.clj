@@ -14,7 +14,8 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [salsa20 :refer (->Salsa20)]
-                               [twofish :refer (->Twofish)])
+                               [twofish :refer (->Twofish)]
+                               [hc128 :refer (->HC128)])
             [org.azjure.cryptsuite :refer :all]))
 
 (defn run-all-tests-azjure []
