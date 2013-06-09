@@ -3028,55 +3028,138 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.mode.cbc" name="org.azjure.mode.cbc"><h1 class="project-name">org.azjure.mode.cbc</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Cipher-Block Chaining</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.hc128" name="org.azjure.cipher.hc128"><h1 class="project-name">org.azjure.cipher.hc128</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>HC-128</h2>
 
-<p>Cipher-Block Chaining mode</p>
+<p>Designed to meet the <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.hc128
+  (:require [clojure.math.numeric-tower :refer (expt)]
+            (org.azjure.cipher [cipher :refer (Cipher)]
+                               [streamcipher :refer [StreamCipher]])
+            (org.azjure [libcrypt :refer (+modw -mod512 to-hex)]
+                        [libbyte :refer :all])))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- f1 [word]
+  (bit-xor (&gt;&gt;&gt; word 7) (&gt;&gt;&gt; word 18) (bit-shift-right word 3)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- f2 [word]
+  (bit-xor (&gt;&gt;&gt; word 17) (&gt;&gt;&gt; word 19) (bit-shift-right word 10)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- g1 [w1 w2 w3]
+  (+modw (bit-xor (&gt;&gt;&gt; w1 10) (&gt;&gt;&gt; w3 23)) (&gt;&gt;&gt; w2 8)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- g2 [w1 w2 w3]
+  (+modw (bit-xor (&lt;&lt;&lt; w1 10) (&lt;&lt;&lt; w3 23)) (&lt;&lt;&lt; w2 8)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- h1 [q word]
+  (+modw (nth q (get-byte 1 word))(nth q (+ (get-byte 3 word) 256))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- h2 [p word]
+  (+modw (nth p (get-byte 1 word))(nth p (+ (get-byte 3 word) 256))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- append-key [ks key i]
+  (-&gt;&gt; (mod i 4)
+       (nth key)
+       (conj ks)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- append-iv [ks iv i]
+  (-&gt;&gt; (mod (- i 8) 4)
+       (nth iv)
+       (conj ks)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- append-new [ks i]
+  (-&gt;&gt; (+modw
+        (f2 (nth ks (- i 2)))
+        (nth ks (- i 7))
+        (f1 (nth ks (- i 15)))
+        (nth ks (- i 16))
+        i)
+       (conj ks)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- key-round [key iv]
+  (fn [ks i]
+    (cond
+     (&lt; i 8)  (append-key ks key i)
+     (&lt; i 16) (append-iv ks iv i)
+     :else    (append-new ks i))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- expand-key 
+  ([{:keys [key iv] :as initmap}]
+     {:pre [(contains? initmap :key) (contains? initmap :iv)
+            (vector? key) (vector? iv)
+            (= 16 (count key)) (= 16 (count iv))]}
+     (let [kw (mapv bytes-word (partition 4 key))
+           iw (mapv bytes-word (partition 4 iv))]
+       (reduce (key-round kw iw) [] (range 1280)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- p-round [ek]
+  (fn [p round]
+    (conj p (nth ek (+ round 256)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- gen-p [ek]
+  (reduce (p-round ek) [] (range 512)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- q-round [ek]
+  (fn [q round]
+    (conj q (nth ek (+ round 768)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- gen-q [ek]
+  (reduce (q-round ek) [] (range 512)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- new-p [p j]
+  (-&gt;&gt; (+modw
+        (nth p j)
+        (g1 
+         (nth p (-mod512 j 3))
+         (nth p (-mod512 j 10))
+         (nth p (-mod512 j 511))))
+       (assoc p j)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- new-q [q j]
+  (-&gt;&gt; (+modw
+        (nth q j)
+        (g2 
+         (nth q (-mod512 j 3))
+         (nth q (-mod512 j 10))
+         (nth q (-mod512 j 511))))
+       (assoc q j)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- sp [p q j]
+  (bit-xor (h1 q (nth p (-mod512 j 12))) (nth p j)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- sq [p q j]
+  (bit-xor (h2 p (nth q (-mod512 j 12))) (nth q j)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- ks-round [[p q _] round]
+  (let [j (mod round 512)]
+    (cond
+     (&lt; (mod round 1024) 512) (let [np (new-p p j)] [np q (sp np q j)])
+     :else (let [nq (new-q q j)] [p nq (sq p nq j)]))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- p-ks-round [{:keys [p q] :as pq} round]
+  (assoc pq :p (assoc p round (last (ks-round [p q 0] round)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- q-ks-round [{:keys [p q] :as pq} round]
+  (assoc pq :q (assoc q round (last (ks-round [p q 0] (+ 512 round))))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- remap-p [pq]
+  (reduce p-ks-round pq (range 512)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- remap-q [pq]
+  (reduce q-ks-round pq (range 512)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def hc128-key-streams (atom {}))
+(def max-stream-length-bits (expt 2 64))
+(def max-stream-length-bytes (expt 2 61))
+(def max-stream-length-words (expt 2 59))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- genkeyword [key iv]
+  (-&gt; (-&gt;&gt; (into key iv)
+           (partition 4)
+           (mapv bytes-word)
+           (mapv to-hex)
+           (apply str))
+      (clojure.string/replace #&quot;0x&quot; )
+      (keyword)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn- gen-key-stream [p q upper]
+  (let [_ (println &quot;Calling gen-keystream with&quot; upper)]
+  (-&gt;&gt; (range 0 upper)
+       (reductions ks-round [p q 0])
+       (rest)
+       (mapv (comp word-bytes reverse-bytes last))
+       (reduce into))))</pre></td></tr><tr><td class="docs"><h3>HC128</h3>
 
-<p><a href="http://en.wikipedia.org/wiki/Cipher_block_chaining">Block Cipher Mode of Operation</a></p>
-
-<blockquote>
-  <p>"In CBC mode, each block of plaintext is XORed with the previous ciphertext
-  block before being encrypted. This way, each ciphertext block depends on all
-  plaintext blocks processed up to that point. To make each message unique, an
-  initialization vector must be used in the first block."</p>
-</blockquote>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  org.azjure.mode.cbc
-  (:require [org.azjure.libcrypt :refer [mbpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-block</h3>
-
-<p>Evaluates to a function over the given cipher, initialization vector and key.</p>
-
-<p>The function takes the current ciphertext and the block to encrypt.
-The block is encrypted and conj'd onto the ciphertext.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [cipher iv key] 
-  (fn [ciphertext bytes]
-    (let [civ (if (empty? ciphertext) 
-                iv 
-                (subvec ciphertext (- (count ciphertext) (mbpb cipher))))]
-      (reduce conj ciphertext (bc/encrypt-block cipher (mapv bit-xor bytes civ) key)))))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
-
-<p>Evaluates to a function over the given cipher, ciphertext, 
-initialization vector and key.</p>
-
-<p>The function takes the current plaintext and the index in the ciphertext
-we are decrypting. The block is decrypted and conj'd onto the plaintext.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [cipher ciphertext iv key]
-  (fn [plaintext idx]
-    (let [lower (* (mbpb cipher) idx)
-          upper (+ (mbpb cipher) lower)
-          block (subvec ciphertext lower upper)
-          civ (if (= 0 idx)
-                iv 
-                (subvec ciphertext (- lower (mbpb cipher)) (- upper (mbpb cipher))))]
-      (reduce conj plaintext (mapv bit-xor (bc/decrypt-block cipher block key) civ)))))</pre></td></tr><tr><td class="docs"><h3>CipherBlockChaining</h3>
-
-<p>Extend the ModeOfOperation protocol through the CipherBlockChaining record.</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CipherBlockChaining []
-  ModeOfOperation
-  (encrypt [_ cipher key iv bytes]
-    (reduce (encrypt-block cipher iv key) [] (partition (mbpb cipher) bytes)))
-  (decrypt [_ cipher key iv bytes]
-    (reduce (decrypt-block cipher bytes iv key) []  (range (/ (count bytes) (mbpb cipher))))))    </pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>Extend the Cipher and StreamCipher protocol thorough the HC128 record type</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord HC128 []
+  Cipher
+  (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
+    (let [ek (expand-key initmap)
+          uid (genkeyword key iv)
+          keymap (assoc (remap-q (remap-p {:p (gen-p ek) :q (gen-q ek)})) :key key :iv iv)]
+      (swap! hc128-key-streams assoc uid {:upper upper :ks (gen-key-stream (:p keymap) (:q keymap) upper)})
+      keymap))
+  (keysizes-bytes [_] [16])
+  StreamCipher
+  (generate-keystream [_ {:keys [key iv p q]} [lower upper]]
+    (let [uid (genkeyword key iv)]
+      (if (&lt; upper (inc (:upper (uid @hc128-key-streams))))
+        (subvec (:ks (uid @hc128-key-streams)) lower upper)
+        (do
+          (swap! hc128-key-streams assoc uid {:upper upper :ks (gen-key-stream p q upper)})
+          (subvec (:ks (uid @hc128-key-streams)) lower upper)))))
+  (keystream-size-bytes [_] max-stream-length-bytes)
+  (iv-size-bytes [_] 16))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

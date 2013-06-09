@@ -3036,8 +3036,7 @@ per round.</p>
 <p><a href="http://en.wikipedia.org/wiki/Cipher_block_chaining">Block Cipher Mode of Operation</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   org.azjure.mode.cfb
-  (:require [org.azjure.libcrypt :refer [mwpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
+  (:require [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
             [org.azjure.cipher.streamcipher :as sc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-byte</h3>
 
 <p>Encrypt a single byte given the cipher,

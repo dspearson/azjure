@@ -3028,55 +3028,60 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.mode.cbc" name="org.azjure.mode.cbc"><h1 class="project-name">org.azjure.mode.cbc</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Cipher-Block Chaining</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.testhc128" name="org.azjure.cipher.testhc128"><h1 class="project-name">org.azjure.cipher.testhc128</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>HC128 Stream Cipher Tests</h1>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test suite for the HC128 stream cipher</p>
+</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
+      :doc }
+  org.azjure.cipher.testhc128
+  (:require [clojure.test :refer :all]
+            (org.azjure [libtest :refer :all]
+                        [testivs :refer :all]
+                        [testkeys :refer :all]
+                        [testplaintext :refer :all]
+                        [testciphertext :refer :all]
+                        [cryptsuite :as cs]
+                        [cryptsuite :refer (-&gt;HC128CFB)]
+                        [cryptsuite :refer (-&gt;HC128OFB)]
+                        [cryptsuite :refer (-&gt;HC128CTR)])
+            (org.azjure.cipher [cipher :as cipher]
+                               [streamcipher :as sc]
+                               [hc128 :refer (-&gt;HC128)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>HC-128 record to be used in the tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc128 (-&gt;HC128))</pre></td></tr><tr><td class="docs"><p>The HC-128 stream mode suites.</p>
+</td><td class="codes"><pre class="brush: clojure">(def HC128CFB (-&gt;HC128CFB))
+(def HC128OFB (-&gt;HC128OFB))</pre></td></tr><tr><td class="docs"><p>The HC-128 counter mode suite.</p>
+</td><td class="codes"><pre class="brush: clojure">(def HC128CTR (-&gt;HC128CTR))</pre></td></tr><tr><td class="docs"><h3>HC-128 Initialization</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>(def ^{:doc "Initialization map to be used in the suite tests."} initmap
+ (cipher/initialize hc128 key-128b))</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def initmap)</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
 
-<p>Cipher-Block Chaining mode</p>
+<p>Each row is</p>
 
-<p><a href="http://en.wikipedia.org/wiki/Cipher_block_chaining">Block Cipher Mode of Operation</a></p>
-
-<blockquote>
-  <p>"In CBC mode, each block of plaintext is XORed with the previous ciphertext
-  block before being encrypted. This way, each ciphertext block depends on all
-  plaintext blocks processed up to that point. To make each message unique, an
-  initialization vector must be used in the first block."</p>
-</blockquote>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  org.azjure.mode.cbc
-  (:require [org.azjure.libcrypt :refer [mbpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-block</h3>
-
-<p>Evaluates to a function over the given cipher, initialization vector and key.</p>
-
-<p>The function takes the current ciphertext and the block to encrypt.
-The block is encrypted and conj'd onto the ciphertext.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block [cipher iv key] 
-  (fn [ciphertext bytes]
-    (let [civ (if (empty? ciphertext) 
-                iv 
-                (subvec ciphertext (- (count ciphertext) (mbpb cipher))))]
-      (reduce conj ciphertext (bc/encrypt-block cipher (mapv bit-xor bytes civ) key)))))</pre></td></tr><tr><td class="docs"><h3>decrypt-block</h3>
-
-<p>Evaluates to a function over the given cipher, ciphertext, 
-initialization vector and key.</p>
-
-<p>The function takes the current plaintext and the index in the ciphertext
-we are decrypting. The block is decrypted and conj'd onto the plaintext.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block [cipher ciphertext iv key]
-  (fn [plaintext idx]
-    (let [lower (* (mbpb cipher) idx)
-          upper (+ (mbpb cipher) lower)
-          block (subvec ciphertext lower upper)
-          civ (if (= 0 idx)
-                iv 
-                (subvec ciphertext (- lower (mbpb cipher)) (- upper (mbpb cipher))))]
-      (reduce conj plaintext (mapv bit-xor (bc/decrypt-block cipher block key) civ)))))</pre></td></tr><tr><td class="docs"><h3>CipherBlockChaining</h3>
-
-<p>Extend the ModeOfOperation protocol through the CipherBlockChaining record.</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CipherBlockChaining []
-  ModeOfOperation
-  (encrypt [_ cipher key iv bytes]
-    (reduce (encrypt-block cipher iv key) [] (partition (mbpb cipher) bytes)))
-  (decrypt [_ cipher key iv bytes]
-    (reduce (decrypt-block cipher bytes iv key) []  (range (/ (count bytes) (mbpb cipher))))))    </pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<pre><code>[suite plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors for HC-128 stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc128s-test-vectors
+  [;[HC128CFB initmap phrase []]
+   ;[HC128OFB initmap phrase []]
+])</pre></td></tr><tr><td class="docs"><p>Test vectors for HC-128 counter mode suite</p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc128ctr-test-vectors
+  [;[HC128CTR initmap phrase []]
+])</pre></td></tr><tr><td class="docs"><h3>HC-128 Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test HC-128 stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testStream
+  (testing &quot;Stream&quot;
+    (is (= true (every? true? (map encryptor hc128s-test-vectors))))
+    (is (= true (every? true? (map decryptor hc128s-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test HC-128 counter mode suite</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testCounter
+  (testing &quot;Counter&quot;
+    (is (= true (every? true? (map #(encryptor % :iv iv-64b) hc128ctr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-64b) hc128ctr-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test HC-128</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testHC128
+  (testing &quot;HC-128&quot;
+    (testStream)
+    (testCounter)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
+</td><td class="codes"><pre class="brush: clojure">(defn  test-ns-hook
+  []
+  (testHC128))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
