@@ -3038,49 +3038,37 @@ net.brehaut.ClojureTools = (function (SH) {
                         [testivs :refer :all]
                         [testkeys :refer :all]
                         [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (-&gt;HC128CFB)]
-                        [cryptsuite :refer (-&gt;HC128OFB)]
-                        [cryptsuite :refer (-&gt;HC128CTR)])
+                        [testciphertext :refer :all])
             (org.azjure.cipher [cipher :as cipher]
                                [streamcipher :as sc]
                                [hc128 :refer (-&gt;HC128)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>HC-128 record to be used in the tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc128 (-&gt;HC128))</pre></td></tr><tr><td class="docs"><p>The HC-128 stream mode suites.</p>
-</td><td class="codes"><pre class="brush: clojure">(def HC128CFB (-&gt;HC128CFB))
-(def HC128OFB (-&gt;HC128OFB))</pre></td></tr><tr><td class="docs"><p>The HC-128 counter mode suite.</p>
-</td><td class="codes"><pre class="brush: clojure">(def HC128CTR (-&gt;HC128CTR))</pre></td></tr><tr><td class="docs"><h3>HC-128 Initialization</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>(def ^{:doc "Initialization map to be used in the suite tests."} initmap
- (cipher/initialize hc128 key-128b))</p>
-</td><td class="codes"></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def initmap)</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
+</td><td class="codes"><pre class="brush: clojure">(def  hc128 (-&gt;HC128))</pre></td></tr><tr><td class="docs"><h3>HC-128 Initialization</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap0
+  (cipher/initialize hc128 {:key hc-128-key :iv hc-128-iv}))</pre></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap1
+  (cipher/initialize hc128 {:key hc-128-key :iv hc-128-iv-1}))</pre></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap2
+  (cipher/initialize hc128 {:key hc-128-key-1 :iv hc-128-iv}))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
 
 <p>Each row is</p>
 
-<pre><code>[suite plaintext ciphertext]
+<pre><code>[cipher initmap plaintext ciphertext]
 </code></pre>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors for HC-128 stream suites</p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc128s-test-vectors
-  [;[HC128CFB initmap phrase []]
-   ;[HC128OFB initmap phrase []]
-])</pre></td></tr><tr><td class="docs"><p>Test vectors for HC-128 counter mode suite</p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc128ctr-test-vectors
-  [;[HC128CTR initmap phrase []]
-])</pre></td></tr><tr><td class="docs"><h3>HC-128 Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the HC-128 spec</p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc128spec-test-vectors
+  [[hc128 initmap0 zeros-64 hc-128-ct  ]
+   [hc128 initmap1 zeros-64 hc-128-ct-1]
+   [hc128 initmap2 zeros-64 hc-128-ct-2]])</pre></td></tr><tr><td class="docs"><h3>HC-128 Tests</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Test HC-128 stream suites</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testStream
   (testing &quot;Stream&quot;
-    (is (= true (every? true? (map encryptor hc128s-test-vectors))))
-    (is (= true (every? true? (map decryptor hc128s-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test HC-128 counter mode suite</p>
-</td><td class="codes"><pre class="brush: clojure">(deftest  testCounter
-  (testing &quot;Counter&quot;
-    (is (= true (every? true? (map #(encryptor % :iv iv-64b) hc128ctr-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :iv iv-64b) hc128ctr-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test HC-128</p>
+    (is (= true (every? true? (map stream-encryptor hc128spec-test-vectors))))
+    (is (= true (every? true? (map stream-decryptor hc128spec-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test HC-128</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testHC128
   (testing &quot;HC-128&quot;
-    (testStream)
-    (testCounter)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
+    (testStream)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
 </td><td class="codes"><pre class="brush: clojure">(defn  test-ns-hook
   []
   (testHC128))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;

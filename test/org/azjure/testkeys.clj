@@ -8,6 +8,7 @@
 ;; [BF]: http://www.schneier.com/code/vectors.txt
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 ;; [S20] http://cr.yp.to/snuffle/spec.pdf
+;; [HC128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
 (ns ^{:author "Jason Ozias"
       :doc "Test keys vectors"}
   org.azjure.testkeys)
@@ -41,6 +42,16 @@ defined at [RFC 2144][R2144]"} c5-128-key
 defined at [RFC 2612][R2612_10]"} c6-128-key
   [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
    0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])
+
+(def ^{:doc "HC-128 128-bit key as a vector of bytes as
+defined at [HC-128 Spec][HC128]"} hc-128-key
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+
+(def ^{:doc "HC-128 128-bit key as a vector of bytes as
+defined at [HC-128 Spec][HC128]"} hc-128-key-1
+  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
 
 (def ^{:doc "Twofish 128-bit key as a vector of bytes as
 defined at [Twofish paper][TF]"} tf-128-key

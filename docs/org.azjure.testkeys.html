@@ -3059,7 +3059,15 @@ defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a
 defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  c6-128-key
   [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
+   0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
+defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
+defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key-1
+  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-128-key
   [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00

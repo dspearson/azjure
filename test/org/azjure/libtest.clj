@@ -3,7 +3,8 @@
             (org.azjure [testivs :refer :all]
                         [testkeys :refer :all]
                         [cryptsuite :as cs])
-            [org.azjure.cipher.blockcipher :as bc]))
+            (org.azjure.cipher [blockcipher :as bc]
+                               [streamcipher :as sc])))
 
 (def ^{:doc "For type comparison"} array-of-bytes-type
   (Class/forName "[B")) 
@@ -39,3 +40,17 @@
 (defn ^{:doc "Helper function for BlockCipher decryption testing"} decrypt-block
   [[cipher initmap plaintext ciphertext]]
   (is (= plaintext (bc/decrypt-block cipher ciphertext initmap))))
+
+;; ### Stream Cipher testing helper function
+
+(defn- ^{:doc "xor the given bytes with the generated keystream."} xor-bytes 
+  [cipher initmap bytes]
+  (mapv bit-xor bytes (sc/generate-keystream cipher initmap [0 (count bytes)])))
+
+(defn ^{:doc "Test keystream encryption."} stream-encryptor
+  [[cipher initmap plaintext ciphertext]]
+  (is (= ciphertext (xor-bytes cipher initmap plaintext))))
+
+(defn ^{:doc "Test keystream decryption."} stream-decryptor
+  [[cipher initmap plaintext ciphertext]]
+  (is (= plaintext (xor-bytes cipher initmap ciphertext))))

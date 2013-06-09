@@ -21,6 +21,9 @@ as defined at [RFC2144][R2144]"} c5-pt
   [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF])
 
 ;; ### 128-bit Plaintext Blocks
+
+(def ^{:doc "A 16-byte vector of zeros."} zeros
+  (vec (take 16 (cycle [0]))))
  
 (def ^{:doc "A sample plaintext block as a vector of 16 bytes
 as defined in Appendix C.1, C.2, and C.3 in [FIPS 197][F197]"} aes-pt 
@@ -28,14 +31,15 @@ as defined in Appendix C.1, C.2, and C.3 in [FIPS 197][F197]"} aes-pt
    0x88 0x99 0xaa 0xbb 0xcc 0xdd 0xee 0xff])
 
 (def ^{:doc "A sample plaintext block as a vector of 16 bytes
-as defined in [RFC2612][R2612_10]"} c6-pt
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+as defined in [RFC2612][R2612_10]"} c6-pt zeros)
 
 (def ^{:doc "A sample plaintext block as a vector of 16 bytes
-as defined in [Twofish paper][TF]"} tf-pt
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+as defined in [Twofish paper][TF]"} tf-pt zeros)
+
+;; ### 512-bit Plaintext Blocks
+
+(def ^{:doc "A 64-byte vector of zeros."} zeros-64
+  (vec (take 64 (cycle [0]))))
 
 ;; ### Other Plaintext Blocks
 

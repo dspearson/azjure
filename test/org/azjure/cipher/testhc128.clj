@@ -8,11 +8,7 @@
                         [testivs :refer :all]
                         [testkeys :refer :all]
                         [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->HC128CFB)]
-                        [cryptsuite :refer (->HC128OFB)]
-                        [cryptsuite :refer (->HC128CTR)])
+                        [testciphertext :refer :all])
             (org.azjure.cipher [cipher :as cipher]
                                [streamcipher :as sc]
                                [hc128 :refer (->HC128)])))
@@ -20,51 +16,38 @@
 
 (def ^{:doc "HC-128 record to be used in the tests"} hc128 (->HC128))
 
-;; The HC-128 stream mode suites.
-(def HC128CFB (->HC128CFB))
-(def HC128OFB (->HC128OFB))
-
-;; The HC-128 counter mode suite.
-(def HC128CTR (->HC128CTR))
-
 ;; ### HC-128 Initialization
 
-;(def ^{:doc "Initialization map to be used in the suite tests."} initmap
-;  (cipher/initialize hc128 key-128b))
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap0
+  (cipher/initialize hc128 {:key hc-128-key :iv hc-128-iv}))
 
-(def initmap)
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap1
+  (cipher/initialize hc128 {:key hc-128-key :iv hc-128-iv-1}))
 
-;; ### Suite Test Vectors
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap2
+  (cipher/initialize hc128 {:key hc-128-key-1 :iv hc-128-iv}))
+
+;; ### Specification Test Vectors
 ;; Each row is
 ;;
-;;     [suite plaintext ciphertext]
+;;     [cipher initmap plaintext ciphertext]
 ;;
 
-(def ^{:doc "Test vectors for HC-128 stream suites"} hc128s-test-vectors
-  [;[HC128CFB initmap phrase []]
-   ;[HC128OFB initmap phrase []]
-])
-
-(def ^{:doc "Test vectors for HC-128 counter mode suite"} hc128ctr-test-vectors
-  [;[HC128CTR initmap phrase []]
-])
+(def ^{:doc "Test vectors from the HC-128 spec"} hc128spec-test-vectors
+  [[hc128 initmap0 zeros-64 hc-128-ct  ]
+   [hc128 initmap1 zeros-64 hc-128-ct-1]
+   [hc128 initmap2 zeros-64 hc-128-ct-2]])
 
 ;; ### HC-128 Tests
 
 (deftest ^{:doc "Test HC-128 stream suites"} testStream
   (testing "Stream"
-    (is (= true (every? true? (map encryptor hc128s-test-vectors))))
-    (is (= true (every? true? (map decryptor hc128s-test-vectors))))))
-
-(deftest ^{:doc "Test HC-128 counter mode suite"} testCounter
-  (testing "Counter"
-    (is (= true (every? true? (map #(encryptor % :iv iv-64b) hc128ctr-test-vectors))))
-    (is (= true (every? true? (map #(decryptor % :iv iv-64b) hc128ctr-test-vectors))))))
+    (is (= true (every? true? (map stream-encryptor hc128spec-test-vectors))))
+    (is (= true (every? true? (map stream-decryptor hc128spec-test-vectors))))))
 
 (deftest ^{:doc "Test HC-128"} testHC128
   (testing "HC-128"
-    (testStream)
-    (testCounter)))
+    (testStream)))
 
 (defn ^{:doc "Namespace hook to run tests in proper order"} test-ns-hook
   []
