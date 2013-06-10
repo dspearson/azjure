@@ -12,41 +12,42 @@ Add the following in the dependencies section of your project.clj file
                ...]
 ```
 
-Require the CryptSuite protocol
+### Block Ciphers
+TODO.  For now see the test files for examples.
+
+### Stream Ciphers
 
 ```Clojure
-(:require [org.azjure.cryptsuite :as cs])
-```
-
-Then require the suite you wish to use (a suite is a combination of cipher, mode, and padding method)
-
-```Clojure
-(:require [org.azjure.cryptsuite :refer (->AESECBPKCS7)]
+(:require (org.azjure.cipher [cipher :as cipher]
+                             [streamcipher :as sc]
+                             [salsa20 :refer (->Salsa20]))
 ```
 
 Encrypt
 
 ```Clojure
 ;; Initialize the record to use
-(def AESCBCPKCS7 (->AESCBCPKCS7))
-;; Encrypt
-(cs/encrypt AESCBCPKCS7 key iv bytes)
+(def s20 (->Salsa20))
+;; Initialize the cipher (the map arg usually takes {:key key :iv iv})
+;; You will get back a map to use during keystream generation
+(def initmap (cipher/initialize s20 {:key key :iv iv}))
+;; Generate keystream and encrypt
+(mapv bit-xor plaintext (sc/generate-keystream s20 initmap [0 (count plaintext)]))
 ```
-where key and iv are vectors of unsigned bytes (0-255) of lengths appropriate for the suite, and bytes
-is a vector of unsigned bytes you wish to encrypt.
 
 Decrypt
 
 ```Clojure
 ;; Initialize the record to use
-(def AESCBCPKCS7 (->AESCBCPKCS7))
-;; Decrypt
-(cs/decrypt AESCBCPKCS7 key iv bytes)
+(def s20 (->Salsa20))
+;; Initialize the cipher (the map arg usually takes {:key key :iv iv})
+;; You will get back a map to use during keystream generation
+(def initmap (cipher/initialize s20 {:key key :iv iv}))
+;; Generate keystream and encrypt
+(mapv bit-xor ciphertext (sc/generate-keystream s20 initmap [0 (count ciphertext)]))
 ```
-where key and iv are vectors of unsigned bytes (0-255) of lengths appropriate for the suite, and bytes
-is a vector of unsigned bytes you wish to decrypt.
 
-See [testcryptsuite.clj](https://github.com/CraZySacX/azjure/blob/master/test/net/ozias/crypt/testcryptsuite.clj) for examples
+See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/org/azjure/cipher) for examples
 
 ## Supported Ciphers
 ### Block
@@ -56,11 +57,12 @@ See [testcryptsuite.clj](https://github.com/CraZySacX/azjure/blob/master/test/ne
 4. CAST-256 (CAST6) - [CAST-256 RFC](http://tools.ietf.org/html/rfc2612)
 5. Twofish (TF) - [Twofish Spec](http://www.schneier.com/paper-twofish-paper.pdf)
 
-### Stream (Should only be run in CFB, OFB or CTR mode)
+### Stream
 1. Salsa20 (S20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
+2. HC-128 (HC128) - [HC-128 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
 
 ## Supported Modes
-Cipher modes describe the method for encrypting multiple blocks.
+Cipher modes describe the method for encrypting multiple blocks with block ciphers.
 
 See [Mode of Operation](http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation) for
 descriptions
@@ -70,14 +72,14 @@ descriptions
 2. Cipher-Block Chaining (CBC)
 3. Propagating Cipher-Block Chaining (PCBC)
 
-### Stream Modes
+### Stream Modes with Block Ciphers
 1. Cipher Feedback (CFB)
 2. Output Feedback (OFB)
 3. Counter (CTR)
 
 ## Supported Padding
-Some cipher modes require that the input be padded with bytes until a multiple of
-the cipher's blocksize.  The following padding methods are supported.
+Some cipher modes (ECB, CBC, PCBC) require that the input be padded with bytes until a 
+multiple of the cipher's blocksize.  The following padding methods are supported.
 
 See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
 
@@ -89,5 +91,4 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 ## In Progress
 * Camellia
-* Change Blowfish initialization to be more streamlined.
-* Change base namespace to org.azjure
+* Review stream modes for block ciphers. They can be better.
