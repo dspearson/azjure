@@ -28,9 +28,10 @@ Encrypt
 ```Clojure
 ;; Initialize the record to use
 (def s20 (->Salsa20))
-;; Initialize the cipher (the map arg usually takes {:key key :iv iv})
-;; You will get back a map to use during keystream generation
-(def initmap (cipher/initialize s20 {:key key :iv iv}))
+;; Initialize the cipher.  Note the map argument usually takes a map of the
+;; format {:key key :iv iv}.  In Salsa20's case it is {:key key :nonce nonce}.
+;; This will evaluate to a map to use during keystream generation
+(def initmap (cipher/initialize s20 {:key key :nonce nonce}))
 ;; Generate keystream and encrypt
 (mapv bit-xor plaintext (sc/generate-keystream s20 initmap [0 (count plaintext)]))
 ```
@@ -40,9 +41,10 @@ Decrypt
 ```Clojure
 ;; Initialize the record to use
 (def s20 (->Salsa20))
-;; Initialize the cipher (the map arg usually takes {:key key :iv iv})
-;; You will get back a map to use during keystream generation
-(def initmap (cipher/initialize s20 {:key key :iv iv}))
+;; Initialize the cipher.  Note the map argument usually takes a map of the
+;; format {:key key :iv iv}.  In Salsa20's case it is {:key key :nonce nonce}.
+;; This will evaluate to a map to use during keystream generation
+(def initmap (cipher/initialize s20 {:key key :nonce nonce}))
 ;; Generate keystream and encrypt
 (mapv bit-xor ciphertext (sc/generate-keystream s20 initmap [0 (count ciphertext)]))
 ```
