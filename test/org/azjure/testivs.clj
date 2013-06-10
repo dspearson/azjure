@@ -7,12 +7,18 @@
 (ns ^{:author "Jason Ozias"}
   org.azjure.testivs)
 
+;; ### 64-bit Initialization Vectors
+
+(def ^{:doc "64-bits of zeros as a vector of bytes."} zeros-64-iv
+  (vec (take 8 (cycle [0]))))
+
 ;; ### 128-bit Initialization Vectors
 
+(def ^{:doc "128-bits of zeros as a vector of bytes."} zeros-128-iv
+  (vec (take 16 (cycle [0]))))
+
 (def ^{:doc "HC-128 128-bit IV as a vector of bytes as
-defined at [HC-128 Spec][HC128]"} hc-128-iv
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+defined at [HC-128 Spec][HC128]"} hc-128-iv zeros-128-iv)
 
 (def ^{:doc "HC-128 128-bit IV as a vector of bytes as
 defined at [HC-128 Spec][HC128]"} hc-128-iv-1

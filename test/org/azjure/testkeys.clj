@@ -28,6 +28,9 @@ as defined at [RFC 2144][R2144]"} c5-80-key
 
 ;; ### 128-bit Keys
 
+(def ^{:doc "128-bits of zeros as a vector of bytes."} zeros-128-key
+  (vec (take 16 (cycle [0]))))
+
 (def ^{:doc "AES 128-bit key as a vector of bytes as
 defined in Appendix C.1 in [FIPS 197][f197]"} aes-128-key
   [0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
@@ -44,9 +47,7 @@ defined at [RFC 2612][R2612_10]"} c6-128-key
    0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])
 
 (def ^{:doc "HC-128 128-bit key as a vector of bytes as
-defined at [HC-128 Spec][HC128]"} hc-128-key
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+defined at [HC-128 Spec][HC128]"} hc-128-key zeros-128-key)
 
 (def ^{:doc "HC-128 128-bit key as a vector of bytes as
 defined at [HC-128 Spec][HC128]"} hc-128-key-1
@@ -54,11 +55,9 @@ defined at [HC-128 Spec][HC128]"} hc-128-key-1
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
 
 (def ^{:doc "Twofish 128-bit key as a vector of bytes as
-defined at [Twofish paper][TF]"} tf-128-key
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+defined at [Twofish paper][TF]"} tf-128-key zeros-128-key)
 
-(def key-128b c5-128-key)
+(def ^{:doc "Used in many tests"} key-128b c5-128-key)
 
 ;; ### 192-bit Keys
 
@@ -80,6 +79,9 @@ defined at [Twofish paper][TF]"} tf-192-key
 
 ;; ### 256-bit Keys
  
+(def ^{:doc "256-bits of zeros as a vector of bytes."} zeros-256-key
+  (vec (take 32 (cycle [0]))))
+
 (def ^{:doc "AES 256-bit key as a vector of bytes as
 defined in Appendix C.3 in [FIPS 197][f197]"} aes-256-key
   (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))

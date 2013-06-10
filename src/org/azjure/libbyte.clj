@@ -164,3 +164,19 @@
      (<<< word (minv-shift shift bits)))
   ([word shift]
      (>>> word shift 32)))
+
+(defn- ^{:doc "Shift a BigInteger x right by n bits."} shift-right 
+  [x n]
+  (.shiftRight x n))
+
+(defn- ^{:doc "Convert a BigInt to a vector of byte values."} bi->bv
+  [x]
+  (let [x (.toBigInteger x)
+        mask (BigInteger. "FF" 16)]
+    (mapv #(.and (shift-right x %) mask) (range 56 -1 -8))))
+
+(defn ^{:doc "Convert a value to a vector of byte values."} x->bv
+  [x]
+  (if (instance? clojure.lang.BigInt x)
+    (bi->bv x)
+    (mapv #(bit-and (bit-shift-right x %) 0xFF) (range 56 -1 -8))))

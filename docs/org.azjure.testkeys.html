@@ -3034,7 +3034,7 @@ net.brehaut.ClojureTools = (function (SH) {
 anything you wish to keep secret.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Test keys vectors</p>
 
-<p>[S20] http://cr.yp.to/snuffle/spec.pdf</p>
+<p><a href="http://cr.yp.to/snuffle/spec.pdf">S20</a> http://cr.yp.to/snuffle/spec.pdf</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
       :doc }
   org.azjure.testkeys)</pre></td></tr><tr><td class="docs"><h3>40-bit Keys</h3>
@@ -3047,7 +3047,9 @@ as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144
 </td><td class="codes"><pre class="brush: clojure">(def  c5-80-key
   [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
    0x23 0x45])</pre></td></tr><tr><td class="docs"><h3>128-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 128-bit key as a vector of bytes as
+</td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  zeros-128-key
+  (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>AES 128-bit key as a vector of bytes as
 defined in Appendix C.1 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-128-key
   [0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
@@ -3061,18 +3063,14 @@ defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
   [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
    0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
+</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  hc-128-key-1
   [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-128-key
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>
+</td><td class="codes"><pre class="brush: clojure">(def  tf-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>Used in many tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def  key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>AES 192-bit key as a vector of bytes as
 defined in Appendix C.2 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-192-key
@@ -3087,7 +3085,9 @@ defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish pap
   [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
    0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10
    0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])</pre></td></tr><tr><td class="docs"><h3>256-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 256-bit key as a vector of bytes as
+</td><td class="codes"></td></tr><tr><td class="docs"><p>256-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  zeros-256-key
+  (vec (take 32 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>AES 256-bit key as a vector of bytes as
 defined in Appendix C.3 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  aes-256-key
   (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))</pre></td></tr><tr><td class="docs"><p>CAST6 256-bit key as a vector of bytes as

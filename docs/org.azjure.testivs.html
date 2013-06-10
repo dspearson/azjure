@@ -3036,12 +3036,15 @@ net.brehaut.ClojureTools = (function (SH) {
 Do not use these initialization vectors to encrypt 
 anything you wish to keep secret.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  org.azjure.testivs)</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>HC-128 128-bit IV as a vector of bytes as
+  org.azjure.testivs)</pre></td></tr><tr><td class="docs"><h3>64-bit Initialization Vectors</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>64-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  zeros-64-iv
+  (vec (take 8 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  zeros-128-iv
+  (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit IV as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc-128-iv
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit IV as a vector of bytes as
+</td><td class="codes"><pre class="brush: clojure">(def  hc-128-iv zeros-128-iv)</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit IV as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  hc-128-iv-1
   [0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00

@@ -6,8 +6,7 @@
                                [blowfish :refer (->Blowfish)]
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
-                               [twofish :refer (->Twofish)]
-                               [salsa20 :refer (->Salsa20)])
+                               [twofish :refer (->Twofish)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (->ElectronicCodebook)]
                              [cbc :refer (->CipherBlockChaining)]
@@ -51,7 +50,6 @@
 (def Twofish (->Twofish))
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
-(def Salsa20 (->Salsa20))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB,CTR
 ;; Setup the mode for use in testing
@@ -595,20 +593,3 @@
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor Twofish CTR key iv bytes))
   (decrypt [_ key iv bytes] (decryptor Twofish CTR key iv bytes)))
-
-;; ### S20CTR
-;; Salsa20 cipher, Various stream modes
-(defrecord S20CFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Salsa20 CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Salsa20 CFB key iv bytes)))
-
-(defrecord S20OFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Salsa20 OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Salsa20 OFB key iv bytes)))
-
-(defrecord S20CTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Salsa20 CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Salsa20 CTR key iv bytes)))

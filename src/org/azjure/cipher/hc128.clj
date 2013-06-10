@@ -180,27 +180,38 @@ in [HC-128 Spec][HC128]."} hc128
        (mapv (comp word-bytes reverse-bytes last))
        (reduce into)))
 
+(defn- ^{:doc "Reset the map in the atom at kivkw."} resetkiv!
+  [kivkw]
+  (swap! hc128-key-streams assoc kivkw {}))
+
+(defn- ^{:doc "Reset the keystream in the map in the atom
+at kivkw."} resetks!
+  [kivkw {:keys [p q]} [lower upper :as range]]
+  (let [ks (gen-key-stream p q upper)]
+    (swap! hc128-key-streams assoc kivkw
+           (assoc (kivkw @hc128-key-streams) :upper upper :ks ks))))
+
 ;; ### HC128
 ;; Extend the Cipher and StreamCipher protocol thorough the HC128 record type
 (defrecord HC128 []
   Cipher
   (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
-    (let [ek (expand-key initmap)
-          uid (genkeyword key iv)
+    (let [kivkw (genkeyword key iv)
+          ek (expand-key initmap)
           keymap (-> (remap-p {:p (gen-p ek) :q (gen-q ek)})
                      (remap-q)
-                     (assoc :key key :iv iv))
-          ks (gen-key-stream (:p keymap) (:q keymap) upper)]
-      (swap! hc128-key-streams assoc uid {:upper upper :ks ks})
+                     (assoc :key key :iv iv))]
+      (do
+        (resetkiv! kivkw)
+        (resetks! kivkw keymap [0 upper]))
       keymap))
   (keysizes-bytes [_] [16])
   StreamCipher
-  (generate-keystream [_ {:keys [key iv p q]} [lower upper]]
-    (let [uid (genkeyword key iv)]
-      (if (< upper (inc (:upper (uid @hc128-key-streams))))
-        (subvec (:ks (uid @hc128-key-streams)) lower upper)
-        (do
-          (swap! hc128-key-streams assoc uid {:upper upper :ks (gen-key-stream p q upper)})
-          (subvec (:ks (uid @hc128-key-streams)) lower upper)))))
+  (generate-keystream [_ {:keys [key iv] :as initmap} [lower upper :as range]]
+    (let [kivkw (genkeyword key iv)]
+      (when (>= (dec upper) (:upper (kivkw @hc128-key-streams)))
+        (resetkiv! kivkw)
+        (resetks! kivkw initmap range))
+      (subvec (:ks (kivkw @hc128-key-streams)) lower upper)))
   (keystream-size-bytes [_] max-stream-length-bytes)
   (iv-size-bytes [_] 16))
