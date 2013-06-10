@@ -76,15 +76,23 @@ in [Salsa20 Spec][S20]"} salsa20
   [key]
   (= 32 (count key)))
 
+(defn- ^{:doc "Increment the counter in the map in the atom
+at noncekw."} inccnt!
+  [noncekw counter]
+  (swap! salsa20-key-streams assoc noncekw
+         (assoc (noncekw @salsa20-key-streams) :counter (inc counter))))
+
 (defn- ^{:doc "A Salsa20 key stream round.  Generates 64-bytes
 of keystream."} salsa20-round
-  [c k0 k1 kw nonce]
+  [c k0 k1 noncekw nonce]
   (fn [ks round]
-    (let [counter (:counter (kw @salsa20-key-streams))
+    (let [counter (:counter (noncekw @salsa20-key-streams))
           n (into nonce (x->bv counter))
-          _ (swap! salsa20-key-streams assoc kw (assoc (kw @salsa20-key-streams) :counter (inc counter)))
-          v64 (reduce into [(nth c 0) k0 (nth c 1) n (nth c 2) k1 (nth c 3)])]
-    (into ks (salsa20 v64)))))
+          _ (inccnt! noncekw counter)]
+      (->> [(nth c 0) k0 (nth c 1) n (nth c 2) k1 (nth c 3)]
+           (reduce into)
+           (salsa20)
+           (into ks)))))
 
 (defn- ^{:doc "Generate enough key stream to cover the upper
 bound of the range."} gen-key-stream
@@ -96,14 +104,6 @@ bound of the range."} gen-key-stream
         rounds (if (not= 0 (rem upper 64)) (inc rounds) rounds)]
     (reduce (salsa20-round c k0 k1 kw nonce) [] (range rounds))))
 
-(defn- ^{:doc "Generate a keyword from the nonce."} gen-keyword
-  [nonce]
-  (-> (->> (partition 4 nonce)
-       (mapv (comp to-hex bytes-word))
-       (reduce str))
-      (clojure.string/replace #"0x" "")
-      (keyword)))
-
 (defn- ^{:doc "Reset the map in the atom at noncekw."} resetnonce!
   [noncekw]
   (swap! salsa20-key-streams assoc noncekw {:counter 0}))
@@ -114,6 +114,14 @@ at noncekw."} resetks!
   (let [ks (gen-key-stream (conj {:kw noncekw} initmap) range)]
     (swap! salsa20-key-streams assoc noncekw 
            (assoc (noncekw @salsa20-key-streams) :upper upper :ks ks))))
+
+(defn- ^{:doc "Generate a keyword from the nonce."} gen-keyword
+  [nonce]
+  (-> (->> (partition 4 nonce)
+       (mapv (comp to-hex bytes-word))
+       (reduce str))
+      (clojure.string/replace #"0x" "")
+      (keyword)))
 
 ;; ### Salsa20
 ;; Extend the StreamCipher and Cipher protocol thorough the Salsa20 record type
