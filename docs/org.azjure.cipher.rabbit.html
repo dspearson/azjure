@@ -3028,131 +3028,247 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.salsa20" name="org.azjure.cipher.salsa20"><h1 class="project-name">org.azjure.cipher.salsa20</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Salsa20</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.rabbit" name="org.azjure.cipher.rabbit"><h1 class="project-name">org.azjure.cipher.rabbit</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Rabbit</h2>
 
-<p>Designed to meet the <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.salsa20
+<p>Designed to meet the <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.rabbit
   (:require [clojure.math.numeric-tower :refer (expt)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer (+modw to-hex)]
-            [org.azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Used to store keystreams for nonces</p>
-</td><td class="codes"><pre class="brush: clojure">(def  salsa20-key-streams
-  (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:nonce1 {:counter val :upper val :ks [keystream vector]}}
- :nonce2 {:counter val :upper val :ks [keystream vector]}
+            [org.azjure.libcrypt :refer (+mod8 +modw to-hex)]
+            [org.azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Used to store keystreams data by key</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  state-maps (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:key    {:ms [] :ss [] :upper val :ks []}
+ :keyiv0 {:ms [] :ss [] :upper val :ks []}
+ :keyiv1 {:ms [] :ss [] :upper val :ks []}}
 </code></pre>
+
+<p>Note that all the ms vectors would be the same in this case as the master
+state for key serves as the master state for any following key/iv pair
+that uses the same key.</p>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>The maximum keystream length in bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def  max-stream-length-bytes
-  (expt 2 67))</pre></td></tr><tr><td class="docs"><p>Used during expansion for 32-byte keys.</p>
-</td><td class="codes"><pre class="brush: clojure">(def  sigma
-  [[0x65 0x78 0x70 0x61]
-   [0x6E 0x64 0x20 0x33]
-   [0x32 0x2D 0x62 0x79]
-   [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><p>Used during expansion for 16-byte keys.</p>
-</td><td class="codes"><pre class="brush: clojure">(def tau
-  [[0x65 0x78 0x70 0x61]
-   [0x6E 0x64 0x20 0x31]
-   [0x36 0x2D 0x62 0x79]
-   [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><p>quarterround function as defined 
-in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  quarterround
-  [[y0 y1 y2 y3]]
-  (let [z1 (bit-xor y1 (&lt;&lt;&lt; (+modw y0 y3) 7))
-        z2 (bit-xor y2 (&lt;&lt;&lt; (+modw z1 y0) 9))
-        z3 (bit-xor y3 (&lt;&lt;&lt; (+modw z2 z1) 13))
-        z0 (bit-xor y0 (&lt;&lt;&lt; (+modw z3 z2) 18))]
-    [z0 z1 z2 z3]))</pre></td></tr><tr><td class="docs"><p>rowround function as defined 
-in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  rowround 
-  [[y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]]
-  (let [[z0 z1 z2 z3] (quarterround [y0 y1 y2 y3])
-        [z5 z6 z7 z4] (quarterround [y5 y6 y7 y4])
-        [z10 z11 z8 z9] (quarterround [y10 y11 y8 y9])
-        [z15 z12 z13 z14] (quarterround [y15 y12 y13 y14])]
-    [z0 z1 z2 z3 z4 z5 z6 z7 z8 z9 z10 z11 z12 z13 z14 z15]))</pre></td></tr><tr><td class="docs"><p>columnround function as defined 
-in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  columnround
-  [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
-  (let [[y0 y4 y8 y12] (quarterround [x0 x4 x8 x12])
-        [y5 y9 y13 y1] (quarterround [x5 x9 x13 x1])
-        [y10 y14 y2 y6] (quarterround [x10 x14 x2 x6])
-        [y15 y3 y7 y11] (quarterround [x15 x3 x7 x11])]
-    [y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]))</pre></td></tr><tr><td class="docs"><p>quarterround function as defined 
-in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  doubleround
-  [x _]
-  (rowround (columnround x)))</pre></td></tr><tr><td class="docs"><p>salsa20 encryption function as defined 
-in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  salsa20
-  [in]
-  (let [x (mapv #(bytes-word % true) (partition 4 in))]
-    (-&gt;&gt; (range 10)
-         (reduce doubleround x)
-         (mapv +modw x)
-         (mapv #(word-bytes % true))
-         (reduce into))))</pre></td></tr><tr><td class="docs"><p>Is the given vector 32 bytes long?</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  bytes32?
-  [key]
-  (= 32 (count key)))</pre></td></tr><tr><td class="docs"><p>Increment the counter in the map in the atom
-at noncekw.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  inccnt!
-  [noncekw counter]
-  (swap! salsa20-key-streams assoc noncekw
-         (assoc (noncekw @salsa20-key-streams) :counter (inc counter))))</pre></td></tr><tr><td class="docs"><p>A Salsa20 key stream round.  Generates 64-bytes
-of keystream.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  salsa20-round
-  [c k0 k1 noncekw nonce]
-  (fn [ks round]
-    (let [counter (:counter (noncekw @salsa20-key-streams))
-          n (into nonce (x-&gt;bv counter))
-          _ (inccnt! noncekw counter)]
-      (-&gt;&gt; [(nth c 0) k0 (nth c 1) n (nth c 2) k1 (nth c 3)]
-           (reduce into)
-           (salsa20)
-           (into ks)))))</pre></td></tr><tr><td class="docs"><p>Generate enough key stream to cover the upper
-bound of the range.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  gen-key-stream
-  [{:keys [key nonce kw]} [lower upper]]
-  (let [c (if (bytes32? key) sigma tau)
-        k0 (subvec key 0 16)
-        k1 (if (bytes32? key) (subvec key 16 32) (subvec key 0 16))
-        rounds (inc (quot upper 64))
-        rounds (if (not= 0 (rem upper 64)) (inc rounds) rounds)]
-    (reduce (salsa20-round c k0 k1 kw nonce) [] (range rounds))))</pre></td></tr><tr><td class="docs"><p>Reset the map in the atom at noncekw.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  resetnonce!
-  [noncekw]
-  (swap! salsa20-key-streams assoc noncekw {:counter 0}))</pre></td></tr><tr><td class="docs"><p>Reset the keystream in the map in the atom
-at noncekw.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  resetks! 
-  [noncekw initmap [lower upper :as range]]
-  (let [ks (gen-key-stream (conj {:kw noncekw} initmap) range)]
-    (swap! salsa20-key-streams assoc noncekw 
-           (assoc (noncekw @salsa20-key-streams) :upper upper :ks ks))))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the nonce.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  gen-keyword
-  [nonce]
-  (-&gt; (-&gt;&gt; (partition 4 nonce)
+</td><td class="codes"><pre class="brush: clojure">(def 
+  max-stream-length-bytes (expt 2 70))</pre></td></tr><tr><td class="docs"><p>The initial state. X and C are empty vectors
+and the carry bit is 0.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  
+  initial-state [[][] 0])</pre></td></tr><tr><td class="docs"><p>Constants used during a counter update.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  avec [0x4D34D34D 0xD34D34D3 0x34D34D34 0x4D34D34D 
+        0xD34D34D3 0x34D34D34 0x4D34D34D 0xD34D34D3])</pre></td></tr><tr><td class="docs"><p>Adds two 32-bit values mod 2^32 and squares them generating
+a 64-bit result.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  square [word1 word2]
+  (.longValue (bigint (expt (+modw word1 word2) 2))))</pre></td></tr><tr><td class="docs"><p>Take two 32-bit values and generate one 32-bit value.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  gfn [word1 word2]
+  (let [squared (square word1 word2)]
+    (bit-xor (bit-and (bit-shift-right squared 32) 0xFFFFFFFF) 
+             (bit-and squared 0xFFFFFFFF))))</pre></td></tr><tr><td class="docs"><p>A g-function round.  Conj's the result of gfn to the 
+supplied g vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  gfn-round [x c]
+  (fn [g round]
+    (conj g (gfn (nth x round) (nth c round)))))</pre></td></tr><tr><td class="docs"><p>Update the counter vector and carry bit based
+on the given round.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  next-counters-b-round [[c b] round]
+  (let [t (+ (nth c round) (nth avec round) b) 
+        ; Note &quot;normal&quot; addition above to catch carry bit if the add
+        ; overflows 32 bits.
+        b (bit-shift-right t 32)] 
+    [(assoc c round (bit-and t 0xFFFFFFFF)) b]))</pre></td></tr><tr><td class="docs"><p>Update the counter vector and carry bit in the
+state vector during key expansion.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  next-counters-b [[x c b] _]
+  (let [uc (reduce next-counters-b-round [c b] (range 8))]
+    [x (first uc) (last uc)]))</pre></td></tr><tr><td class="docs"><p>Generate a 32-bit word from indexes into the g
+vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  next-x-even [g]
+  (fn [[i0 i1 i2]]
+    (+modw (nth g i0) (&lt;&lt;&lt; (nth g i1) 16) (&lt;&lt;&lt; (nth g i2) 16))))</pre></td></tr><tr><td class="docs"><p>Generate a 32-bit word from indexes into the g
+vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  next-x-odd [g]
+  (fn [[i0 i1 i2]]
+    (+modw (nth g i0) (&lt;&lt;&lt; (nth g i1) 8) (nth g i2))))</pre></td></tr><tr><td class="docs"><p>Generate the next [x c b] state.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  next-x [[x c b]]
+  (let [g (reduce (gfn-round x c) [] (range 8))
+        evenfn (next-x-even g)
+        oddfn (next-x-odd g)]
+    [[(evenfn [0 7 6])
+      (oddfn  [1 0 7])
+      (evenfn [2 1 0])
+      (oddfn  [3 2 1])
+      (evenfn [4 3 2])
+      (oddfn  [5 4 3])
+      (evenfn [6 5 4])
+      (oddfn  [7 6 5])] c b]))</pre></td></tr><tr><td class="docs"><p>Used to convert the X vector in [x c b] from words to bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  bytes-word-x [state]
+  (mapv bytes-word (first state)))</pre></td></tr><tr><td class="docs"><p>Used to convert the C vector in [x c b] from words to bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  bytes-word-c [state]
+  (mapv bytes-word (second state)))</pre></td></tr><tr><td class="docs"><p>Used to get the carry bit out of the state [x c b].</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  identity-b [state]
+  (identity (last state)))</pre></td></tr><tr><td class="docs"><p>Updates the current [x c b] state during key expansion.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  expand-key-round [key]
+  (fn [[x c b] round]
+    (if (even? round)
+      [(conj x (into (nth key (+mod8 round 1)) (nth key round)))
+       (conj c (into (nth key (+mod8 round 4)) (nth key (+mod8 round 5))))
+       b]
+      [(conj x (into (nth key (+mod8 round 5)) (nth key (+mod8 round 4))))
+       (conj c (into (nth key round) (nth key (+mod8 round 1))))
+       b])))</pre></td></tr><tr><td class="docs"><p>Expand the key into the master state [x c b].</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  expand-key [key]
+  (let [kvec (mapv vec (reverse (partition 2 key)))]
+    (-&gt; (expand-key-round kvec)
+        (reduce initial-state (range 8))
+        ((juxt bytes-word-x bytes-word-c identity-b)))))</pre></td></tr><tr><td class="docs"><p>Updated the counters in [x c b] based on the given round.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  update-counters-postms-round [[x c b] round]
+  [x (assoc c round (bit-xor (nth c round) (nth x (+mod8 round 4)))) b])</pre></td></tr><tr><td class="docs"><p>Update the counters as the final step in master state
+generation.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  update-counters-postms [state]
+  (reduce update-counters-postms-round state (range 8)))</pre></td></tr><tr><td class="docs"><p>xor the counter value with a word formed from two 
+2-byte sections of the IV.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  xor-counter [c ivec]
+  (fn [[cidx iidx0 iidx1]]
+    (-&gt;&gt; (into (nth ivec iidx0) (nth ivec iidx1))
+         (bytes-word)
+         (bit-xor (nth c cidx)))))</pre></td></tr><tr><td class="docs"><p>Update a counter value based on the given iv and round.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  update-counters-pre-ss-round [iv]
+  (fn [c round]
+    (let [xfn (xor-counter c iv)]
+      (-&gt;&gt; (condp = (mod round 4)
+             0 (xfn [round 1 0])
+             1 (xfn [round 3 1])
+             2 (xfn [round 3 2])
+             3 (xfn [round 2 0]))
+           (assoc c round)))))</pre></td></tr><tr><td class="docs"><p>Update the counters vector before starting state calculation.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  update-counters-pre-ss [[x c b] iv]
+  (let [ivec (mapv vec (reverse (partition 2 iv)))]
+    [x (reduce (update-counters-pre-ss-round ivec) c (range 8)) b]))</pre></td></tr><tr><td class="docs"><p>Get the 2 most significant bytes from the given word.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  ms2b [word]
+  (bit-shift-right word 16))</pre></td></tr><tr><td class="docs"><p>Get the 2 least significant bytes from the given word.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  ls2b [word]
+  (bit-and word 0xFFFF))</pre></td></tr><tr><td class="docs"><p>Function composition that represents one Rabbit state 
+transition.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  next-state (comp next-x next-counters-b))</pre></td></tr><tr><td class="docs"><p>Convert the given indices into x (a vector of bytes) 
+into an output word.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  outw&lt;-x [x]
+  (fn [[idx0 idx1 idx2 idx3]]
+    (bit-or
+     (bit-xor (ls2b (nth x idx0)) (ms2b (nth x idx1)))
+     (bit-shift-left (bit-xor (ms2b (nth x idx2)) (ls2b (nth x idx3))) 16))))</pre></td></tr><tr><td class="docs"><p>Represents one Rabbit round.  This will update the initmap
+with the current starting state for the next round (:ss), and will place
+the 128-bits (as four 32-bit words) of generated keystream into :out.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  rabbit-round [{:keys [ss out] :as initmap} r]
+  (let [[xn cn bn] (next-state ss 0)
+        exfn (outw&lt;-x xn)]
+    (assoc initmap 
+      :ss [xn cn bn]
+      :out (-&gt;&gt; [(exfn [6 3 6 1])
+                 (exfn [4 1 4 7])
+                 (exfn [2 7 2 5])
+                 (exfn [0 5 0 3])]
+                (into out)))))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+;; TODO: Move this to library as all stream ciphers use it.
+  bytes-&gt;keyword [bytes]
+  (-&gt; (-&gt;&gt; (partition 4 bytes)
            (mapv (comp to-hex bytes-word))
            (reduce str))
       (clojure.string/replace #&quot;0x&quot; &quot;&quot;)
-      (keyword)))</pre></td></tr><tr><td class="docs"><h3>Salsa20</h3>
+      (keyword)))</pre></td></tr><tr><td class="docs"><p>Evaluates to the master state.  The master state is
+based soley on the key, so only needs to be calculated for new key
+values.  If a master state is found at the baseuid, that is used.
+If a master state is found at the current uid is found, that is used.
+Otherwise, a new master state is calculated.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  master-state [baseuid uid key]
+  (if (contains? @state-maps baseuid)
+    (:ms (baseuid @state-maps))
+    (if (contains? @state-maps uid)
+      (:ms (uid @state-maps))
+      (-&gt; next-state
+          (reduce (expand-key key) (range 4))
+          (update-counters-postms)))))</pre></td></tr><tr><td class="docs"><p>Evaluates to the starting state. If no initialization
+vector is supplied the starting state is the master state.  Otherwise,
+the starting state is calculated based upon the initialization vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  starting-state [uid ms iv]
+  (if (nil? iv)
+    ms
+    (reduce next-state (update-counters-pre-ss ms iv) (range 4))))</pre></td></tr><tr><td class="docs"><p>Reset the state at uid in the state-maps atom.  If no
+state map exists at :baseuid one will be generated for efficiencies
+with new IVs for the same key.  Then reset the statemap at :uid.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  resetstatemap! 
+  ([key iv uid]
+     {:pre [(vector? key)(vector? iv)(keyword? uid)
+            (= 16 (count key))(= 8 (count iv))]}
+  (let [baseuid (bytes-&gt;keyword key)
+        ms (master-state baseuid uid key)]
+    (if-not (contains? @state-maps baseuid)
+      (swap! state-maps assoc baseuid 
+             {:ms ms :ss (starting-state baseuid ms nil)}))
+    (swap! state-maps assoc uid
+           {:ms ms :ss (starting-state uid ms iv)}))))</pre></td></tr><tr><td class="docs"><p>Swap any existing keystream in the state map at :uid with
+a newly generated one.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn-  
+  swapstatemapks!
+  ([uid [lower upper :as bounds]]
+     {:pre [(&lt; upper max-stream-length-bytes)]}
+  (let [rounds (inc (quot upper 16)) ; Each round generates 16-bytes (128-bits)
+        rounds (if (zero? (rem upper 16)) rounds (inc rounds))
+        statemap (uid @state-maps)
+        out (reduce rabbit-round (conj {:out []} statemap) (range rounds))]
+    (swap! state-maps assoc uid
+           (assoc (uid @state-maps) 
+             :ss (:ss out) 
+             :upper upper 
+             :ks (reduce into (mapv word-bytes (:out out))))))))</pre></td></tr><tr><td class="docs"><h3>Rabbit</h3>
 
-<p>Extend the StreamCipher and Cipher protocol thorough the Salsa20 record type</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord Salsa20 []
+<p>Extend the StreamCipher and Cipher protocol thorough the Rabbit record type.</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord Rabbit []
   Cipher
-  (initialize [_ {:keys [nonce upper] :or {upper 1024} :as initmap}]
-    (let [kw (gen-keyword nonce)]
+  ;; Initialize will, by default, generate 1024 bytes of keystream.  This can be
+  ;; increased or decreased by supplying :upper X in the initmap along with :key
+  ;; and :iv. Evaluates to a map {:key key :iv iv :upper upper :uid uid} to be
+  ;; used with generate-keystream.
+  (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
+    (let [uid (bytes-&gt;keyword (if (nil? iv) key (into key iv)))]
       (do
-        (resetnonce! kw)
-        (resetks! kw initmap [0 upper]))
-      initmap))
-  (keysizes-bytes [_] [16 32])
+        (resetstatemap! key iv uid)
+        (swapstatemapks! uid [0 upper]))
+      (assoc initmap :upper upper :uid uid)))
+  (keysizes-bytes [_] [16])
   StreamCipher
-  (generate-keystream [_ {:keys [nonce] :as initmap} [lower upper :as range]]
-    (let [noncekw (gen-keyword nonce)]
-      (when (&gt;= (dec upper) (:upper (noncekw @salsa20-key-streams)))
-        (resetnonce! noncekw)
-        (resetks! noncekw initmap range))
-      (subvec (:ks (noncekw @salsa20-key-streams)) lower upper)))
+  ;; If upper is larger than the current upper bound of the keystream in the
+  ;; state map at the given uid, then new keystream is generated and stored.
+  ;; The result is always a subvector of the keystream stored with the state map
+  ;; at :uid.
+  (generate-keystream [_ {:keys [key iv uid]} [lower upper :as bounds]]
+    (when (&gt;= (dec upper) (:upper (uid @state-maps)))
+      (resetstatemap! key iv uid)
+      (swapstatemapks! uid [0 upper]))
+    (subvec (:ks (uid @state-maps)) lower upper))
   (keystream-size-bytes [_] max-stream-length-bytes)
   (iv-size-bytes [_] 8))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
