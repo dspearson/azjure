@@ -10,6 +10,17 @@
             [org.azjure.libcrypt :refer (+modw to-hex)]
             [org.azjure.libbyte :refer :all]))
 
+(def ^{:doc "Used to store keystreams data by key"} rabbit-key-streams
+  (atom {}))
+
+;;     {:key    {:ms [] :ss [] :upper val :ks []}
+;;      :keyiv0 {:ms [] :ss [] :upper val :ks []}
+;;      :keyiv1 {:ms [] :ss [] :upper val :ks []}}
+;;
+;; Note that all the ms vectors would be the same in this case as the master
+;; state for key serves as the master state for any following key/iv pair
+;; that uses the same key.
+
 (def ^{:doc "The maximum keystream length in bytes"} max-stream-length-bytes
   (expt 2 70))
 
@@ -131,22 +142,28 @@ a 64-bit result."} square
      (bit-xor (ls2b (nth x idx0)) (ms2b (nth x idx1)))
      (bit-shift-left (bit-xor (ms2b (nth x idx2)) (ls2b (nth x idx3))) 16))))
 
-(defn- rabbit-round [[xi ci bi oi :as state] r]
-  (let [_ (println "Xi: " xi)
-        _ (println "Ci: " ci)
-        _ (println "Bi: " bi)
-        _ (println "Oi: " oi)
-        [xn cn bn] (roundfn [xi ci bi] 0)
+(defn- rabbit-round [{:keys [ss out] :as initmap} r]
+  (let [[xn cn bn] (roundfn ss 0)
         exfn (word<-x xn)]
-    [xn cn bn
-     (into oi
-           [(exfn [6 3 6 1])
-            (exfn [4 1 4 7])
-            (exfn [2 7 2 5])
-            (exfn [0 5 0 3])])]))
-    
+    (assoc initmap 
+      :ss [xn cn bn]
+      :out (->> [(exfn [6 3 6 1])
+                 (exfn [4 1 4 7])
+                 (exfn [2 7 2 5])
+                 (exfn [0 5 0 3])]
+                (into out)))))
+
 (defn print-state [state]
   (println "State: " ((juxt #(mapv to-hex (first %)) #(mapv to-hex (second %)) #(to-hex (last %) 1)) state)))
+
+(defn- ^{:doc "Generate a keyword from the 
+given vector of bytes."} bytes->keyword
+  [bytes]
+  (-> (->> (partition 4 bytes)
+           (mapv (comp to-hex bytes-word))
+           (reduce str))
+      (clojure.string/replace #"0x" "")
+      (keyword)))
 
 ;; ### Rabbit
 ;; Extend the StreamCipher and Cipher protocol thorough the Rabbit record type
@@ -158,14 +175,11 @@ a 64-bit result."} square
                  (state-xor))
           ss (if (nil? iv) ms
                  (reduce roundfn 
-                         (mod-counters ms iv) (range 4)))] 
+                         (mod-counters ms iv) (range 4)))]
       {:ms ms :ss ss}))
   (keysizes-bytes [_] [16])
   StreamCipher
-  (generate-keystream [_ {:keys [ss]} [lower upper :as range]]
-    (let [ns (conj ss [])
-          _ (println ns)]
-      (reduce rabbit-round ns [0 1 2])))
-;    (rabbit-round (rabbit-round (conj ss []) 0) 1))
+  (generate-keystream [_ {:keys [ss] :as initmap} [lower upper :as bounds]]
+    (reduce rabbit-round (conj {:out []} initmap) (range 3)))
   (keystream-size-bytes [_] max-stream-length-bytes)
   (iv-size-bytes [_] 8))

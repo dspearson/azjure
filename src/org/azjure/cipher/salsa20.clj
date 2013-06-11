@@ -118,8 +118,8 @@ at noncekw."} resetks!
 (defn- ^{:doc "Generate a keyword from the nonce."} gen-keyword
   [nonce]
   (-> (->> (partition 4 nonce)
-       (mapv (comp to-hex bytes-word))
-       (reduce str))
+           (mapv (comp to-hex bytes-word))
+           (reduce str))
       (clojure.string/replace #"0x" "")
       (keyword)))
 
