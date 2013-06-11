@@ -153,9 +153,6 @@ a 64-bit result."} square
                  (exfn [0 5 0 3])]
                 (into out)))))
 
-(defn print-state [state]
-  (println "State: " ((juxt #(mapv to-hex (first %)) #(mapv to-hex (second %)) #(to-hex (last %) 1)) state)))
-
 (defn- ^{:doc "Generate a keyword from the 
 given vector of bytes."} bytes->keyword
   [bytes]
@@ -165,21 +162,57 @@ given vector of bytes."} bytes->keyword
       (clojure.string/replace #"0x" "")
       (keyword)))
 
+(defn- master-state [baseuid uid key]
+  (if (contains? @rabbit-key-streams baseuid)
+    (:ms (baseuid @rabbit-key-streams))
+    (if (contains? @rabbit-key-streams uid)
+      (:ms (uid @rabbit-key-streams))
+      (-> roundfn
+          (reduce (expand-key key) (range 4))
+          (state-xor)))))
+
+(defn- starting-state [uid ms iv]
+  (if (nil? iv)
+    ms
+    (reduce roundfn (mod-counters ms iv) (range 4))))
+
+(defn- resetstate! [key iv resetkw]
+  (let [basekw (bytes->keyword key)
+        ms (master-state basekw resetkw key)]
+    (if-not (contains? @rabbit-key-streams basekw)
+      (swap! rabbit-key-streams assoc basekw 
+             {:ms ms :ss (starting-state basekw ms nil)}))
+    (swap! rabbit-key-streams assoc resetkw
+           {:ms ms :ss (starting-state resetkw ms iv)})))
+
+(defn- swapks! [keykw [lower upper :as bounds]]
+  (let [rounds (inc (quot upper 16))
+        rounds (if (zero? (rem upper 16)) rounds (inc rounds))
+        statemap (keykw @rabbit-key-streams)
+        out (reduce rabbit-round (conj {:out []} statemap) (range rounds))]
+    (swap! rabbit-key-streams assoc keykw
+           (assoc (keykw @rabbit-key-streams) 
+             :ss (:ss out) 
+             :upper upper 
+             :ks (reduce into (mapv word-bytes (:out out)))))))
+
 ;; ### Rabbit
 ;; Extend the StreamCipher and Cipher protocol thorough the Rabbit record type
 (defrecord Rabbit []
   Cipher
-  (initialize [_ {:keys [key iv upper] :or [upper 1024] :as initmap}]
-    (let [ms (-> roundfn
-                 (reduce (expand-key key) (range 4))
-                 (state-xor))
-          ss (if (nil? iv) ms
-                 (reduce roundfn 
-                         (mod-counters ms iv) (range 4)))]
-      {:ms ms :ss ss}))
+  (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
+    (let [kivb (if (nil? iv) key (into key iv))
+          keykw (bytes->keyword kivb)]
+      (do
+        (resetstate! key iv keykw)
+        (swapks! keykw [0 upper]))
+      (assoc initmap :upper upper :keykw keykw)))
   (keysizes-bytes [_] [16])
   StreamCipher
-  (generate-keystream [_ {:keys [ss] :as initmap} [lower upper :as bounds]]
-    (reduce rabbit-round (conj {:out []} initmap) (range 3)))
+  (generate-keystream [_ {:keys [key iv keykw]} [lower upper :as bounds]]
+    (when (>= (dec upper) (:upper (keykw @rabbit-key-streams)))
+      (resetstate! key iv keykw)
+      (swapks! keykw [0 upper]))
+    (subvec (:ks (keykw @rabbit-key-streams)) lower upper))
   (keystream-size-bytes [_] max-stream-length-bytes)
   (iv-size-bytes [_] 8))
