@@ -30,45 +30,19 @@
 
 ;; ### Modulus math
 
-(defn- ^{:doc "x + y mod z"} +modz [z]
-  (fn [x y] (-> (+ x y)
-                (mod z))))
+(defn ^{:doc "x op y mod z"} modz [op z]
+  (fn this
+    ([] 0)
+    ([x] x)
+    ([x y] (-> (op x y)
+               (mod z)))
+    ([x y & more]
+       (apply this (this x y) more))))
 
-(defn- ^{:doc "x - y mod z"} -modz [z]
-  (fn [x y] (-> (- x y)
-                (mod z))))
-
-(defn ^{:doc "x + y mod 8"} +mod8
-  ([] 0)
-  ([x] x)
-  ([x y] ((+modz 8) x y))
-  ([x y & more]
-     (reduce +mod8 (+mod8 x y) more)))
-
-(defn ^{:doc "x + y mod 32"} +mod32
-  ([] 0)
-  ([x] x)
-  ([x y] ((+modz 32) x y))
-  ([x y & more]
-     (reduce +mod32 (+mod32 x y) more)))
-
-(defn ^{:doc "x + y mod mod 2^32"} +modw
-  ([] 0)
-  ([x] x)
-  ([x y] ((+modz 0x100000000) x y))
-  ([x y & more]
-     (reduce +modw (+modw x y) more)))
-
-(defn ^{:doc "x - y mod 512"} -mod512
-  ([] 0)
-  ([x] x)
-  ([x y] ((-modz 512) x y))
-  ([x y & more]
-     (reduce -mod512 (-mod512 x y) more)))
-
-(defn ^{:doc "x - y mod 2^32"} -modw
-  ([] 0)
-  ([x] x)
-  ([x y] ((-modz 0x100000000) x y))
-  ([x y & more]
-     (reduce -modw (-modw x y) more)))
+(def ^{:doc "x + y mod 8"}    +mod8    (modz + 8))
+(def ^{:doc "x + y mod 32"}   +mod32   (modz + 32))
+(def ^{:doc "x + y mod 2^32"} +modw    (modz + 0x100000000))
+(def ^{:doc "x - y mod 2^64"} +moddw   (modz + 0x10000000000000000))
+(def ^{:doc "x - y mod 512"}  -mod512  (modz - 512))
+(def ^{:doc "x - y mod 2^32"} -modw    (modz - 0x100000000))
+(def ^{:doc "x - y mod 2^64"} -moddw   (modz - 0x10000000000000000))

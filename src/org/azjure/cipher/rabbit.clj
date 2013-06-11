@@ -263,7 +263,7 @@ a newly generated one."}
       (do
         (resetstatemap! key iv uid)
         (swapstatemapks! uid [0 upper]))
-      (assoc initmap :upper upper :uid uid)))
+      (assoc initmap :uid uid)))
   (keysizes-bytes [_] [16])
   StreamCipher
   ;; If upper is larger than the current upper bound of the keystream in the
