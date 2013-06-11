@@ -1,5 +1,4 @@
 ;; # Salsa20 Stream Cipher Tests
-
 (ns ^{:author "Jason Ozias"
       :doc "Test suite for the Salsa20 stream cipher"}
   org.azjure.cipher.testsalsa20

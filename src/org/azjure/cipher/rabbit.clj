@@ -222,8 +222,10 @@ state map exists at :baseuid one will be generated for efficiencies
 with new IVs for the same key.  Then reset the statemap at :uid."} 
   resetstatemap! 
   ([key iv uid]
-     {:pre [(vector? key)(vector? iv)(keyword? uid)
-            (= 16 (count key))(= 8 (count iv))]}
+     {:pre [(vector? key)(keyword? uid)
+            (or (nil? iv)(vector? iv))
+            (= 16 (count key))
+            (or (nil? iv)(= 8 (count iv)))]}
   (let [baseuid (bytes->keyword key)
         ms (master-state baseuid uid key)]
     (if-not (contains? @state-maps baseuid)
@@ -235,7 +237,7 @@ with new IVs for the same key.  Then reset the statemap at :uid."}
 (defn- ^{:doc "Swap any existing keystream in the state map at :uid with
 a newly generated one."} 
   swapstatemapks!
-  ([uid [lower upper :as bounds]]
+  ([uid [lower upper]]
      {:pre [(< upper max-stream-length-bytes)]}
   (let [rounds (inc (quot upper 16)) ; Each round generates 16-bytes (128-bits)
         rounds (if (zero? (rem upper 16)) rounds (inc rounds))
@@ -268,7 +270,7 @@ a newly generated one."}
   ;; state map at the given uid, then new keystream is generated and stored.
   ;; The result is always a subvector of the keystream stored with the state map
   ;; at :uid.
-  (generate-keystream [_ {:keys [key iv uid]} [lower upper :as bounds]]
+  (generate-keystream [_ {:keys [key iv uid lower upper]} _]
     (when (>= (dec upper) (:upper (uid @state-maps)))
       (resetstatemap! key iv uid)
       (swapstatemapks! uid [0 upper]))

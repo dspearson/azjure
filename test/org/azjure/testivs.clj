@@ -4,6 +4,7 @@
 ;; <em>WARNING!!</em><br/>
 ;; Do not use these initialization vectors to encrypt 
 ;; anything you wish to keep secret.
+;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
 (ns ^{:author "Jason Ozias"}
   org.azjure.testivs)
 
@@ -11,6 +12,16 @@
 
 (def ^{:doc "64-bits of zeros as a vector of bytes."} zeros-64-iv
   (vec (take 8 (cycle [0]))))
+
+(def ^{:doc "Rabbit 64-bit IV as a vector of bytes as
+defined at [Rabbit Spec][RABBIT]"}
+  rabbit-64-iv-0
+  [0xC3 0x73 0xF5 0x75 0xC1 0x26 0x7E 0x59])
+
+(def ^{:doc "Rabbit 64-bit IV as a vector of bytes as
+defined at [Rabbit Spec][RABBIT]"}
+  rabbit-64-iv-1
+  [0xA6 0xEB 0x56 0x1A 0xD2 0xF4 0x17 0x27])
 
 ;; ### 128-bit Initialization Vectors
 

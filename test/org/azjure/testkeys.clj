@@ -9,6 +9,7 @@
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 ;; [S20] http://cr.yp.to/snuffle/spec.pdf
 ;; [HC128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
+;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
 (ns ^{:author "Jason Ozias"
       :doc "Test keys vectors"}
   org.azjure.testkeys)
@@ -53,6 +54,18 @@ defined at [HC-128 Spec][HC128]"} hc-128-key zeros-128-key)
 defined at [HC-128 Spec][HC128]"} hc-128-key-1
   [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
+
+(def ^{:doc "Rabbit 128-bit key as a vector of bytes as
+defined at [Rabbit Spec][RABBIT]"}
+  rabbit-128-key-0
+  [0x91 0x28 0x13 0x29 0x2E 0x3D 0x36 0xFE
+   0x3B 0xFC 0x62 0xF1 0xDC 0x51 0xC3 0xAC])
+
+(def ^{:doc "Rabbit 128-bit key as a vector of bytes as
+defined at [Rabbit Spec][RABBIT]"}
+  rabbit-128-key-1
+  [0x83 0x95 0x74 0x15 0x87 0xE0 0xC7 0x33
+   0xE9 0xE9 0xAB 0x01 0xC0 0x9B 0x00 0x43])
 
 (def ^{:doc "Twofish 128-bit key as a vector of bytes as
 defined at [Twofish paper][TF]"} tf-128-key zeros-128-key)

@@ -3039,7 +3039,15 @@ anything you wish to keep secret.</p>
   org.azjure.testivs)</pre></td></tr><tr><td class="docs"><h3>64-bit Initialization Vectors</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>64-bits of zeros as a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  zeros-64-iv
-  (vec (take 8 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
+  (vec (take 8 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>Rabbit 64-bit IV as a vector of bytes as
+defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  rabbit-64-iv-0
+  [0xC3 0x73 0xF5 0x75 0xC1 0x26 0x7E 0x59])</pre></td></tr><tr><td class="docs"><p>Rabbit 64-bit IV as a vector of bytes as
+defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  rabbit-64-iv-1
+  [0xA6 0xEB 0x56 0x1A 0xD2 0xF4 0x17 0x27])</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  zeros-128-iv
   (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit IV as a vector of bytes as

@@ -3067,7 +3067,17 @@ defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">H
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  hc-128-key-1
   [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Rabbit 128-bit key as a vector of bytes as
+defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  rabbit-128-key-0
+  [0x91 0x28 0x13 0x29 0x2E 0x3D 0x36 0xFE
+   0x3B 0xFC 0x62 0xF1 0xDC 0x51 0xC3 0xAC])</pre></td></tr><tr><td class="docs"><p>Rabbit 128-bit key as a vector of bytes as
+defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  rabbit-128-key-1
+  [0x83 0x95 0x74 0x15 0x87 0xE0 0xC7 0x33
+   0xE9 0xE9 0xAB 0x01 0xC0 0x9B 0x00 0x43])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>Used in many tests</p>
 </td><td class="codes"><pre class="brush: clojure">(def  key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>

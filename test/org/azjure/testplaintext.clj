@@ -36,6 +36,11 @@ as defined in [RFC2612][R2612_10]"} c6-pt zeros)
 (def ^{:doc "A sample plaintext block as a vector of 16 bytes
 as defined in [Twofish paper][TF]"} tf-pt zeros)
 
+;; ### 384-bit Plaintext Blocks
+
+(def ^{:doc "A 48-byte vector of zeros."} zeros-48
+  (vec (take 48 (cycle [0]))))
+
 ;; ### 512-bit Plaintext Blocks
 
 (def ^{:doc "A 64-byte vector of zeros."} zeros-64
