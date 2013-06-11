@@ -60,8 +60,9 @@ See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/or
 5. Twofish (TF) - [Twofish Spec](http://www.schneier.com/paper-twofish-paper.pdf)
 
 ### Stream
-1. Salsa20 (S20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
+1. Salsa20 (Salsa20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
 2. HC-128 (HC128) - [HC-128 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
+3. Rabbit (Rabbit) - [Rabbit Spec](http://tools.ietf.org/rfc/rfc4503.txt)
 
 ## Supported Modes
 Cipher modes describe the method for encrypting multiple blocks with block ciphers.
@@ -93,4 +94,3 @@ See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descr
 
 ## In Progress
 * Camellia
-* Review stream modes for block ciphers. They can be better.
