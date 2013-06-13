@@ -23,6 +23,17 @@ defined at [Rabbit Spec][RABBIT]"}
   rabbit-64-iv-1
   [0xA6 0xEB 0x56 0x1A 0xD2 0xF4 0x17 0x27])
 
+;; ### 80-bit Initialization Vectors
+
+(def ^{:doc "80-bits of zeros as a vector of bytes."}
+  zeros-80-iv
+  (vec (take 10 (cycle [0]))))
+
+(def ^{:doc "80-bits of zeros as a vector of bytes."}
+  trivium-80-iv
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x80 0x00
+   0x00 0x00])
+
 ;; ### 128-bit Initialization Vectors
 
 (def ^{:doc "128-bits of zeros as a vector of bytes."} zeros-128-iv

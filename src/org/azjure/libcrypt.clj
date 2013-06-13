@@ -2,7 +2,8 @@
 ;; Library functions
 (ns ^{:author "Jason Ozias"}
   org.azjure.libcrypt
-  (:require [org.azjure.cipher.blockcipher :as bc]))
+  (:require [org.azjure.libbyte :refer (bytes-word)]
+            [org.azjure.cipher.blockcipher :as bc]))
 
 ;; ### to-hex
 ;; Print a value as hex prefixed by 0x.
@@ -11,6 +12,9 @@
 (defn to-hex 
   ([val len] (format (str "0x%0" len "X") val))
   ([val] (to-hex val 8)))
+
+(defn string->hexstrvec [string]
+  (mapv (partial apply str) (mapv #(into % '(\x \0)) (partition 2 string))))
 
 (defmacro maybe
   "Assuming that the body of code returns X, this macro returns [X nil] in the case of no error
@@ -46,3 +50,11 @@
 (def ^{:doc "x - y mod 512"}  -mod512  (modz - 512))
 (def ^{:doc "x - y mod 2^32"} -modw    (modz - 0x100000000))
 (def ^{:doc "x - y mod 2^64"} -moddw   (modz - 0x10000000000000000))
+
+(defn ^{:doc "Generate a keyword from the given vector of bytes."}
+  bytes->keyword [bytes]
+  (-> (->> (partition 4 bytes)
+           (mapv (comp to-hex bytes-word))
+           (reduce str))
+      (clojure.string/replace #"0x" "")
+      (keyword)))

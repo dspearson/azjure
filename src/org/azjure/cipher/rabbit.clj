@@ -6,7 +6,7 @@
   (:require [clojure.math.numeric-tower :refer (expt)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer (+mod8 +modw to-hex)]
+            [org.azjure.libcrypt :refer (bytes->keyword +mod8 +modw to-hex)]
             [org.azjure.libbyte :refer :all]))
 
 (def ^{:doc "Used to store keystreams data by key"}
@@ -185,15 +185,6 @@ the 128-bits (as four 32-bit words) of generated keystream into :out."}
                  (exfn [2 7 2 5])
                  (exfn [0 5 0 3])]
                 (into out)))))
-
-(defn- ^{:doc "Generate a keyword from the given vector of bytes."}
-;; TODO: Move this to library as all stream ciphers use it.
-  bytes->keyword [bytes]
-  (-> (->> (partition 4 bytes)
-           (mapv (comp to-hex bytes-word))
-           (reduce str))
-      (clojure.string/replace #"0x" "")
-      (keyword)))
 
 (defn- ^{:doc "Evaluates to the master state.  The master state is
 based soley on the key, so only needs to be calculated for new key

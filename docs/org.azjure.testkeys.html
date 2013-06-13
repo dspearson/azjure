@@ -3042,11 +3042,19 @@ anything you wish to keep secret.</p>
 as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  c5-40-key
   [0x01 0x23 0x45 0x67 0x12])</pre></td></tr><tr><td class="docs"><h3>80-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
+</td><td class="codes"></td></tr><tr><td class="docs"><p>80-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  zeros-80-key
+  (vec (take 10 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
 as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  c5-80-key
   [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45])</pre></td></tr><tr><td class="docs"><h3>128-bit Keys</h3>
+   0x23 0x45])</pre></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
+as defined at <a href="http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&amp;view=markup">Trivium Test Vectors</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  trivium-80-key-0
+  [0x80 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00])</pre></td></tr><tr><td class="docs"><h3>128-bit Keys</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  zeros-128-key
   (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>AES 128-bit key as a vector of bytes as

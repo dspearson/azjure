@@ -10,6 +10,7 @@
 ;; [S20] http://cr.yp.to/snuffle/spec.pdf
 ;; [HC128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
 ;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
+;; [TRI]: http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&view=markup
 (ns ^{:author "Jason Ozias"
       :doc "Test keys vectors"}
   org.azjure.testkeys)
@@ -22,10 +23,20 @@ as defined at [RFC 2144][R2144]"} c5-40-key
 
 ;; ### 80-bit Keys
 
+(def ^{:doc "80-bits of zeros as a vector of bytes."}
+  zeros-80-key
+  (vec (take 10 (cycle [0]))))
+
 (def ^{:doc "A sample 80-bit key as a vector of bytes
 as defined at [RFC 2144][R2144]"} c5-80-key
   [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
    0x23 0x45])
+
+(def ^{:doc "A sample 80-bit key as a vector of bytes
+as defined at [Trivium Test Vectors][TRI]"}
+  trivium-80-key-0
+  [0x80 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00])
 
 ;; ### 128-bit Keys
 

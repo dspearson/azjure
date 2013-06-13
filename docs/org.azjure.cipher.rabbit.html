@@ -3035,7 +3035,7 @@ net.brehaut.ClojureTools = (function (SH) {
   (:require [clojure.math.numeric-tower :refer (expt)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer (+mod8 +modw to-hex)]
+            [org.azjure.libcrypt :refer (bytes-&gt;keyword +mod8 +modw to-hex)]
             [org.azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Used to store keystreams data by key</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   state-maps (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:key    {:ms [] :ss [] :upper val :ks []}
@@ -3186,15 +3186,7 @@ the 128-bits (as four 32-bit words) of generated keystream into :out.</p>
                  (exfn [4 1 4 7])
                  (exfn [2 7 2 5])
                  (exfn [0 5 0 3])]
-                (into out)))))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-;; TODO: Move this to library as all stream ciphers use it.
-  bytes-&gt;keyword [bytes]
-  (-&gt; (-&gt;&gt; (partition 4 bytes)
-           (mapv (comp to-hex bytes-word))
-           (reduce str))
-      (clojure.string/replace #&quot;0x&quot; &quot;&quot;)
-      (keyword)))</pre></td></tr><tr><td class="docs"><p>Evaluates to the master state.  The master state is
+                (into out)))))</pre></td></tr><tr><td class="docs"><p>Evaluates to the master state.  The master state is
 based soley on the key, so only needs to be calculated for new key
 values.  If a master state is found at the baseuid, that is used.
 If a master state is found at the current uid is found, that is used.
@@ -3259,7 +3251,7 @@ a newly generated one.</p>
       (do
         (resetstatemap! key iv uid)
         (swapstatemapks! uid [0 upper]))
-      (assoc initmap :upper upper :uid uid)))
+      (assoc initmap :uid uid)))
   (keysizes-bytes [_] [16])
   StreamCipher
   ;; If upper is larger than the current upper bound of the keystream in the
