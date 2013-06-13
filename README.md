@@ -63,6 +63,7 @@ See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/or
 1. Salsa20 (Salsa20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
 2. HC-128 (HC128) - [HC-128 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
 3. Rabbit (Rabbit) - [Rabbit Spec](http://tools.ietf.org/rfc/rfc4503.txt)
+4. Trivium (Trivium) - [Trivium Spec](http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf)
 
 ## Supported Modes
 Cipher modes describe the method for encrypting multiple blocks with block ciphers.
