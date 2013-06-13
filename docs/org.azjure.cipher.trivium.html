@@ -3028,66 +3028,122 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.libcrypt" name="org.azjure.libcrypt"><h1 class="project-name">org.azjure.libcrypt</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>libcrypt</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.trivium" name="org.azjure.cipher.trivium"><h1 class="project-name">org.azjure.cipher.trivium</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Trivium</h2>
 
-<p>Library functions</p>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  org.azjure.libcrypt
-  (:require [org.azjure.libbyte :refer (bytes-word)]
-            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>to-hex</h3>
+<p>Designed to meet the <a href="http://www.ecrypt.eu.org/stream/ciphers/trivium/trivium.pdf">Trivium Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.trivium
+  (:require [clojure.math.numeric-tower :refer (expt)]
+            (org.azjure.cipher [cipher :refer (Cipher)]
+                               [streamcipher :refer [StreamCipher]])
+            [org.azjure.libcrypt :refer (bytes-&gt;keyword to-hex)]
+            [org.azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Trivium key streams.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  trivium-key-streams (atom {}))</pre></td></tr><tr><td class="docs"><p>The maximum keystream length in bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  max-stream-length-bytes (expt 2 61))</pre></td></tr><tr><td class="docs"><p>Generate a vector of x ones.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  x-ones [x]
+  (vec (take x (cycle [1]))))</pre></td></tr><tr><td class="docs"><p>Generate a vector of x zeros.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  x-zeros [x]
+  (vec (take x (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>Initialize the trivium state with the key and IV.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  initialize-state [key iv]
+  (let [lower (into (reduce into (mapv byte-&gt;bits (reverse key))) (x-zeros 13))
+        mid (into (reduce into (mapv byte-&gt;bits (reverse iv))) (x-zeros 4))
+        upper (into (x-zeros 108) (x-ones 3))]
+    [lower mid upper]))</pre></td></tr><tr><td class="docs"><p>Calculate a t-value given indices into the state vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  calc-tx [[idx0 idx1 idx2 idx3 idx4] state]
+  (bit-xor (nth state idx0)
+           (bit-and (nth state idx1) (nth state idx2))
+           (nth state idx3)
+           (nth state idx4)))</pre></td></tr><tr><td class="docs"><p>Rotate a state vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  rotate [bit bitseq]
+  (vec (conj (drop-last bitseq) bit)))</pre></td></tr><tr><td class="docs"><p>Rotate all 3 state vectors.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  rotate-all [t1 t2 t3 state]
+  [(rotate t3 (first state))
+   (rotate t1 (second state))
+   (rotate t2 (last state))])</pre></td></tr><tr><td class="docs"><p>A Trivium starting state calculation round.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  starting-state-round [state round]
+  (let [asone (reduce into state)
+        t1 (calc-tx [65  90  91  92  170] asone)
+        t2 (calc-tx [161 174 175 176 263] asone)
+        t3 (calc-tx [242 285 286 287 68 ] asone)]
+    (rotate-all t1 t2 t3 state)))</pre></td></tr><tr><td class="docs"><p>Generate the Trivium starting state, given
+the initial state.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  starting-state [state]
+  (reduce starting-state-round state (range 1152)))</pre></td></tr><tr><td class="docs"><p>Calculate a new t-value from the state during encryption.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  calc-new-t [t [idx0 idx1 idx2] state]
+  (bit-xor t
+           (bit-and (nth state idx0)(nth state idx1))
+           (nth state idx2)))</pre></td></tr><tr><td class="docs"><p>A key stream generation round.  Generates 1-bit of key stream.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  key-stream-round [[state out] round]
+  (let [asone (reduce into state)
+        t1 (bit-xor (nth asone 65)(nth asone 92))
+        t2 (bit-xor (nth asone 161)(nth asone 176))
+        t3 (bit-xor (nth asone 242)(nth asone 287))
+        outbit (bit-xor t1 t2 t3)
+        nt1 (calc-new-t t1 [90  91  170] asone) 
+        nt2 (calc-new-t t2 [174 175 263] asone)
+        nt3 (calc-new-t t3 [285 286  68] asone)]
+    [(rotate-all nt1 nt2 nt3 state)
+     (conj out outbit)]))</pre></td></tr><tr><td class="docs"><p>Generate x bits of key stream.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  key-stream [x state]
+  (reduce key-stream-round [state []] (range x)))</pre></td></tr><tr><td class="docs"><p>Reset the state at uid in the keystreams atom.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  resetks!
+  ([uid]
+     {:pre [(keyword? uid)]}
+     (swap! trivium-key-streams assoc uid {})))</pre></td></tr><tr><td class="docs"><p>Swap any existing keystream in the keystream atom at :uid
+with a newly generated one.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  swapks!
+  ([key iv uid [lower upper]]
+     {:pre [(vector? key)(vector? iv)(keyword? uid)
+            (= 10 (count key))(= 10 (count iv))
+            (&lt; upper max-stream-length-bytes)]}
+     (let [rounds (* 8 upper) ; Each round generates 1-bit.
+           out (-&gt;&gt; (initialize-state key iv)
+                    (starting-state)
+                    (key-stream rounds)
+                    (last)
+                    (partition 8)
+                    (mapv bits-&gt;byte))]
+       (swap! trivium-key-streams assoc uid {:ks out :upper upper}))))</pre></td></tr><tr><td class="docs"><h3>Trivium</h3>
 
-<p>Print a value as hex prefixed by 0x.</p>
-
-<p>Useful for testing</p>
-</td><td class="codes"><pre class="brush: clojure">(defn to-hex 
-  ([val len] (format (str &quot;0x%0&quot; len &quot;X&quot;) val))
-  ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn string-&gt;hexstrvec [string]
-  (mapv (partial apply str) (mapv #(into % '(\x \0)) (partition 2 string))))</pre></td></tr><tr><td class="docs"><p>Assuming that the body of code returns X, this macro returns [X nil] in the case of no error
-  and [nil E] in event of an exception object E.</p>
-</td><td class="codes"><pre class="brush: clojure">(defmacro maybe
-  [&amp; body]
-  `(try [(do ~@body) nil]
-     (catch Error e#
-       [nil e#])))</pre></td></tr><tr><td class="docs"><h3>bytes-per-block</h3>
-</td><td class="codes"><pre class="brush: clojure">(defn- bytes-per-block [cipher]
-  (/ (bc/blocksize cipher) 8))</pre></td></tr><tr><td class="docs"><h3>mbpb</h3>
-
-<p>Memoization of bytes-per-block</p>
-</td><td class="codes"><pre class="brush: clojure">(def mbpb (memoize bytes-per-block))</pre></td></tr><tr><td class="docs"><h3>Modulus math</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>x op y mod z</p>
-</td><td class="codes"><pre class="brush: clojure">(defn  modz [op z]
-  (fn this
-    ([] 0)
-    ([x] x)
-    ([x y] (-&gt; (op x y)
-               (mod z)))
-    ([x y &amp; more]
-       (apply this (this x y) more))))</pre></td></tr><tr><td class="docs"><p>x + y mod 8</p>
-
-<p>x + y mod 32</p>
-
-<p>x + y mod 2^32</p>
-
-<p>x - y mod 2^64</p>
-
-<p>x - y mod 512</p>
-
-<p>x - y mod 2^32</p>
-
-<p>x - y mod 2^64</p>
-</td><td class="codes"><pre class="brush: clojure">(def     +mod8    (modz + 8))
-(def    +mod32   (modz + 32))
-(def  +modw    (modz + 0x100000000))
-(def  +moddw   (modz + 0x10000000000000000))
-(def   -mod512  (modz - 512))
-(def  -modw    (modz - 0x100000000))
-(def  -moddw   (modz - 0x10000000000000000))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn 
-  bytes-&gt;keyword [bytes]
-  (-&gt; (-&gt;&gt; (partition 4 bytes)
-           (mapv (comp to-hex bytes-word))
-           (reduce str))
-      (clojure.string/replace #&quot;0x&quot; &quot;&quot;)
-      (keyword)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>Extend the StreamCipher and Cipher protocol thorough the Trivium record type.</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord Trivium []
+  Cipher
+  ;; Initialize will, by default, generate 1024 bytes (8192 bits) of keystream.  
+  ;; This can be increased or decreased by supplying :upper X in the initmap 
+  ;; along with :key and :iv. Evaluates to a map 
+  ;; {:key key :iv iv :upper upper :uid uid} to be used with generate-keystream.
+  (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
+    (let [uid (bytes-&gt;keyword (into key iv))]
+      (do
+        (resetks! uid)
+        (swapks! key iv uid [0 upper]))
+      (assoc initmap :uid uid)))
+  (keysizes-bytes [_] [10])
+  StreamCipher
+  ;; If upper is larger than the current upper bound of the keystream in the
+  ;; state map at the given uid, then new keystream is generated and stored.
+  ;; The result is always a subvector of the keystream stored with the state map
+  ;; at :uid.
+  (generate-keystream [_ {:keys [key iv uid lower upper]} _]
+    (when (&gt;= (dec upper) (:upper (uid @trivium-key-streams)))
+      (resetks! uid)
+      (swapks! key iv uid [0 upper]))
+    (subvec (:ks (uid @trivium-key-streams)) lower upper))
+  (keystream-size-bytes [_] max-stream-length-bytes)
+  (iv-size-bytes [_] 10))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

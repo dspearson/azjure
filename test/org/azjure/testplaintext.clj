@@ -46,6 +46,12 @@ as defined in [Twofish paper][TF]"} tf-pt zeros)
 (def ^{:doc "A 64-byte vector of zeros."} zeros-64
   (vec (take 64 (cycle [0]))))
 
+;; ### 8192-bit Plaintext Blocks
+
+(def ^{:doc "A 512-byte vector of zeros."}
+  zeros-512
+  (vec (take 512 (cycle [0]))))
+
 ;; ### Other Plaintext Blocks
 
 (def ^{:doc " A sample plaintext message.  In this case it is my name as 11 UTF-8

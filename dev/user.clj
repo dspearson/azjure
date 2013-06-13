@@ -16,7 +16,8 @@
                                [salsa20 :refer (->Salsa20)]
                                [twofish :refer (->Twofish)]
                                [hc128 :refer (->HC128)]
-                               [rabbit :refer (->Rabbit)])
+                               [rabbit :refer (->Rabbit)]
+                               [trivium :refer (->Trivium)])
             [org.azjure.cryptsuite :refer :all]))
 
 (defn run-all-tests-azjure []

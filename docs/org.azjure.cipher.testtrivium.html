@@ -3028,66 +3028,58 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.libcrypt" name="org.azjure.libcrypt"><h1 class="project-name">org.azjure.libcrypt</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>libcrypt</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.testtrivium" name="org.azjure.cipher.testtrivium"><h1 class="project-name">org.azjure.cipher.testtrivium</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Test suite for the Trivium stream cipher</p>
 
-<p>Library functions</p>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
-  org.azjure.libcrypt
-  (:require [org.azjure.libbyte :refer (bytes-word)]
-            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>to-hex</h3>
+<p> ## Trivium Stream Cipher Tests</p>
+</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
+      :doc }
+  org.azjure.cipher.testtrivium
+  (:require [clojure.test :refer :all]
+            (org.azjure [libtest :refer :all]
+                        [testivs :refer :all]
+                        [testkeys :refer :all]
+                        [testplaintext :refer :all]
+                        [testciphertext :refer :all])
+            (org.azjure.cipher [cipher :as cipher]
+                               [streamcipher :as sc]
+                               [trivium :refer (-&gt;Trivium)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Trivium record to be used in the tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  trivium (-&gt;Trivium))</pre></td></tr><tr><td class="docs"><h3>Trivium Initialization</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  initmap0
+  (cipher/initialize trivium {:key trivium-80-key-0 :iv zeros-80-iv}))</pre></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  initmap1
+  (cipher/initialize trivium {:key zeros-80-key :iv trivium-80-iv}))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
 
-<p>Print a value as hex prefixed by 0x.</p>
+<p>Each row is</p>
 
-<p>Useful for testing</p>
-</td><td class="codes"><pre class="brush: clojure">(defn to-hex 
-  ([val len] (format (str &quot;0x%0&quot; len &quot;X&quot;) val))
-  ([val] (to-hex val 8)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn string-&gt;hexstrvec [string]
-  (mapv (partial apply str) (mapv #(into % '(\x \0)) (partition 2 string))))</pre></td></tr><tr><td class="docs"><p>Assuming that the body of code returns X, this macro returns [X nil] in the case of no error
-  and [nil E] in event of an exception object E.</p>
-</td><td class="codes"><pre class="brush: clojure">(defmacro maybe
-  [&amp; body]
-  `(try [(do ~@body) nil]
-     (catch Error e#
-       [nil e#])))</pre></td></tr><tr><td class="docs"><h3>bytes-per-block</h3>
-</td><td class="codes"><pre class="brush: clojure">(defn- bytes-per-block [cipher]
-  (/ (bc/blocksize cipher) 8))</pre></td></tr><tr><td class="docs"><h3>mbpb</h3>
-
-<p>Memoization of bytes-per-block</p>
-</td><td class="codes"><pre class="brush: clojure">(def mbpb (memoize bytes-per-block))</pre></td></tr><tr><td class="docs"><h3>Modulus math</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>x op y mod z</p>
-</td><td class="codes"><pre class="brush: clojure">(defn  modz [op z]
-  (fn this
-    ([] 0)
-    ([x] x)
-    ([x y] (-&gt; (op x y)
-               (mod z)))
-    ([x y &amp; more]
-       (apply this (this x y) more))))</pre></td></tr><tr><td class="docs"><p>x + y mod 8</p>
-
-<p>x + y mod 32</p>
-
-<p>x + y mod 2^32</p>
-
-<p>x - y mod 2^64</p>
-
-<p>x - y mod 512</p>
-
-<p>x - y mod 2^32</p>
-
-<p>x - y mod 2^64</p>
-</td><td class="codes"><pre class="brush: clojure">(def     +mod8    (modz + 8))
-(def    +mod32   (modz + 32))
-(def  +modw    (modz + 0x100000000))
-(def  +moddw   (modz + 0x10000000000000000))
-(def   -mod512  (modz - 512))
-(def  -modw    (modz - 0x100000000))
-(def  -moddw   (modz - 0x10000000000000000))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
+<pre><code>[cipher initmap plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from Trivium spec</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  triviumspec-test-vectors
+  [[trivium (assoc initmap0 :lower 0   :upper 64 ) zeros-64 trivium-80-ct-0]
+   [trivium (assoc initmap0 :lower 192 :upper 256) zeros-64 trivium-80-ct-1]
+   [trivium (assoc initmap0 :lower 256 :upper 320) zeros-64 trivium-80-ct-2]
+   [trivium (assoc initmap0 :lower 448 :upper 512) zeros-64 trivium-80-ct-3]
+   [trivium (assoc initmap1 :lower 0   :upper 64 ) zeros-64 trivium-80-ct-4]
+   [trivium (assoc initmap1 :lower 192 :upper 256) zeros-64 trivium-80-ct-5]
+   [trivium (assoc initmap1 :lower 256 :upper 320) zeros-64 trivium-80-ct-6]
+   [trivium (assoc initmap1 :lower 448 :upper 512) zeros-64 trivium-80-ct-7]])</pre></td></tr><tr><td class="docs"><h3>Trivium Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test Trivium stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest 
+  testStream
+  (testing &quot;Stream&quot;
+    (is (= true (every? true? (map stream-encryptor triviumspec-test-vectors))))
+    (is (= true (every? true? (map stream-decryptor triviumspec-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test Trivium</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest 
+  testTrivium
+  (testing &quot;Trivium&quot;
+    (testStream)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
 </td><td class="codes"><pre class="brush: clojure">(defn 
-  bytes-&gt;keyword [bytes]
-  (-&gt; (-&gt;&gt; (partition 4 bytes)
-           (mapv (comp to-hex bytes-word))
-           (reduce str))
-      (clojure.string/replace #&quot;0x&quot; &quot;&quot;)
-      (keyword)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  test-ns-hook []
+  (testTrivium))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

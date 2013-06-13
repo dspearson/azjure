@@ -3056,7 +3056,11 @@ as defined in <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish 
   (vec (take 48 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>512-bit Plaintext Blocks</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>A 64-byte vector of zeros.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  zeros-64
-  (vec (take 64 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>Other Plaintext Blocks</h3>
+  (vec (take 64 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>8192-bit Plaintext Blocks</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>A 512-byte vector of zeros.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  zeros-512
+  (vec (take 512 (cycle [0]))))</pre></td></tr><tr><td class="docs"><h3>Other Plaintext Blocks</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p> A sample plaintext message.  In this case it is my name as 11 UTF-8
 bytes (0x4a61736f63204f7a696173) repeated 16 times to make 11 blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  pt-1 

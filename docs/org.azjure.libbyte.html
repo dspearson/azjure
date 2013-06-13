@@ -3033,7 +3033,21 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>Byte manipulation library</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   org.azjure.libbyte
-  (:require [clojure.math.numeric-tower :refer (expt)]))</pre></td></tr><tr><td class="docs"><h3>get-byte</h3>
+  (:require [clojure.math.numeric-tower :refer (expt)]))</pre></td></tr><tr><td class="docs"><p>Returns a lazy sequence of [index, item] pairs, where items come
+  from 's' and indexes count up from zero.</p>
+
+<p>  (indexed '(a b c d))  =>  ([0 a] [1 b] [2 c] [3 d])</p>
+</td><td class="codes"><pre class="brush: clojure">(defn indexed
+  [s]
+  (map vector (iterate inc 0) s))</pre></td></tr><tr><td class="docs"><p>Returns a lazy sequence containing the positions at which pred
+   is true for items in coll.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn positions
+  [pred coll]
+  (for [[idx elt] (indexed coll) :when (pred elt)] idx))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn byte-&gt;bits [byte]
+  (vec (reverse (mapv #(if % 1 0) (mapv (partial bit-test byte) (range 8))))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn bits-&gt;byte [bits]
+  (reduce bit-set 0 (positions #{1} bits)))</pre></td></tr><tr><td class="docs"><h3>get-byte</h3>
 
 <p>Get byte <em>num</em> out of the given word.  <em>num</em>
 should be 1-4.</p>
