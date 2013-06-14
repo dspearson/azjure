@@ -6,66 +6,66 @@
   (:require [clojure.math.numeric-tower :refer (expt)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [streamcipher :refer [StreamCipher]])
-            (org.azjure [libcrypt :refer (to-hex +modw -mod512)]
+            (org.azjure [libcrypt :refer :all]
                         [libbyte :refer :all])))
 
 (def ^{:doc "Used to store upper bounds and current keystreams
-for initialized key/iv pairs"} hc128-key-streams
-  (atom {}))
+for initialized key/iv pairs"} 
+  hc128-key-streams (atom {}))
 
 ;;     {:keyiv1 {:upper val :ks [keystream vector]}
 ;;      :keyiv2 {:upper val :ks [keystream vector]}
 
-(def ^{:doc "The maximum keystream length in bytes"} max-stream-length-bytes
-  (expt 2 61))
+(def ^{:doc "The maximum keystream length in bytes"}
+  max-stream-length-bytes (expt 2 61))
 
 ;; ### HC-128 Specification Functions
 
 (defn- ^{:doc "f1 function as defined in [HC-128 Spec][HC128].
-Takes a 32-bit word value and evaluates to a 32-bit word."} f1 
-  [word]
+Takes a 32-bit word value and evaluates to a 32-bit word."}
+  f1 [word]
   (bit-xor (>>> word 7) (>>> word 18) (bit-shift-right word 3)))
 
 (defn- ^{:doc "f2 function as defined in [HC-128 Spec][HC128].
-Takes a 32-bit word value and evaluates to a 32-bit word."} f2 
-  [word]
+Takes a 32-bit word value and evaluates to a 32-bit word."}
+  f2 [word]
   (bit-xor (>>> word 17) (>>> word 19) (bit-shift-right word 10)))
 
 (defn- ^{:doc "g1 function as defined in [HC-128 Spec][HC128].
-Takes three 32-bit word values and evaluates to a 32-bit word."} g1 
-  [w1 w2 w3]
+Takes three 32-bit word values and evaluates to a 32-bit word."}
+  g1 [w1 w2 w3]
   (+modw (bit-xor (>>> w1 10) (>>> w3 23)) (>>> w2 8)))
 
 (defn- ^{:doc "g2 function as defined in [HC-128 Spec][HC128].
-Takes three 32-bit word values and evaluates to a 32-bit word."} g2
-  [w1 w2 w3]
+Takes three 32-bit word values and evaluates to a 32-bit word."}
+  g2 [w1 w2 w3]
   (+modw (bit-xor (<<< w1 10) (<<< w3 23)) (<<< w2 8)))
 
 (defn- ^{:doc "h1 function as defined in [HC-128 Spec][HC128].
-Uses the q sbox and a 32-bit word value and evaluates to a 32-bit word."} h1
-  [q word]
+Uses the q sbox and a 32-bit word value and evaluates to a 32-bit word."}
+  h1 [q word]
   (+modw (nth q (get-byte 1 word))(nth q (+ (get-byte 3 word) 256))))
 
 (defn- ^{:doc "h2 function as defined in [HC-128 Spec][HC128].
-Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."} h2
-  [p word]
+Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."}
+  h2 [p word]
   (+modw (nth p (get-byte 1 word))(nth p (+ (get-byte 3 word) 256))))
 
-(defn- ^{:doc "Add the key to the subkeys vector."} append-key 
-  [ks key i]
+(defn- ^{:doc "Add the key to the subkeys vector."}
+  append-key [ks key i]
   (->> (mod i 4)
        (nth key)
        (conj ks)))
 
-(defn- ^{:doc "Add the IV to the subkeys vector."} append-iv 
-  [ks iv i]
+(defn- ^{:doc "Add the IV to the subkeys vector."}
+  append-iv [ks iv i]
   (->> (mod (- i 8) 4)
        (nth iv)
        (conj ks)))
 
 (defn- ^{:doc "Add the newly calculated word values to the 
-subkeys vector."} append-new
-  [ks i]
+subkeys vector."}
+  append-new [ks i]
   (->> (+modw
         (f2 (nth ks (- i 2)))
         (nth ks (- i 7))
@@ -75,15 +75,16 @@ subkeys vector."} append-new
        (conj ks)))
 
 (defn- ^{:doc "Add one word to the key schedule vector
-based on the round number"} key-round 
-  [key iv]
+based on the round number"}
+  key-round [key iv]
   (fn [ks round]
     (cond
       (< round 8)  (append-key ks key round)
       (< round 16) (append-iv ks iv round)
       :else        (append-new ks round))))
 
-(defn- ^{:doc "Expand the key into a vector of 1280 32-bit words."} expand-key 
+(defn- ^{:doc "Expand the key into a vector of 1280 32-bit words."}
+  expand-key  
   ([{:keys [key iv] :as initmap}]
      {:pre [(contains? initmap :key) (contains? initmap :iv)
             (vector? key) (vector? iv)
@@ -180,38 +181,42 @@ in [HC-128 Spec][HC128]."} hc128
        (mapv (comp word-bytes reverse-bytes last))
        (reduce into)))
 
-(defn- ^{:doc "Reset the map in the atom at kivkw."} resetkiv!
-  [kivkw]
-  (swap! hc128-key-streams assoc kivkw {}))
+(defn- ^{:doc "Reset the map in the atom at uid."}
+  swapuid! [{:keys [uid] :as initmap}]
+  (if (contains? @hc128-key-streams uid)
+    (swap! hc128-key-streams assoc uid
+           (assoc (uid @hc128-key-streams) :upper 0 :ks []))
+    (let [ek (expand-key initmap)
+          sboxmap (-> (remap-p {:p (gen-p ek) :q (gen-q ek)})
+                      (remap-q))]
+      (swap! hc128-key-streams assoc uid sboxmap))))
 
 (defn- ^{:doc "Reset the keystream in the map in the atom
-at kivkw."} resetks!
-  [kivkw {:keys [p q]} [lower upper :as range]]
-  (let [ks (gen-key-stream p q upper)]
-    (swap! hc128-key-streams assoc kivkw
-           (assoc (kivkw @hc128-key-streams) :upper upper :ks ks))))
+at uid."} 
+  swapks! [{:keys [uid upper] :as initmap}]
+  (let [p (:p (uid @hc128-key-streams))
+        q (:q (uid @hc128-key-streams))
+        ks (gen-key-stream p q upper)]
+    (swap! hc128-key-streams assoc uid
+           (assoc (uid @hc128-key-streams) :upper upper :ks ks))))
 
 ;; ### HC128
 ;; Extend the Cipher and StreamCipher protocol thorough the HC128 record type
 (defrecord HC128 []
   Cipher
   (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
-    (let [kivkw (genkeyword key iv)
-          ek (expand-key initmap)
-          keymap (-> (remap-p {:p (gen-p ek) :q (gen-q ek)})
-                     (remap-q)
-                     (assoc :key key :iv iv))]
+    (let [uid (bytes->keyword (into key iv))
+          initmap (assoc initmap :uid uid :upper upper)]
       (do
-        (resetkiv! kivkw)
-        (resetks! kivkw keymap [0 upper]))
-      keymap))
+        (swapuid! initmap)
+        (swapks! initmap))
+      initmap))
   (keysizes-bytes [_] [16])
   StreamCipher
-  (generate-keystream [_ {:keys [key iv] :as initmap} [lower upper :as range]]
-    (let [kivkw (genkeyword key iv)]
-      (when (>= (dec upper) (:upper (kivkw @hc128-key-streams)))
-        (resetkiv! kivkw)
-        (resetks! kivkw initmap range))
-      (subvec (:ks (kivkw @hc128-key-streams)) lower upper)))
+  (generate-keystream [_ {:keys [uid lower upper] :as initmap} _]
+    (when (>= (dec upper) (:upper (uid @hc128-key-streams)))
+      (swapuid! initmap)
+      (swapks! initmap))
+    (subvec (:ks (uid @hc128-key-streams)) lower upper))
   (keystream-size-bytes [_] max-stream-length-bytes)
   (iv-size-bytes [_] 16))

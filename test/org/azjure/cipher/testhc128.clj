@@ -34,9 +34,9 @@
 ;;
 
 (def ^{:doc "Test vectors from the HC-128 spec"} hc128spec-test-vectors
-  [[hc128 initmap0 zeros-64 hc-128-ct  ]
-   [hc128 initmap1 zeros-64 hc-128-ct-1]
-   [hc128 initmap2 zeros-64 hc-128-ct-2]])
+  [[hc128 (assoc initmap0 :lower 0 :upper 64) zeros-64 hc-128-ct  ]
+   [hc128 (assoc initmap1 :lower 0 :upper 64) zeros-64 hc-128-ct-1]
+   [hc128 (assoc initmap2 :lower 0 :upper 64) zeros-64 hc-128-ct-2]])
 
 ;; ### HC-128 Tests
 

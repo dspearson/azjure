@@ -26,7 +26,8 @@
 
 ;; ### get-byte
 ;; Get byte <em>num</em> out of the given word.  <em>num</em>
-;; should be 1-4.
+;; should be 1-4 where 1 is the least significant byte and 4
+;; is the most significant byte.
 ;;
 ;;     (get-byte 0x11223344 4)
 ;;

@@ -16,6 +16,7 @@
                                [salsa20 :refer (->Salsa20)]
                                [twofish :refer (->Twofish)]
                                [hc128 :refer (->HC128)]
+                               [hc256 :refer (->HC256)]
                                [rabbit :refer (->Rabbit)]
                                [trivium :refer (->Trivium)])
             [org.azjure.cryptsuite :refer :all]))
