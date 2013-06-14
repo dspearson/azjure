@@ -3037,71 +3037,75 @@ net.brehaut.ClojureTools = (function (SH) {
                                [streamcipher :refer [StreamCipher]])
             [org.azjure.libcrypt :refer (+modw to-hex)]
             [org.azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Used to store keystreams for nonces</p>
-</td><td class="codes"><pre class="brush: clojure">(def  salsa20-key-streams
+</td><td class="codes"><pre class="brush: clojure">(def 
+  salsa20-key-streams
   (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:nonce1 {:counter val :upper val :ks [keystream vector]}}
  :nonce2 {:counter val :upper val :ks [keystream vector]}
 </code></pre>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>The maximum keystream length in bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def  max-stream-length-bytes
+</td><td class="codes"><pre class="brush: clojure">(def 
+  max-stream-length-bytes
   (expt 2 67))</pre></td></tr><tr><td class="docs"><p>Used during expansion for 32-byte keys.</p>
-</td><td class="codes"><pre class="brush: clojure">(def  sigma
+</td><td class="codes"><pre class="brush: clojure">(def 
+  sigma
   [[0x65 0x78 0x70 0x61]
    [0x6E 0x64 0x20 0x33]
    [0x32 0x2D 0x62 0x79]
    [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><p>Used during expansion for 16-byte keys.</p>
-</td><td class="codes"><pre class="brush: clojure">(def tau
+</td><td class="codes"><pre class="brush: clojure">(def 
+  tau
   [[0x65 0x78 0x70 0x61]
    [0x6E 0x64 0x20 0x31]
    [0x36 0x2D 0x62 0x79]
    [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><p>quarterround function as defined 
 in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  quarterround
-  [[y0 y1 y2 y3]]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  quarterround [[y0 y1 y2 y3]]
   (let [z1 (bit-xor y1 (&lt;&lt;&lt; (+modw y0 y3) 7))
         z2 (bit-xor y2 (&lt;&lt;&lt; (+modw z1 y0) 9))
         z3 (bit-xor y3 (&lt;&lt;&lt; (+modw z2 z1) 13))
         z0 (bit-xor y0 (&lt;&lt;&lt; (+modw z3 z2) 18))]
     [z0 z1 z2 z3]))</pre></td></tr><tr><td class="docs"><p>rowround function as defined 
 in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  rowround 
-  [[y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  rowround [[y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]]
   (let [[z0 z1 z2 z3] (quarterround [y0 y1 y2 y3])
         [z5 z6 z7 z4] (quarterround [y5 y6 y7 y4])
         [z10 z11 z8 z9] (quarterround [y10 y11 y8 y9])
         [z15 z12 z13 z14] (quarterround [y15 y12 y13 y14])]
     [z0 z1 z2 z3 z4 z5 z6 z7 z8 z9 z10 z11 z12 z13 z14 z15]))</pre></td></tr><tr><td class="docs"><p>columnround function as defined 
 in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  columnround
-  [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  columnround [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
   (let [[y0 y4 y8 y12] (quarterround [x0 x4 x8 x12])
         [y5 y9 y13 y1] (quarterround [x5 x9 x13 x1])
         [y10 y14 y2 y6] (quarterround [x10 x14 x2 x6])
         [y15 y3 y7 y11] (quarterround [x15 x3 x7 x11])]
     [y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]))</pre></td></tr><tr><td class="docs"><p>quarterround function as defined 
 in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  doubleround
-  [x _]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  doubleround [x _]
   (rowround (columnround x)))</pre></td></tr><tr><td class="docs"><p>salsa20 encryption function as defined 
 in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  salsa20
-  [in]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  salsa20 [in]
   (let [x (mapv #(bytes-word % true) (partition 4 in))]
     (-&gt;&gt; (range 10)
          (reduce doubleround x)
          (mapv +modw x)
          (mapv #(word-bytes % true))
          (reduce into))))</pre></td></tr><tr><td class="docs"><p>Is the given vector 32 bytes long?</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  bytes32?
-  [key]
-  (= 32 (count key)))</pre></td></tr><tr><td class="docs"><p>Increment the counter in the map in the atom
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  bytes32? [bytes]
+  (= 32 (count bytes)))</pre></td></tr><tr><td class="docs"><p>Increment the counter in the map in the atom
 at noncekw.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  inccnt!
-  [noncekw counter]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  inccnt! [noncekw counter]
   (swap! salsa20-key-streams assoc noncekw
          (assoc (noncekw @salsa20-key-streams) :counter (inc counter))))</pre></td></tr><tr><td class="docs"><p>A Salsa20 key stream round.  Generates 64-bytes
 of keystream.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  salsa20-round
-  [c k0 k1 noncekw nonce]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  salsa20-round [c k0 k1 noncekw nonce]
   (fn [ks round]
     (let [counter (:counter (noncekw @salsa20-key-streams))
           n (into nonce (x-&gt;bv counter))

@@ -14,6 +14,7 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [salsa20 :refer (->Salsa20)]
+                               [chacha :refer (->Chacha)]
                                [twofish :refer (->Twofish)]
                                [hc128 :refer (->HC128)]
                                [hc256 :refer (->HC256)]
