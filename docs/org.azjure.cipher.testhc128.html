@@ -3058,9 +3058,9 @@ net.brehaut.ClojureTools = (function (SH) {
 </code></pre>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the HC-128 spec</p>
 </td><td class="codes"><pre class="brush: clojure">(def  hc128spec-test-vectors
-  [[hc128 initmap0 zeros-64 hc-128-ct  ]
-   [hc128 initmap1 zeros-64 hc-128-ct-1]
-   [hc128 initmap2 zeros-64 hc-128-ct-2]])</pre></td></tr><tr><td class="docs"><h3>HC-128 Tests</h3>
+  [[hc128 (assoc initmap0 :lower 0 :upper 64) zeros-64 hc-128-ct  ]
+   [hc128 (assoc initmap1 :lower 0 :upper 64) zeros-64 hc-128-ct-1]
+   [hc128 (assoc initmap2 :lower 0 :upper 64) zeros-64 hc-128-ct-2]])</pre></td></tr><tr><td class="docs"><h3>HC-128 Tests</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>Test HC-128 stream suites</p>
 </td><td class="codes"><pre class="brush: clojure">(deftest  testStream
   (testing &quot;Stream&quot;

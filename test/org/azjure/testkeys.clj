@@ -9,6 +9,7 @@
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 ;; [S20] http://cr.yp.to/snuffle/spec.pdf
 ;; [HC128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
+;; [HC256]: http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf
 ;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
 ;; [TRI]: http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&view=markup
 (ns ^{:author "Jason Ozias"
@@ -59,10 +60,13 @@ defined at [RFC 2612][R2612_10]"} c6-128-key
    0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])
 
 (def ^{:doc "HC-128 128-bit key as a vector of bytes as
-defined at [HC-128 Spec][HC128]"} hc-128-key zeros-128-key)
+defined at [HC-128 Spec][HC128]"}
+  hc-128-key
+  zeros-128-key)
 
 (def ^{:doc "HC-128 128-bit key as a vector of bytes as
-defined at [HC-128 Spec][HC128]"} hc-128-key-1
+defined at [HC-128 Spec][HC128]"}
+  hc-128-key-1
   [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
 
@@ -116,6 +120,14 @@ defined in [RFC 2612][R2612_10]"} c6-256-key
    0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
    0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
    0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])
+
+(def ^{:doc "HC-256 256-bit key as a vector of bytes as
+defined at [HC-256 Spec][HC256]"}
+  hc-256-256-key-1
+  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
 
 (def ^{:doc "Twofish 256-bit key as a vector of bytes as
 defined at [Twofish paper][TF]"} tf-256-key

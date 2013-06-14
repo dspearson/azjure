@@ -173,8 +173,8 @@ in [HC-128 Spec][HC128]."} hc128
       (clojure.string/replace #"0x" "")
       (keyword)))
 
-(defn- ^{:doc "Generate a key stream for length bytes."} gen-key-stream
-  [p q length]
+(defn- ^{:doc "Generate a key stream for length bytes."}
+  gen-key-stream [p q length]
   (->> (range 0 length)
        (reductions hc128 [p q 0])
        (rest)

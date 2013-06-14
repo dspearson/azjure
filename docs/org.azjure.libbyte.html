@@ -3050,7 +3050,8 @@ net.brehaut.ClojureTools = (function (SH) {
   (reduce bit-set 0 (positions #{1} bits)))</pre></td></tr><tr><td class="docs"><h3>get-byte</h3>
 
 <p>Get byte <em>num</em> out of the given word.  <em>num</em>
-should be 1-4.</p>
+should be 1-4 where 1 is the least significant byte and 4
+is the most significant byte.</p>
 
 <pre><code>(get-byte 0x11223344 4)
 </code></pre>

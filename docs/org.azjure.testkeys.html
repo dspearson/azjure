@@ -3071,9 +3071,12 @@ defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
   [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
    0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
+</td><td class="codes"><pre class="brush: clojure">(def 
+  hc-128-key
+  zeros-128-key)</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
 defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  hc-128-key-1
+</td><td class="codes"><pre class="brush: clojure">(def 
+  hc-128-key-1
   [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Rabbit 128-bit key as a vector of bytes as
 defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
@@ -3114,7 +3117,14 @@ defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
   [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
    0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
    0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
-   0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
+   0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])</pre></td></tr><tr><td class="docs"><p>HC-256 256-bit key as a vector of bytes as
+defined at <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  hc-256-256-key-1
+  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-256-key
   (into tf-192-key [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))</pre></td></tr><tr><td class="docs"><h3>Blowfish Test Keys</h3>

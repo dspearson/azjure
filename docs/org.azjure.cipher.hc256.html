@@ -3028,56 +3028,61 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.hc128" name="org.azjure.cipher.hc128"><h1 class="project-name">org.azjure.cipher.hc128</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>HC-128</h2>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.hc256" name="org.azjure.cipher.hc256"><h1 class="project-name">org.azjure.cipher.hc256</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>HC-256</h2>
 
-<p>Designed to meet the <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.hc128
+<p>Designed to meet the <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a></p>
+</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.hc256
   (:require [clojure.math.numeric-tower :refer (expt)]
             (org.azjure.cipher [cipher :refer (Cipher)]
                                [streamcipher :refer [StreamCipher]])
             (org.azjure [libcrypt :refer :all]
                         [libbyte :refer :all])))</pre></td></tr><tr><td class="docs"><p>Used to store upper bounds and current keystreams
 for initialized key/iv pairs</p>
-</td><td class="codes"><pre class="brush: clojure">(def  
-  hc128-key-streams (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:keyiv1 {:upper val :ks [keystream vector]}
+</td><td class="codes"><pre class="brush: clojure">(def 
+  hc256-key-streams (atom {}))</pre></td></tr><tr><td class="docs"><pre><code>{:keyiv1 {:upper val :ks [keystream vector]}
  :keyiv2 {:upper val :ks [keystream vector]}
 </code></pre>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>The maximum keystream length in bytes</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
-  max-stream-length-bytes (expt 2 61))</pre></td></tr><tr><td class="docs"><h3>HC-128 Specification Functions</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>f1 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  max-stream-length-bytes (expt 2 125))</pre></td></tr><tr><td class="docs"><h3>HC-256 Specification Functions</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>f1 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Takes a 32-bit word value and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  f1 [word]
-  (bit-xor (&gt;&gt;&gt; word 7) (&gt;&gt;&gt; word 18) (bit-shift-right word 3)))</pre></td></tr><tr><td class="docs"><p>f2 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  f1 [x]
+  (bit-xor (&gt;&gt;&gt; x 7) (&gt;&gt;&gt; x 18) (bit-shift-right x 3)))</pre></td></tr><tr><td class="docs"><p>f2 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Takes a 32-bit word value and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  f2 [word]
-  (bit-xor (&gt;&gt;&gt; word 17) (&gt;&gt;&gt; word 19) (bit-shift-right word 10)))</pre></td></tr><tr><td class="docs"><p>g1 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  f2 [x]
+  (bit-xor (&gt;&gt;&gt; x 17) (&gt;&gt;&gt; x 19) (bit-shift-right x 10)))</pre></td></tr><tr><td class="docs"><p>g1 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Takes three 32-bit word values and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  g1 [w1 w2 w3]
-  (+modw (bit-xor (&gt;&gt;&gt; w1 10) (&gt;&gt;&gt; w3 23)) (&gt;&gt;&gt; w2 8)))</pre></td></tr><tr><td class="docs"><p>g2 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  g1 [x y q]
+  (+modw (bit-xor (&gt;&gt;&gt; x 10) (&gt;&gt;&gt; y 23)) (nth q (mod (bit-xor x y) 1024))))</pre></td></tr><tr><td class="docs"><p>g2 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Takes three 32-bit word values and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  g2 [w1 w2 w3]
-  (+modw (bit-xor (&lt;&lt;&lt; w1 10) (&lt;&lt;&lt; w3 23)) (&lt;&lt;&lt; w2 8)))</pre></td></tr><tr><td class="docs"><p>h1 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  g2 [x y p]
+  (+modw (bit-xor (&gt;&gt;&gt; x 10) (&gt;&gt;&gt; y 23)) (nth p (mod (bit-xor x y) 1024))))</pre></td></tr><tr><td class="docs"><p>h1 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Uses the q sbox and a 32-bit word value and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
   h1 [q word]
-  (+modw (nth q (get-byte 1 word))(nth q (+ (get-byte 3 word) 256))))</pre></td></tr><tr><td class="docs"><p>h2 function as defined in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.
+  (+modw (nth q (get-byte 1 word))
+         (nth q (+ (get-byte 2 word) 256))
+         (nth q (+ (get-byte 3 word) 512))
+         (nth q (+ (get-byte 4 word) 768))))</pre></td></tr><tr><td class="docs"><p>h2 function as defined in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.
 Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
   h2 [p word]
-  (+modw (nth p (get-byte 1 word))(nth p (+ (get-byte 3 word) 256))))</pre></td></tr><tr><td class="docs"><p>Add the key to the subkeys vector.</p>
+  (+modw (nth p (get-byte 1 word))
+         (nth p (+ (get-byte 2 word) 256))
+         (nth p (+ (get-byte 3 word) 512))
+         (nth p (+ (get-byte 4 word) 768))))</pre></td></tr><tr><td class="docs"><p>Add the key to the subkeys vector.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
   append-key [ks key i]
-  (-&gt;&gt; (mod i 4)
-       (nth key)
+  (-&gt;&gt; (nth key i)
        (conj ks)))</pre></td></tr><tr><td class="docs"><p>Add the IV to the subkeys vector.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
   append-iv [ks iv i]
-  (-&gt;&gt; (mod (- i 8) 4)
+  (-&gt;&gt; (mod i 8) 
        (nth iv)
        (conj ks)))</pre></td></tr><tr><td class="docs"><p>Add the newly calculated word values to the 
 subkeys vector.</p>
@@ -3097,124 +3102,105 @@ based on the round number</p>
     (cond
       (&lt; round 8)  (append-key ks key round)
       (&lt; round 16) (append-iv ks iv round)
-      :else        (append-new ks round))))</pre></td></tr><tr><td class="docs"><p>Expand the key into a vector of 1280 32-bit words.</p>
+      :else        (append-new ks round))))</pre></td></tr><tr><td class="docs"><p>Expand the key into a vector of 2560 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  expand-key  
+  expand-key 
   ([{:keys [key iv] :as initmap}]
      {:pre [(contains? initmap :key) (contains? initmap :iv)
             (vector? key) (vector? iv)
-            (= 16 (count key)) (= 16 (count iv))]}
+            (= 32 (count key)) (= 32 (count iv))]}
      (let [kw (mapv bytes-word (partition 4 key))
            iw (mapv bytes-word (partition 4 iv))]
-       (reduce (key-round kw iw) [] (range 1280)))))</pre></td></tr><tr><td class="docs"><p>conj a value from the key schedule onto the p sbox.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  p-round
-  [ek]
+       (reduce (key-round kw iw) [] (range 2560)))))</pre></td></tr><tr><td class="docs"><p>conj a value from the key schedule onto the p sbox.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  p-round [ek]
   (fn [p round]
-    (conj p (nth ek (+ round 256)))))</pre></td></tr><tr><td class="docs"><p>Generate the initial p-sbox.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  gen-p
-  [ek]
-  (reduce (p-round ek) [] (range 512)))</pre></td></tr><tr><td class="docs"><p>conj a value from the key schedule onto the q sbox.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  q-round
-  [ek]
+    (conj p (nth ek (+ round 512)))))</pre></td></tr><tr><td class="docs"><p>Generate the initial p-sbox.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  gen-p [ek]
+  (reduce (p-round ek) [] (range 1024)))</pre></td></tr><tr><td class="docs"><p>conj a value from the key schedule onto the q sbox.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  q-round [ek]
   (fn [q round]
-    (conj q (nth ek (+ round 768)))))</pre></td></tr><tr><td class="docs"><p>Generate the initial q-sbox.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  gen-q
-  [ek]
-  (reduce (q-round ek) [] (range 512)))</pre></td></tr><tr><td class="docs"><p>Calculate and place a new value in the p sbox at index j</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  new-p
-  [p j]
+    (conj q (nth ek (+ round 1536)))))</pre></td></tr><tr><td class="docs"><p>Generate the initial q-sbox.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  gen-q [ek]
+  (reduce (q-round ek) [] (range 1024)))</pre></td></tr><tr><td class="docs"><p>Calculate and place a new value in the p sbox at index j</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  new-p [p q j]
   (-&gt;&gt; (+modw
         (nth p j)
+        (nth p (-mod1024 j 10))
         (g1 
-         (nth p (-mod512 j 3))
-         (nth p (-mod512 j 10))
-         (nth p (-mod512 j 511))))
+         (nth p (-mod1024 j 3))
+         (nth p (-mod1024 j 1023))
+         q))
        (assoc p j)))</pre></td></tr><tr><td class="docs"><p>Calculate and place a new value in the q sbox at index j</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  new-q
-  [q j]
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  new-q [p q j]
   (-&gt;&gt; (+modw
         (nth q j)
+        (nth q (-mod1024 j 10))
         (g2 
-         (nth q (-mod512 j 3))
-         (nth q (-mod512 j 10))
-         (nth q (-mod512 j 511))))
-       (assoc q j)))</pre></td></tr><tr><td class="docs"><p>Calculate an output word during the lower 512.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  sp
-  [p q j]
-  (bit-xor (h1 q (nth p (-mod512 j 12))) (nth p j)))</pre></td></tr><tr><td class="docs"><p>Calculate an output word during the upper 512.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  sq
-  [p q j]
-  (bit-xor (h2 p (nth q (-mod512 j 12))) (nth q j)))</pre></td></tr><tr><td class="docs"><p>The hc128 cipher function as defined
-in <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a>.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  hc128
-  [[p q _] round]
-  (let [j (mod round 512)]
-    (cond
-     (&lt; (mod round 1024) 512) (let [np (new-p p j)] [np q (sp np q j)])
-     :else (let [nq (new-q q j)] [p nq (sq p nq j)]))))</pre></td></tr><tr><td class="docs"><p>Recalculate a p word given a round.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  p-ks-round
-  [{:keys [p q] :as pq} round]
-  (assoc pq :p (assoc p round (last (hc128 [p q 0] round)))))</pre></td></tr><tr><td class="docs"><p>Recalculate a q word given a round.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  q-ks-round
-  [{:keys [p q] :as pq} round]
-  (assoc pq :q (assoc q round (last (hc128 [p q 0] (+ 512 round))))))</pre></td></tr><tr><td class="docs"><p>Recalculate the p sbox during key expansion.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  remap-p
-  [pq]
-  (reduce p-ks-round pq (range 512)))</pre></td></tr><tr><td class="docs"><p>Recalculate the q sbox during key expansion.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  remap-q
-  [pq]
-  (reduce q-ks-round pq (range 512)))</pre></td></tr><tr><td class="docs"><p>Generate a keyword based on the Key/IV pair.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  genkeyword
-  [key iv]
-  (-&gt; (-&gt;&gt; (into key iv)
-           (partition 4)
-           (mapv bytes-word)
-           (mapv to-hex)
-           (apply str))
-      (clojure.string/replace #&quot;0x&quot; &quot;&quot;)
-      (keyword)))</pre></td></tr><tr><td class="docs"><p>Generate a key stream for length bytes.</p>
+         (nth q (-mod1024 j 3))
+         (nth q (-mod1024 j 1023))
+         p))
+       (assoc q j)))</pre></td></tr><tr><td class="docs"><p>Calculate an output word during the lower 1024.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  gen-key-stream [p q length]
-  (-&gt;&gt; (range 0 length)
-       (reductions hc128 [p q 0])
-       (rest)
-       (mapv (comp word-bytes reverse-bytes last))
-       (reduce into)))</pre></td></tr><tr><td class="docs"><p>Reset the map in the atom at uid.</p>
+  sp [p q j]
+  (bit-xor (h1 q (nth p (-mod1024 j 12))) (nth p j)))</pre></td></tr><tr><td class="docs"><p>Calculate an output word during the upper 1024.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
-  swapuid! [{:keys [uid] :as initmap}]
-  (if (contains? @hc128-key-streams uid)
-    (swap! hc128-key-streams assoc uid
-           (assoc (uid @hc128-key-streams) :upper 0 :ks []))
+  sq [p q j]
+  (bit-xor (h2 p (nth q (-mod1024 j 12))) (nth q j)))</pre></td></tr><tr><td class="docs"><p>The hc256 cipher function as defined
+in <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a>.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  hc256 [ke]
+  (fn [[p q out] round]
+    (let [j (mod round 1024)]
+      (cond
+       (&lt; (mod round 2048) 1024) (let [np (new-p p q j)] [np q (if ke out (conj out (sp np q j)))])
+       :else (let [nq (new-q p q j)] [p nq (if ke out (conj out (sq p nq j)))])))))</pre></td></tr><tr><td class="docs"><p>Recalculate the sboxes during key expansion.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  gen-sboxes [p q]
+  (reduce (hc256 true) [p q []] (range 4096)))</pre></td></tr><tr><td class="docs"><p>Reset the map in the atom at uid.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  resetkiv! [uid initmap]
+  (if (contains? @hc256-key-streams uid)
+    (swap! hc256-key-streams assoc uid
+           (assoc (uid @hc256-key-streams) :upper 0 :ks []))
     (let [ek (expand-key initmap)
-          sboxmap (-&gt; (remap-p {:p (gen-p ek) :q (gen-q ek)})
-                      (remap-q))]
-      (swap! hc128-key-streams assoc uid sboxmap))))</pre></td></tr><tr><td class="docs"><p>Reset the keystream in the map in the atom
+          [p q _] (gen-sboxes (gen-p ek) (gen-q ek))]
+      (swap! hc256-key-streams assoc uid {:p p :q q}))))</pre></td></tr><tr><td class="docs"><p>Reset the keystream in the map in the atom
 at uid.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn-  
-  swapks! [{:keys [uid upper] :as initmap}]
-  (let [p (:p (uid @hc128-key-streams))
-        q (:q (uid @hc128-key-streams))
-        ks (gen-key-stream p q upper)]
-    (swap! hc128-key-streams assoc uid
-           (assoc (uid @hc128-key-streams) :upper upper :ks ks))))</pre></td></tr><tr><td class="docs"><h3>HC128</h3>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  resetks! [uid upper]
+  (let [p (:p (uid @hc256-key-streams))
+        q (:q (uid @hc256-key-streams))
+        ks (-&gt;&gt; (range upper)
+                (reduce (hc256 false) [p q []])
+                (last)
+                (mapv word-bytes)
+                (reduce into))]
+    (swap! hc256-key-streams assoc uid
+           (assoc (uid @hc256-key-streams) :upper upper :ks ks))))</pre></td></tr><tr><td class="docs"><h3>HC256</h3>
 
-<p>Extend the Cipher and StreamCipher protocol thorough the HC128 record type</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord HC128 []
+<p>Extend the Cipher and StreamCipher protocol thorough the HC256 record type</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord HC256 []
   Cipher
   (initialize [_ {:keys [key iv upper] :or {upper 1024} :as initmap}]
-    (let [uid (bytes-&gt;keyword (into key iv))
-          initmap (assoc initmap :uid uid :upper upper)]
+    (let [uid (bytes-&gt;keyword (into key iv))]
       (do
-        (swapuid! initmap)
-        (swapks! initmap))
+        (resetkiv! uid initmap)
+        (resetks! uid upper))
       initmap))
-  (keysizes-bytes [_] [16])
+  (keysizes-bytes [_] [32])
   StreamCipher
-  (generate-keystream [_ {:keys [uid lower upper] :as initmap} _]
-    (when (&gt;= (dec upper) (:upper (uid @hc128-key-streams)))
-      (swapuid! initmap)
-      (swapks! initmap))
-    (subvec (:ks (uid @hc128-key-streams)) lower upper))
+  (generate-keystream [_ {:keys [key iv lower upper] :as initmap} _]
+    (let [uid (bytes-&gt;keyword (into key iv))]
+      (when (&gt;= (dec upper) (:upper (uid @hc256-key-streams)))
+        (resetkiv! uid initmap)
+        (resetks! uid upper))
+      (subvec (:ks (uid @hc256-key-streams)) lower upper)))
   (keystream-size-bytes [_] max-stream-length-bytes)
-  (iv-size-bytes [_] 16))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+  (iv-size-bytes [_] 32))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

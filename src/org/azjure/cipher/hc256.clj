@@ -59,13 +59,12 @@ Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."}
 
 (defn- ^{:doc "Add the key to the subkeys vector."}
   append-key [ks key i]
-  (->> (mod i 4)
-       (nth key)
+  (->> (nth key i)
        (conj ks)))
 
 (defn- ^{:doc "Add the IV to the subkeys vector."}
   append-iv [ks iv i]
-  (->> (mod (- i 8) 4)
+  (->> (mod i 8) 
        (nth iv)
        (conj ks)))
 
@@ -174,7 +173,11 @@ at uid."}
   resetks! [uid upper]
   (let [p (:p (uid @hc256-key-streams))
         q (:q (uid @hc256-key-streams))
-        ks (last (reduce (hc256 false) [p q []] (range upper)))]
+        ks (->> (range upper)
+                (reduce (hc256 false) [p q []])
+                (last)
+                (mapv word-bytes)
+                (reduce into))]
     (swap! hc256-key-streams assoc uid
            (assoc (uid @hc256-key-streams) :upper upper :ks ks))))
 
