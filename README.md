@@ -58,6 +58,7 @@ See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/or
 3. CAST-128 (CAST5) - [CAST-128 RFC](http://tools.ietf.org/html/rfc2144)
 4. CAST-256 (CAST6) - [CAST-256 RFC](http://tools.ietf.org/html/rfc2612)
 5. Twofish (TF) - [Twofish Spec](http://www.schneier.com/paper-twofish-paper.pdf)
+6. TEA (TEA) - [TEA Spec](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf)
 
 ### Stream
 1. Salsa20 (Salsa20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
