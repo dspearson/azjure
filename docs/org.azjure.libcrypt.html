@@ -3078,6 +3078,8 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>x - y mod 2^32</p>
 
 <p>x - y mod 2^64</p>
+
+<p>x * y mod 2^32</p>
 </td><td class="codes"><pre class="brush: clojure">(def     +mod8     (modz + 8))
 (def    +mod32    (modz + 32))
 (def  +modw     (modz + 0x100000000))
@@ -3085,7 +3087,8 @@ net.brehaut.ClojureTools = (function (SH) {
 (def   -mod512   (modz - 512))
 (def  -mod1024  (modz - 1024))
 (def  -modw     (modz - 0x100000000))
-(def  -moddw    (modz - 0x10000000000000000))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
+(def  -moddw    (modz - 0x10000000000000000))
+(def  *modw     (modz * 0x100000000))</pre></td></tr><tr><td class="docs"><p>Generate a keyword from the given vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn 
   bytes-&gt;keyword [bytes]
   (-&gt; (-&gt;&gt; (partition 4 bytes)

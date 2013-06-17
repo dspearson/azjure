@@ -6,6 +6,7 @@
                                [blowfish :refer (->Blowfish)]
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
+                               [tea :refer (->TEA)]
                                [twofish :refer (->Twofish)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (->ElectronicCodebook)]
@@ -43,13 +44,14 @@
 (def X923 (->X923pad))
 (def ISO7816 (->ISO7816pad))
 
-;; #### AES, Blowfish, CAST5, CAST6, Twofish
+;; #### AES, Blowfish, CAST5, CAST6, Twofish, TEA
 ;; Setup the ciphers
 (def AES (->Aes))
 (def Blowfish (->Blowfish))
 (def Twofish (->Twofish))
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
+(def TEA (->TEA))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB,CTR
 ;; Setup the mode for use in testing
@@ -593,3 +595,105 @@
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor Twofish CTR key iv bytes))
   (decrypt [_ key iv bytes] (decryptor Twofish CTR key iv bytes)))
+
+;; ### TEAECBX
+;; TEA cipher, Electronic Codebook Mode, various padding methods
+(defrecord TEAECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA ECB PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA ECB PKCS7 key iv bytes)))
+
+(defrecord TEAECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA ECB Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA ECB Zeropad key iv bytes)))
+
+(defrecord TEAECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA ECB ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA ECB ISO10126 key iv bytes)))
+
+(defrecord TEAECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA ECB X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA ECB X923 key iv bytes)))
+
+(defrecord TEAECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA ECB ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA ECB ISO7816 key iv bytes)))
+
+;; ### TEACBCX
+;; TEA cipher, Cipher-Block Chaining Mode, various padding methods
+(defrecord TEACBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CBC PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CBC PKCS7 key iv bytes)))
+
+(defrecord TEACBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CBC Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CBC Zeropad key iv bytes)))
+
+(defrecord TEACBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CBC ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CBC ISO10126 key iv bytes)))
+
+(defrecord TEACBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CBC X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CBC X923 key iv bytes)))
+
+(defrecord TEACBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CBC ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CBC ISO7816 key iv bytes)))
+
+;; ### TEAPCBCX
+;; TEA cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord TEAPCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA PCBC PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA PCBC PKCS7 key iv bytes)))
+
+(defrecord TEAPCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA PCBC Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA PCBC Zeropad key iv bytes)))
+
+(defrecord TEAPCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA PCBC ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA PCBC ISO10126 key iv bytes)))
+
+(defrecord TEAPCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA PCBC X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA PCBC X923 key iv bytes)))
+
+(defrecord TEAPCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA PCBC ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA PCBC ISO7816 key iv bytes)))
+
+;; ### TEACFB
+;; TEA cipher, Cipher Feedback Mode
+(defrecord TEACFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CFB key iv bytes)))
+
+;; ### TEAOFB
+;; TEA cipher, Output Feedback Mode
+(defrecord TEAOFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA OFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA OFB key iv bytes)))
+
+;; ### TEACTR
+;; TEA cipher, Counter Mode
+(defrecord TEACTR []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor TEA CTR key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor TEA CTR key iv bytes)))

@@ -3028,591 +3028,186 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cryptsuite" name="org.azjure.cryptsuite"><h1 class="project-name">org.azjure.cryptsuite</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Crypt Suite Protocol</h2>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;} 
-  org.azjure.cryptsuite
-  (:require (org.azjure.cipher [blockcipher :as bc]
-                               [aes :refer (-&gt;Aes)]
-                               [blowfish :refer (-&gt;Blowfish)]
-                               [cast5 :refer (-&gt;CAST5)]
-                               [cast6 :refer (-&gt;CAST6)]
-                               [tea :refer (-&gt;TEA)]
-                               [twofish :refer (-&gt;Twofish)])
-            (org.azjure.mode [modeofoperation :as mode]
-                             [ecb :refer (-&gt;ElectronicCodebook)]
-                             [cbc :refer (-&gt;CipherBlockChaining)]
-                             [pcbc :refer (-&gt;PropagatingCipherBlockChaining)]
-                             [cfb :refer (-&gt;CipherFeedback)]
-                             [ofb :refer (-&gt;OutputFeedback)]
-                             [ctr :refer (-&gt;CounterMode)])
-            (org.azjure.padding [pad :as padder]
-                                [pkcs7pad :refer (-&gt;PKCS7pad)]
-                                [zeropad :refer (-&gt;Zeropad)]
-                                [iso10126pad :refer (-&gt;ISO10126pad)]
-                                [x923pad :refer (-&gt;X923pad)]
-                                [iso7816pad :refer (-&gt;ISO7816pad)])))</pre></td></tr><tr><td class="docs"><h3>CipherSuite</h3>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.testtea" name="org.azjure.cipher.testtea"><h1 class="project-name">org.azjure.cipher.testtea</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Test suite for the TEA block cipher</p>
 
-<p>This protocol defines two functions</p>
+<h1>Twofish Block Cipher Tests</h1>
+</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
+      :doc }
+  org.azjure.cipher.testtea
+  (:require [clojure.test :refer :all]
+            (org.azjure [libtest :refer :all]
+                        [testivs :refer :all]
+                        [testkeys :refer :all]
+                        [testplaintext :refer :all]
+                        [testciphertext :refer :all]
+                        [cryptsuite :as cs]
+                        [cryptsuite :refer (-&gt;TEAECBPKCS7)]
+                        [cryptsuite :refer (-&gt;TEAECBZERO)]
+                        [cryptsuite :refer (-&gt;TEAECBISO10126)]
+                        [cryptsuite :refer (-&gt;TEAECBX923)]
+                        [cryptsuite :refer (-&gt;TEAECBISO7816)]
+                        [cryptsuite :refer (-&gt;TEACBCPKCS7)]
+                        [cryptsuite :refer (-&gt;TEACBCZERO)]
+                        [cryptsuite :refer (-&gt;TEACBCISO10126)]
+                        [cryptsuite :refer (-&gt;TEACBCX923)]
+                        [cryptsuite :refer (-&gt;TEACBCISO7816)]
+                        [cryptsuite :refer (-&gt;TEAPCBCPKCS7)]
+                        [cryptsuite :refer (-&gt;TEAPCBCZERO)]
+                        [cryptsuite :refer (-&gt;TEAPCBCISO10126)]
+                        [cryptsuite :refer (-&gt;TEAPCBCX923)]
+                        [cryptsuite :refer (-&gt;TEAPCBCISO7816)]
+                        [cryptsuite :refer (-&gt;TEACFB)]
+                        [cryptsuite :refer (-&gt;TEAOFB)]
+                        [cryptsuite :refer (-&gt;TEACTR)])
+            (org.azjure.cipher [cipher :as cipher]
+                               [blockcipher :as bc]
+                               [tea :refer (-&gt;TEA)])))</pre></td></tr><tr><td class="docs"><h3>Record Definitions</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>TEA record to be used in the tests</p>
+</td><td class="codes"><pre class="brush: clojure">(def  TEA (-&gt;TEA))</pre></td></tr><tr><td class="docs"><p>The TEA block mode suites.</p>
+</td><td class="codes"><pre class="brush: clojure">(def TEAECBPKCS7 (-&gt;TEAECBPKCS7))
+(def TEAECBZERO (-&gt;TEAECBZERO))
+(def TEAECBISO10126 (-&gt;TEAECBISO10126))
+(def TEAECBX923 (-&gt;TEAECBX923))
+(def TEAECBISO7816 (-&gt;TEAECBISO7816))
+(def TEACBCPKCS7 (-&gt;TEACBCPKCS7))
+(def TEACBCZERO (-&gt;TEACBCZERO))
+(def TEACBCISO10126 (-&gt;TEACBCISO10126))
+(def TEACBCX923 (-&gt;TEACBCX923))
+(def TEACBCISO7816 (-&gt;TEACBCISO7816))
+(def TEAPCBCPKCS7 (-&gt;TEAPCBCPKCS7))
+(def TEAPCBCZERO (-&gt;TEAPCBCZERO))
+(def TEAPCBCISO10126 (-&gt;TEAPCBCISO10126))
+(def TEAPCBCX923 (-&gt;TEAPCBCX923))
+(def TEAPCBCISO7816 (-&gt;TEAPCBCISO7816))</pre></td></tr><tr><td class="docs"><p>The TEA stream mode suites.</p>
+</td><td class="codes"><pre class="brush: clojure">(def TEACFB (-&gt;TEACFB))
+(def TEAOFB (-&gt;TEAOFB))</pre></td></tr><tr><td class="docs"><p>The TEA counter mode suite.</p>
+</td><td class="codes"><pre class="brush: clojure">(def TEACTR (-&gt;TEACTR))</pre></td></tr><tr><td class="docs"><h3>TEA Initialization</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap0
+  (cipher/initialize TEA {:key zeros-128-key}))</pre></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
+</td><td class="codes"><pre class="brush: clojure">(def  initmap1
+  (cipher/initialize TEA {:key tea-128-key}))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
 
-<h4>encrypt</h4>
+<p>Each row is</p>
 
-<p>Encrypt the given bytes vector with the given
-key and initialization vector.</p>
+<pre><code>[cipher initmap plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors from the TEA spec</p>
+</td><td class="codes"><pre class="brush: clojure">(def  teaspec-test-vectors
+  [[TEA initmap0 zeros-64-pt tea-128-ct-0]
+   [TEA initmap0 tea-64-pt-0 tea-128-ct-1]
+   [TEA initmap1 zeros-64-pt tea-128-ct-2]
+   [TEA initmap1 tea-64-pt-0 tea-128-ct-3]])</pre></td></tr><tr><td class="docs"><h3>Suite Test Vectors</h3>
 
-<h4>decrypt</h4>
+<p>Each row is</p>
 
-<p>Decrypt the given bytes vector with the given
-key and initialization vector.</p>
-</td><td class="codes"><pre class="brush: clojure">(defprotocol CryptSuite
-  (encrypt [_ key iv bytes])
-  (decrypt [_ key iv bytes]))</pre></td></tr><tr><td class="docs"><h4>PKCS7, Zeropad, ISO10126, X923, ISO7816</h4>
-
-<p>Setup the padding records</p>
-</td><td class="codes"><pre class="brush: clojure">(def PKCS7 (-&gt;PKCS7pad))
-(def Zeropad (-&gt;Zeropad))
-(def ISO10126 (-&gt;ISO10126pad))
-(def X923 (-&gt;X923pad))
-(def ISO7816 (-&gt;ISO7816pad))</pre></td></tr><tr><td class="docs"><h4>AES, Blowfish, CAST5, CAST6, Twofish, TEA</h4>
-
-<p>Setup the ciphers</p>
-</td><td class="codes"><pre class="brush: clojure">(def AES (-&gt;Aes))
-(def Blowfish (-&gt;Blowfish))
-(def Twofish (-&gt;Twofish))
-(def CAST5 (-&gt;CAST5))
-(def CAST6 (-&gt;CAST6))
-(def TEA (-&gt;TEA))</pre></td></tr><tr><td class="docs"><h4>ECB,CBC,PCBC,CFB,OFB,CTR</h4>
-
-<p>Setup the mode for use in testing</p>
-</td><td class="codes"><pre class="brush: clojure">(def ECB (-&gt;ElectronicCodebook))
-(def CBC (-&gt;CipherBlockChaining))
-(def PCBC (-&gt;PropagatingCipherBlockChaining))
-(def CFB (-&gt;CipherFeedback))
-(def OFB (-&gt;OutputFeedback))
-(def CTR (-&gt;CounterMode))</pre></td></tr><tr><td class="docs"><h3>encryptor</h3>
-
-<p>Helper function for encryption.  Pads the bytearr with the given padder
-and then encrypts the array with the given cipher and mode.</p>
-
-<p>Evaluates to a vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encryptor 
-  ([cipher mode key iv bytes]
-     (mode/encrypt mode cipher key iv bytes))
-  ([cipher mode padding key iv bytes]
-     (encryptor cipher mode key iv (padder/pad padding bytes cipher))))</pre></td></tr><tr><td class="docs"><h3>decryptor</h3>
-
-<p>Helper function for decryption.  Decrypts the given vector of bytes with
-the cipher and mode given.</p>
-
-<p>If a padding was supplied, unpads the result with the given padder.</p>
-
-<p>Evaluates to a vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decryptor 
-  ([cipher mode key iv bytes]
-     (mode/decrypt mode cipher key iv bytes))
-  ([cipher mode padding key iv words]
-     (padder/unpad padding (decryptor cipher mode key iv words))))</pre></td></tr><tr><td class="docs"><h3>AESECBX</h3>
-
-<p>AES cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>AESCBCX</h3>
-
-<p>AES cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>AESPCBCX</h3>
-
-<p>AES cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESPCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>AESCFB</h3>
-
-<p>AES cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>AESOFB</h3>
-
-<p>AES cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESOFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>AESCTR</h3>
-
-<p>AES cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord AESCTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor AES CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor AES CTR key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFECBX</h3>
-
-<p>Blowfish cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFCBCX</h3>
-
-<p>Blowfish cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFPCBCX</h3>
-
-<p>Blowfish cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFPCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFCFBX</h3>
-
-<p>Blowfish cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFOFB</h3>
-
-<p>Blowfish cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFOFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>BFCTR</h3>
-
-<p>Blowfish cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord BFCTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Blowfish CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Blowfish CTR key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5ECBX</h3>
-
-<p>CAST5 cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5ECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5ECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5ECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5ECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5ECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5CBCX</h3>
-
-<p>CAST5 cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5PCBCX</h3>
-
-<p>CAST5 cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5PCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5PCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5PCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5PCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5PCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5CFB</h3>
-
-<p>CAST5 cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5OFB</h3>
-
-<p>CAST5 cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5OFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST5CTR</h3>
-
-<p>CAST5 cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST5CTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST5 CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST5 CTR key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6ECBX</h3>
-
-<p>CAST6 cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6ECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6ECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6ECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6ECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6ECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6CBCX</h3>
-
-<p>CAST6 cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6PCBCX</h3>
-
-<p>CAST6 cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6PCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6PCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6PCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6PCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6PCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6CFB</h3>
-
-<p>CAST6 cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6OFB</h3>
-
-<p>CAST6 cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6OFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>CAST6CTR</h3>
-
-<p>CAST6 cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord CAST6CTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor CAST6 CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor CAST6 CTR key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFECBX</h3>
-
-<p>Twofish cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFCBCX</h3>
-
-<p>Twofish cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFPCBCX</h3>
-
-<p>Twofish cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFPCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFPCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFPCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFPCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFPCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFCFB</h3>
-
-<p>Twofish cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFOFB</h3>
-
-<p>Twofish cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFOFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TFCTR</h3>
-
-<p>Twofish cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TFCTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor Twofish CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor Twofish CTR key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEAECBX</h3>
-
-<p>TEA cipher, Electronic Codebook Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAECBPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA ECB PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA ECB PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAECBZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA ECB Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA ECB Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAECBISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA ECB ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA ECB ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAECBX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA ECB X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA ECB X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAECBISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA ECB ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA ECB ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEACBCX</h3>
-
-<p>TEA cipher, Cipher-Block Chaining Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEAPCBCX</h3>
-
-<p>TEA cipher, Propagating Cipher-Block Chain Mode, various padding methods</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAPCBCPKCS7 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA PCBC PKCS7 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA PCBC PKCS7 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAPCBCZERO []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA PCBC Zeropad key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA PCBC Zeropad key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAPCBCISO10126 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA PCBC ISO10126 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA PCBC ISO10126 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAPCBCX923 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA PCBC X923 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA PCBC X923 key iv bytes)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAPCBCISO7816 []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA PCBC ISO7816 key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA PCBC ISO7816 key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEACFB</h3>
-
-<p>TEA cipher, Cipher Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEAOFB</h3>
-
-<p>TEA cipher, Output Feedback Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEAOFB []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA OFB key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA OFB key iv bytes)))</pre></td></tr><tr><td class="docs"><h3>TEACTR</h3>
-
-<p>TEA cipher, Counter Mode</p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord TEACTR []
-    CryptSuite
-  (encrypt [_ key iv bytes] (encryptor TEA CTR key iv bytes))
-  (decrypt [_ key iv bytes] (decryptor TEA CTR key iv bytes)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<pre><code>[suite plaintext ciphertext]
+</code></pre>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test vectors for TEA block suites</p>
+</td><td class="codes"><pre class="brush: clojure">(def  teablock-test-vectors
+  [[TEAECBPKCS7    initmap0 phrase [0x9B 0xCE 0xCC 0xF1 0xD9 0x55 0xD0 0xCD
+                                    0x93 0xD2 0xCD 0xCA 0x50 0x09 0x66 0x99
+                                    0x39 0xF6 0x89 0xAC 0xA5 0x0D 0x38 0x80
+                                    0x50 0xDC 0xEF 0x5C 0xC8 0xB0 0x59 0x0E
+                                    0x8D 0x4D 0x35 0xA0 0xF2 0x37 0x2C 0x33
+                                    0xE7 0x86 0xC3 0xC9 0x35 0xC8 0x88 0xEF]]
+   [TEAECBZERO     initmap0 phrase [0x9B 0xCE 0xCC 0xF1 0xD9 0x55 0xD0 0xCD
+                                    0x93 0xD2 0xCD 0xCA 0x50 0x09 0x66 0x99
+                                    0x39 0xF6 0x89 0xAC 0xA5 0x0D 0x38 0x80
+                                    0x50 0xDC 0xEF 0x5C 0xC8 0xB0 0x59 0x0E
+                                    0x8D 0x4D 0x35 0xA0 0xF2 0x37 0x2C 0x33
+                                    0x50 0xA9 0x95 0x6A 0x21 0x8B 0x96 0x3E]]
+   [TEAECBX923     initmap0 phrase [0x9B 0xCE 0xCC 0xF1 0xD9 0x55 0xD0 0xCD
+                                    0x93 0xD2 0xCD 0xCA 0x50 0x09 0x66 0x99
+                                    0x39 0xF6 0x89 0xAC 0xA5 0x0D 0x38 0x80
+                                    0x50 0xDC 0xEF 0x5C 0xC8 0xB0 0x59 0x0E
+                                    0x8D 0x4D 0x35 0xA0 0xF2 0x37 0x2C 0x33
+                                    0x05 0xF6 0x84 0x14 0x2E 0x1E 0xE6 0xCB]]
+   [TEAECBISO7816  initmap0 phrase [0x9B 0xCE 0xCC 0xF1 0xD9 0x55 0xD0 0xCD
+                                    0x93 0xD2 0xCD 0xCA 0x50 0x09 0x66 0x99
+                                    0x39 0xF6 0x89 0xAC 0xA5 0x0D 0x38 0x80
+                                    0x50 0xDC 0xEF 0x5C 0xC8 0xB0 0x59 0x0E
+                                    0x8D 0x4D 0x35 0xA0 0xF2 0x37 0x2C 0x33
+                                    0x22 0x42 0x28 0x52 0x2F 0x14 0x6F 0x76]]
+   [TEACBCPKCS7    initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0xB3 0x5B 0x51 0x40 0x45 0x5C 0xD8 0xF2
+                                    0x5E 0x3A 0xD1 0x64 0xC2 0x2D 0x28 0x2C
+                                    0x15 0xAF 0xAB 0x8E 0x86 0x8F 0x4C 0x86
+                                    0xB1 0x16 0x84 0x35 0xA0 0x2C 0x1B 0xF2
+                                    0x31 0xC5 0xEA 0xC6 0xDB 0x23 0x34 0x1E]]
+   [TEACBCZERO     initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0xB3 0x5B 0x51 0x40 0x45 0x5C 0xD8 0xF2
+                                    0x5E 0x3A 0xD1 0x64 0xC2 0x2D 0x28 0x2C
+                                    0x15 0xAF 0xAB 0x8E 0x86 0x8F 0x4C 0x86
+                                    0xB1 0x16 0x84 0x35 0xA0 0x2C 0x1B 0xF2
+                                    0xC8 0xA3 0x73 0xF2 0x2E 0xF9 0x55 0xD2]]
+   [TEACBCX923     initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0xB3 0x5B 0x51 0x40 0x45 0x5C 0xD8 0xF2
+                                    0x5E 0x3A 0xD1 0x64 0xC2 0x2D 0x28 0x2C
+                                    0x15 0xAF 0xAB 0x8E 0x86 0x8F 0x4C 0x86
+                                    0xB1 0x16 0x84 0x35 0xA0 0x2C 0x1B 0xF2
+                                    0xC8 0xBB 0x89 0x9C 0x1F 0xC5 0x9D 0x81]]
+   [TEACBCISO7816  initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0xB3 0x5B 0x51 0x40 0x45 0x5C 0xD8 0xF2
+                                    0x5E 0x3A 0xD1 0x64 0xC2 0x2D 0x28 0x2C
+                                    0x15 0xAF 0xAB 0x8E 0x86 0x8F 0x4C 0x86
+                                    0xB1 0x16 0x84 0x35 0xA0 0x2C 0x1B 0xF2
+                                    0x3D 0xBC 0x22 0xB7 0xEB 0xB7 0xB0 0xDE]]
+   [TEAPCBCPKCS7   initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0x2B 0x26 0xD0 0x5B 0xFA 0x4F 0xFF 0x8F
+                                    0x60 0x1F 0x4A 0x3A 0x27 0xC2 0xBC 0x13
+                                    0xB1 0x01 0x80 0xD9 0x01 0x66 0xBD 0x9C
+                                    0x40 0x6D 0x5D 0x2F 0x12 0x01 0x8E 0x71
+                                    0x7E 0x60 0x43 0xAE 0x74 0x76 0xCC 0xC0]]
+   [TEAPCBCZERO    initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0x2B 0x26 0xD0 0x5B 0xFA 0x4F 0xFF 0x8F
+                                    0x60 0x1F 0x4A 0x3A 0x27 0xC2 0xBC 0x13
+                                    0xB1 0x01 0x80 0xD9 0x01 0x66 0xBD 0x9C
+                                    0x40 0x6D 0x5D 0x2F 0x12 0x01 0x8E 0x71
+                                    0x64 0x23 0x31 0x68 0xA8 0x3D 0xC8 0x74]]
+   [TEAPCBCX923    initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0x2B 0x26 0xD0 0x5B 0xFA 0x4F 0xFF 0x8F
+                                    0x60 0x1F 0x4A 0x3A 0x27 0xC2 0xBC 0x13
+                                    0xB1 0x01 0x80 0xD9 0x01 0x66 0xBD 0x9C
+                                    0x40 0x6D 0x5D 0x2F 0x12 0x01 0x8E 0x71
+                                    0x61 0x29 0x35 0x2F 0xE9 0xBC 0xF3 0x4C]]
+   [TEAPCBCISO7816 initmap0 phrase [0x36 0xBE 0x5D 0x1B 0xB9 0x40 0xCC 0xF3
+                                    0x2B 0x26 0xD0 0x5B 0xFA 0x4F 0xFF 0x8F
+                                    0x60 0x1F 0x4A 0x3A 0x27 0xC2 0xBC 0x13
+                                    0xB1 0x01 0x80 0xD9 0x01 0x66 0xBD 0x9C
+                                    0x40 0x6D 0x5D 0x2F 0x12 0x01 0x8E 0x71
+                                    0xE9 0x69 0xB8 0x4A 0xFA 0x11 0xAA 0x34]]])</pre></td></tr><tr><td class="docs"><p>Test vectors for TEA stream suites</p>
+</td><td class="codes"><pre class="brush: clojure">(def  teas-test-vectors
+  [;[TEACFB initmap0 phrase []]
+   ;[TEAOFB initmap0 phrase []]
+])</pre></td></tr><tr><td class="docs"><p>Test vectors for TEA counter mode suite</p>
+</td><td class="codes"><pre class="brush: clojure">(def  teactr-test-vectors
+  [;[TEACTR initmap0 phrase []]
+])</pre></td></tr><tr><td class="docs"><h3>TEA Tests</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test TEA spec test vectors</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testSpec
+  (testing &quot;Spec&quot;
+    (is (= true (every? true? (map encrypt-block teaspec-test-vectors))))
+    (is (= true (every? true? (map decrypt-block teaspec-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>Test TEA block suites</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testBlock
+  (testing &quot;Block&quot;
+    (is (= true (every? true? (map encryptor teablock-test-vectors))))
+    (is (= true (every? true? (map decryptor teablock-test-vectors))))))</pre></td></tr><tr><td class="docs"><p>(deftest ^{:doc "Test TEA stream suites"} testStream
+ (testing "Stream"
+   (is (= true (every? true? (map encryptor teas-test-vectors))))
+   (is (= true (every? true? (map decryptor teas-test-vectors))))))</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>(deftest ^{:doc "Test TEA counter mode suite"} testCounter
+ (testing "Counter"
+   (is (= true (every? true? (map #(encryptor % :iv iv-64b) teactr-test-vectors))))
+   (is (= true (every? true? (map #(decryptor % :iv iv-64b) teactr-test-vectors))))))</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Test TEA</p>
+</td><td class="codes"><pre class="brush: clojure">(deftest  testTEA
+  (testing &quot;TEA&quot;
+    (testSpec)
+    (testBlock)
+    ;(testStream)
+    ;(testCounter)))</pre></td></tr><tr><td class="docs"><p>Namespace hook to run tests in proper order</p>
+</td><td class="codes"><pre class="brush: clojure">(defn  test-ns-hook
+  []
+  (testTEA))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

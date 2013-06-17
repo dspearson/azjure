@@ -4,6 +4,9 @@
   org.azjure.libbyte
   (:require [clojure.math.numeric-tower :refer (expt)]))
 
+(def ^{:doc "32-bit mask"}
+  mask32 0xFFFFFFFF)
+
 (defn indexed
   "Returns a lazy sequence of [index, item] pairs, where items come
   from 's' and indexes count up from zero.
@@ -155,19 +158,6 @@
 (defn <<< 
   ([word shift bits] (<<<-mm word shift bits))
   ([word shift] (<<<-mm word shift 32)))
-;;     (let [sft (mod shift bits)
-;;           mask (- (expt 2 bits) 1)]
-;;       (if (zero? sft) 
-;;         word
-;;         (cond
-;;          (<= bits 32) (bit-or 
-;;                       (bit-and (bit-shift-left word sft) mask) 
-;;                       (bit-shift-right word (minv-shift sft bits)))
-;;          (> bits 32) (.or
-;;                       (.and (.shiftLeft (BigInteger. (str word)) sft))
-;;                       (.shiftRight (BigInteger. (str word)) (minv-shift sft bits)))
-;;  ([word shift]
-;;     (<<< word shift 32)))
 
 ;; ### >>>
 ;; Circular right shift
@@ -201,3 +191,11 @@
   (if (instance? clojure.lang.BigInt x)
     (bi->bv x)
     (mapv #(bit-and (bit-shift-right x %) 0xFF) (range 56 -1 -8))))
+
+(defn ^{:doc "32-bit left shift"}
+  bsl32 [x n]
+  (bit-and (bit-shift-left x n) mask32))
+
+(defn ^{:doc "32-bit right shift"}
+  bsr32 [x n]
+  (bit-and (bit-shift-right x n) mask32))

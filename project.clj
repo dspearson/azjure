@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/math.numeric-tower "0.0.2"]]
   :profiles {:dev {:source-paths ["dev"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.3"]]}}
+                   :dependencies [[org.clojure/tools.namespace "0.2.3"]
+                                  [com.taoensso/timbre "2.1.2"]]}}
   :aliases {"build" ["install"]
             "sdoc" ["marg" "--multi" "src/" "test/"]}
   :jvm-opts ["-Xmx500m"]

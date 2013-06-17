@@ -1,5 +1,4 @@
 ;; # Twofish Block Cipher Tests
-
 (ns ^{:author "Jason Ozias"
       :doc "Test suite for the Twofish block cipher"}
   org.azjure.cipher.testtwofish

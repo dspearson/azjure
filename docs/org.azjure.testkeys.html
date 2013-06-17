@@ -3088,7 +3088,11 @@ defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   rabbit-128-key-1
   [0x83 0x95 0x74 0x15 0x87 0xE0 0xC7 0x33
-   0xE9 0xE9 0xAB 0x01 0xC0 0x9B 0x00 0x43])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
+   0xE9 0xE9 0xAB 0x01 0xC0 0x9B 0x00 0x43])</pre></td></tr><tr><td class="docs"><p>TEA 128-bit key as a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  tea-128-key
+  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
+   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
 defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def  tf-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>Used in many tests</p>
 </td><td class="codes"><pre class="brush: clojure">(def  key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>

@@ -3,7 +3,9 @@
             [clojure.pprint :refer (pprint)]
             [clojure.test :refer :all]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
-            (org.azjure [libcrypt :refer :all]
+            [taoensso.timbre.profiling :as profiling :refer (p profile)]
+            (org.azjure [cryptsuite :as cs]
+                        [libcrypt :refer :all]
                         [libbyte :refer :all]
                         [testkeys :refer :all])
             (org.azjure.cipher [cipher :as cipher]
@@ -13,6 +15,7 @@
                                [blowfish :refer (->Blowfish)]
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
+                               [tea :refer (->TEA)]
                                [salsa20 :refer (->Salsa20)]
                                [chacha :refer (->Chacha)]
                                [twofish :refer (->Twofish)]
