@@ -16,6 +16,7 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [tea :refer (->TEA)]
+                               [xtea :refer (->XTEA)]
                                [salsa20 :refer (->Salsa20)]
                                [chacha :refer (->Chacha)]
                                [twofish :refer (->Twofish)]

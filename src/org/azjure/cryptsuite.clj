@@ -7,6 +7,7 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [tea :refer (->TEA)]
+                               [xtea :refer (->XTEA)]
                                [twofish :refer (->Twofish)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (->ElectronicCodebook)]
@@ -52,6 +53,7 @@
 (def CAST5 (->CAST5))
 (def CAST6 (->CAST6))
 (def TEA (->TEA))
+(def XTEA (->XTEA))
 
 ;; #### ECB,CBC,PCBC,CFB,OFB,CTR
 ;; Setup the mode for use in testing
@@ -697,3 +699,105 @@
     CryptSuite
   (encrypt [_ key iv bytes] (encryptor TEA CTR key iv bytes))
   (decrypt [_ key iv bytes] (decryptor TEA CTR key iv bytes)))
+
+;; ### XTEAECBX
+;; XTEA cipher, Electronic Codebook Mode, various padding methods
+(defrecord XTEAECBPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA ECB PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA ECB PKCS7 key iv bytes)))
+
+(defrecord XTEAECBZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA ECB Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA ECB Zeropad key iv bytes)))
+
+(defrecord XTEAECBISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA ECB ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA ECB ISO10126 key iv bytes)))
+
+(defrecord XTEAECBX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA ECB X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA ECB X923 key iv bytes)))
+
+(defrecord XTEAECBISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA ECB ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA ECB ISO7816 key iv bytes)))
+
+;; ### XTEACBCX
+;; XTEA cipher, Cipher-Block Chaining Mode, various padding methods
+(defrecord XTEACBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CBC PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CBC PKCS7 key iv bytes)))
+
+(defrecord XTEACBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CBC Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CBC Zeropad key iv bytes)))
+
+(defrecord XTEACBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CBC ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CBC ISO10126 key iv bytes)))
+
+(defrecord XTEACBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CBC X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CBC X923 key iv bytes)))
+
+(defrecord XTEACBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CBC ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CBC ISO7816 key iv bytes)))
+
+;; ### XTEAPCBCX
+;; XTEA cipher, Propagating Cipher-Block Chain Mode, various padding methods
+(defrecord XTEAPCBCPKCS7 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA PCBC PKCS7 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA PCBC PKCS7 key iv bytes)))
+
+(defrecord XTEAPCBCZERO []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA PCBC Zeropad key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA PCBC Zeropad key iv bytes)))
+
+(defrecord XTEAPCBCISO10126 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA PCBC ISO10126 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA PCBC ISO10126 key iv bytes)))
+
+(defrecord XTEAPCBCX923 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA PCBC X923 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA PCBC X923 key iv bytes)))
+
+(defrecord XTEAPCBCISO7816 []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA PCBC ISO7816 key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA PCBC ISO7816 key iv bytes)))
+
+;; ### XTEACFB
+;; XTEA cipher, Cipher Feedback Mode
+(defrecord XTEACFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CFB key iv bytes)))
+
+;; ### XTEAOFB
+;; XTEA cipher, Output Feedback Mode
+(defrecord XTEAOFB []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA OFB key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA OFB key iv bytes)))
+
+;; ### XTEACTR
+;; XTEA cipher, Counter Mode
+(defrecord XTEACTR []
+    CryptSuite
+  (encrypt [_ key iv bytes] (encryptor XTEA CTR key iv bytes))
+  (decrypt [_ key iv bytes] (decryptor XTEA CTR key iv bytes)))
