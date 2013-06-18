@@ -11,7 +11,8 @@
   :aliases {"build" ["install"]
             "docs" ["do" "doc," "marg" "--multi" "src/" "test/"]}
   :jvm-opts ["-Xmx500m"]
-  :plugins [[lein-marginalia "0.7.1"]
+  :plugins [[codox "0.6.4"]
+            [lein-marginalia "0.7.1"]
             [lein-clojars "0.9.1"]]
   :repositories {"ozias.net" "http://www.ozias.net/archiva"}
   :scm {:name "git"
