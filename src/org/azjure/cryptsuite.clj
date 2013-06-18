@@ -4,11 +4,11 @@
   (:require (org.azjure.cipher [blockcipher :as bc]
                                [aes :refer (->Aes)]
                                [blowfish :refer (->Blowfish)]
+                               [twofish :refer (->Twofish)]
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [tea :refer (->TEA)]
-                               [xtea :refer (->XTEA)]
-                               [twofish :refer (->Twofish)])
+                               [xtea :refer (->XTEA)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (->ElectronicCodebook)]
                              [cbc :refer (->CipherBlockChaining)]

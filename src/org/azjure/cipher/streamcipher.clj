@@ -10,7 +10,7 @@
 ;; #### keystream-size-bytes
 ;;
 ;; #### iv-size-bytes
-;;
+
 (defprotocol StreamCipher
   (generate-keystream [_ initmap iv])
   (keystream-size-bytes [_])
