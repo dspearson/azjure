@@ -4,10 +4,12 @@
             [clojure.test :refer :all]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             [taoensso.timbre.profiling :as profiling :refer (p profile)]
-            (org.azjure [cryptsuite :as cs]
+            (org.azjure [cryptsuite :as cs :refer :all]
                         [libcrypt :refer :all]
                         [libbyte :refer :all]
-                        [testkeys :refer :all])
+                        [testkeys :refer :all]
+                        [testivs :refer :all]
+                        [testplaintext :refer :all])
             (org.azjure.cipher [cipher :as cipher]
                                [blockcipher :as bc]
                                [streamcipher :as sc]

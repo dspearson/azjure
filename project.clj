@@ -9,10 +9,12 @@
                    :dependencies [[org.clojure/tools.namespace "0.2.3"]
                                   [com.taoensso/timbre "2.1.2"]]}}
   :aliases {"build" ["install"]
-            "sdoc" ["marg" "--multi" "src/" "test/"]}
+            "sdoc" ["do" "doc," "marg" "--multi" "src/" "test/"]}
   :jvm-opts ["-Xmx500m"]
   :plugins [[lein-marginalia "0.7.1"]
             [lein-clojars "0.9.1"]]
   :repositories {"ozias.net" "http://www.ozias.net/archiva"}
   :scm {:name "git"
-         :url "https://github.com/CraZySacX/azjure"})
+         :url "https://github.com/CraZySacX/azjure"}
+  :codox {:output-dir "api"
+          :sources ["src" "test"]})
