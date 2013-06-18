@@ -42,8 +42,8 @@
   (fn [[y z] round]
     (let [yfn (calc-y key false)
           zfn (calc-z key false)
-          nz (zfn [y z (*modw round delta)])]
-      [(yfn [y nz (*modw (inc round) delta)]) nz])))
+          nz (zfn [y z (*modw (inc round) delta)])]
+      [(yfn [y nz (*modw round delta)]) nz])))
 
 (defn- ^{:doc "TEA cipher algorithm"}
   cipher 

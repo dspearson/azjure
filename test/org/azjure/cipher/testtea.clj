@@ -67,15 +67,6 @@
 (def ^{:doc "Initialization map to be used in the suite tests."} initmap1
   (cipher/initialize TEA {:key tea-128-key-0}))
 
-;(def ^{:doc "Initialization map to be used in the suite tests."} initmap2
-;  (cipher/initialize TEA {:key tea-128-key-1}))
-
-;(def ^{:doc "Initialization map to be used in the suite tests."} initmap3
-;  (cipher/initialize TEA {:key tea-128-key-2}))
-
-;(def ^{:doc "Initialization map to be used in the suite tests."} initmap4
-;  (cipher/initialize TEA {:key tea-128-key-3}))
-
 ;; ### Specification Test Vectors
 ;; Each row is
 ;;

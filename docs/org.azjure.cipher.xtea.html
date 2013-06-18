@@ -3028,128 +3028,73 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.testkeys" name="org.azjure.testkeys"><h1 class="project-name">org.azjure.testkeys</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h1>Test Keys</h1>
+</script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.xtea" name="org.azjure.cipher.xtea"><h1 class="project-name">org.azjure.cipher.xtea</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>XTEA</h2>
 
-<p><em>WARNING!!!</em> Do not use these keys to encrypt
-anything you wish to keep secret.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Test keys vectors</p>
+<p>Extended Tiny Encryption Algorithm</p>
+</td><td class="codes"><pre class="brush: clojure">(ns org.azjure.cipher.xtea
+  (:require (org.azjure.cipher [cipher :refer (Cipher)]
+                               [blockcipher :refer (BlockCipher)])
+            [org.azjure.libcrypt :refer :all]
+            [org.azjure.libbyte :refer :all]
+            [taoensso.timbre.profiling :as profiling :refer (p profile)]))</pre></td></tr><tr><td class="docs"><p>Golden ratio remainder.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  delta 0x9E3779B9)</pre></td></tr><tr><td class="docs"><p>XTEA y calculation</p>
 
-<p><a href="http://cr.yp.to/snuffle/spec.pdf">S20</a> http://cr.yp.to/snuffle/spec.pdf</p>
-</td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
-      :doc }
-  org.azjure.testkeys)</pre></td></tr><tr><td class="docs"><h3>40-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 40-bit key as a vector of bytes
-as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-40-key
-  [0x01 0x23 0x45 0x67 0x12])</pre></td></tr><tr><td class="docs"><h3>80-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>80-bits of zeros as a vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  zeros-80-key
-  (vec (take 10 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
-as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-80-key
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45])</pre></td></tr><tr><td class="docs"><p>A sample 80-bit key as a vector of bytes
-as defined at <a href="http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&amp;view=markup">Trivium Test Vectors</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  trivium-80-key-0
-  [0x80 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00])</pre></td></tr><tr><td class="docs"><h3>128-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(def  zeros-128-key
-  (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>AES 128-bit key as a vector of bytes as
-defined in Appendix C.1 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-128-key
-  [0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
-   0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f])</pre></td></tr><tr><td class="docs"><p>CAST5 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC 2144</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c5-128-key
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>CAST6 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-128-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d])</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
-defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  hc-128-key
-  zeros-128-key)</pre></td></tr><tr><td class="docs"><p>HC-128 128-bit key as a vector of bytes as
-defined at <a href="http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf">HC-128 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  hc-128-key-1
-  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Rabbit 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  rabbit-128-key-0
-  [0x91 0x28 0x13 0x29 0x2E 0x3D 0x36 0xFE
-   0x3B 0xFC 0x62 0xF1 0xDC 0x51 0xC3 0xAC])</pre></td></tr><tr><td class="docs"><p>Rabbit 128-bit key as a vector of bytes as
-defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  rabbit-128-key-1
-  [0x83 0x95 0x74 0x15 0x87 0xE0 0xC7 0x33
-   0xE9 0xE9 0xAB 0x01 0xC0 0x9B 0x00 0x43])</pre></td></tr><tr><td class="docs"><p>TEA 128-bit key as a vector of bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  tea-128-key-0
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>XTEA 128-bit key as a vector of bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  xtea-128-key-0
-  [0x01 0x23 0x45 0x67 0x12 0x34 0x56 0x78
-   0x23 0x45 0x67 0x89 0x34 0x56 0x78 0x9a])</pre></td></tr><tr><td class="docs"><p>XTEA 128-bit key as a vector of bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  xtea-128-key-1
-  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01])</pre></td></tr><tr><td class="docs"><p>XTEA 128-bit key as a vector of bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  xtea-128-key-2
-  [0x01 0x01 0x01 0x01 0x01 0x01 0x01 0x01
-   0x01 0x01 0x01 0x01 0x01 0x01 0x01 0x01])</pre></td></tr><tr><td class="docs"><p>XTEA 128-bit key as a vector of bytes</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  xtea-128-key-3
-  [0x01 0x23 0x45 0x67 0x89 0xab 0xcd 0xef
-   0x01 0x23 0x45 0x67 0x89 0xab 0xcd 0xef])</pre></td></tr><tr><td class="docs"><p>Twofish 128-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-128-key zeros-128-key)</pre></td></tr><tr><td class="docs"><p>Used in many tests</p>
-</td><td class="codes"><pre class="brush: clojure">(def  key-128b c5-128-key)</pre></td></tr><tr><td class="docs"><h3>192-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>AES 192-bit key as a vector of bytes as
-defined in Appendix C.2 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-192-key
-  (into aes-128-key [0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17]))</pre></td></tr><tr><td class="docs"><p>CAST6 192-bit key as a vector of bytes as
-defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-192-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
-   0xba 0xc7 0x7a 0x77 0x17 0x94 0x28 0x63])</pre></td></tr><tr><td class="docs"><p>Twofish 192-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-192-key
-  [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF
-   0xFE 0xDC 0xBA 0x98 0x76 0x54 0x32 0x10
-   0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])</pre></td></tr><tr><td class="docs"><h3>256-bit Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>256-bits of zeros as a vector of bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(def  zeros-256-key
-  (vec (take 32 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>AES 256-bit key as a vector of bytes as
-defined in Appendix C.3 in <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">FIPS 197</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  aes-256-key
-  (into aes-192-key [0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f]))</pre></td></tr><tr><td class="docs"><p>CAST6 256-bit key as a vector of bytes as
-defined in <a href="http://tools.ietf.org/html/rfc2612#page-10">RFC 2612</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  c6-256-key
-  [0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
-   0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
-   0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
-   0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04])</pre></td></tr><tr><td class="docs"><p>HC-256 256-bit key as a vector of bytes as
-defined at <a href="http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf">HC-256 Spec</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  hc-256-256-key-1
-  [0x00 0x00 0x00 0x55 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-   0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])</pre></td></tr><tr><td class="docs"><p>Twofish 256-bit key as a vector of bytes as
-defined at <a href="http://www.schneier.com/paper-twofish-paper.pdf">Twofish paper</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  tf-256-key
-  (into tf-192-key [0x88 0x99 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF]))</pre></td></tr><tr><td class="docs"><h3>Blowfish Test Keys</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 128-bit key as a vector of 4 32-bit words
-as defined <a href="http://www.schneier.com/code/vectors.txt">Blowfish vectors</a></p>
-</td><td class="codes"><pre class="brush: clojure">(def  key-128-1
-  [0x01234567 0x89ABCDEF 0xF0E1D2C3 0xB4A59687])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>y+= (z&lt;&lt;4 ^ z>>5) + z ^ sum + k[sum&amp;3],</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  calc-y [key enc]
+  (fn [[y z sum]]
+    (let [addsubfn (if enc +modw -modw)]
+      ((if enc +modw -modw) y
+       (bit-xor
+        (+modw (bit-xor (bsl32 z 4)(bsr32 z 5)) z)
+        (+modw sum (nth key (bit-and sum 3))))))))</pre></td></tr><tr><td class="docs"><p>XTEA z calculation</p>
+
+<p>z+= (y&lt;&lt;4 ^ y>>5) + y ^ sum + k[sum>>11 &amp;3] ;</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  calc-z [key enc]
+  (fn [[y z sum]]
+    ((if enc +modw -modw) z
+     (bit-xor
+      (+modw (bit-xor (bsl32 y 4)(bsr32 y 5)) y)
+      (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))</pre></td></tr><tr><td class="docs"><p>Encipher round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  encipher-round [key]
+  (fn [[y z] round]
+    (let [yfn (calc-y key true)
+          zfn (calc-z key true)
+          ny (yfn [y z (*modw round delta)])]
+      [ny (zfn [ny z (*modw (inc round) delta)])])))</pre></td></tr><tr><td class="docs"><p>Decipher round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  decipher-round [key]
+  (fn [[y z] round]
+    (let [yfn (calc-y key false)
+          zfn (calc-z key false)
+          nz (zfn [y z (*modw (inc round) delta)])]
+      [(yfn [y nz (*modw round delta)]) nz])))</pre></td></tr><tr><td class="docs"><p>TEA cipher algorithm</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  cipher 
+  ([bytes key enc]
+     {:pre [(vector? bytes)(vector? key)
+            (= (count bytes) 8)(= (count key) 16)]}
+  (let [c-words (mapv bytes-word (partition 4 bytes))
+        key-words (mapv bytes-word (partition 4 key))
+        rng (if enc (range 32)(range 31 -1 -1))
+        roundfn (if enc (encipher-round key-words)(decipher-round key-words))]
+    (reduce roundfn c-words rng))))</pre></td></tr><tr><td class="docs"><h3>XTEA</h3>
+
+<p>Extend the Cipher and BlockCipher thorough the XTEA record type</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defrecord XTEA []
+  Cipher
+  (initialize [_ {:keys [key] :as initmap}] 
+    initmap)
+  (keysizes-bytes [_] 
+    [16])
+  BlockCipher
+  (encrypt-block [_ bytes {:keys [key] :as initmap}]
+    (reduce into (mapv word-bytes (cipher (vec bytes) key true))))
+  (decrypt-block [_ bytes {:keys [key] :as initmap}]
+    (reduce into (mapv word-bytes (cipher (vec bytes) key false))))
+  (blocksize [_] 64))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

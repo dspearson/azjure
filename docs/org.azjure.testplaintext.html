@@ -3045,7 +3045,22 @@ as defined at <a href="http://tools.ietf.org/html/rfc2144#appendix-B.1">RFC2144<
   [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   tea-64-pt-0
-  [0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08])</pre></td></tr><tr><td class="docs"><h3>128-bit Plaintext Blocks</h3>
+  [0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  xtea-64-pt-0
+  [0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  xtea-64-pt-1
+  [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  xtea-64-pt-2
+  [0x01 0x01 0x01 0x01 0x01 0x01 0x01 0x01])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  xtea-64-pt-3
+  [0x01 0x23 0x45 0x67 0x89 0xab 0xcd 0xef])</pre></td></tr><tr><td class="docs"><p>A sample plaintex block as  a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  xtea-64-pt-4
+  [0x41 0x41 0x41 0x41 0x41 0x41 0x41 0x41])</pre></td></tr><tr><td class="docs"><h3>128-bit Plaintext Blocks</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>A 16-byte vector of zeros.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  zeros
   (vec (take 16 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>A sample plaintext block as a vector of 16 bytes

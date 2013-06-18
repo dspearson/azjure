@@ -3030,7 +3030,7 @@ net.brehaut.ClojureTools = (function (SH) {
 })(SyntaxHighlighter);
 </script><title>org.azjure/azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#org.azjure.cipher.testtea" name="org.azjure.cipher.testtea"><h1 class="project-name">org.azjure.cipher.testtea</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Test suite for the TEA block cipher</p>
 
-<h1>Twofish Block Cipher Tests</h1>
+<h1>TEA Block Cipher Tests</h1>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;
       :doc }
   org.azjure.cipher.testtea
@@ -3086,7 +3086,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(def  initmap0
   (cipher/initialize TEA {:key zeros-128-key}))</pre></td></tr><tr><td class="docs"><p>Initialization map to be used in the suite tests.</p>
 </td><td class="codes"><pre class="brush: clojure">(def  initmap1
-  (cipher/initialize TEA {:key tea-128-key}))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
+  (cipher/initialize TEA {:key tea-128-key-0}))</pre></td></tr><tr><td class="docs"><h3>Specification Test Vectors</h3>
 
 <p>Each row is</p>
 

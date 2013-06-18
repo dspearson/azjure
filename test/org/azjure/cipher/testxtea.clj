@@ -67,6 +67,15 @@
 (def ^{:doc "Initialization map to be used in the suite tests."} initmap1
   (cipher/initialize XTEA {:key xtea-128-key-0}))
 
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap2
+  (cipher/initialize XTEA {:key xtea-128-key-1}))
+
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap3
+  (cipher/initialize XTEA {:key xtea-128-key-2}))
+
+(def ^{:doc "Initialization map to be used in the suite tests."} initmap4
+  (cipher/initialize XTEA {:key xtea-128-key-3}))
+
 ;; ### Specification Test Vectors
 ;; Each row is
 ;;
@@ -74,8 +83,47 @@
 ;;
 
 (def ^{:doc "Test vectors from the XTEA spec"} xteaspec-test-vectors
-  [[XTEA initmap0 zeros-64-pt xtea-128-ct-0]
-   [XTEA initmap0 tea-64-pt-0 xtea-128-ct-1]
-   [XTEA initmap1 zeros-64-pt xtea-128-ct-2]
-   [XTEA initmap1 tea-64-pt-0 xtea-128-ct-3]])
+  [[XTEA initmap0 zeros-64-pt  xtea-128-ct-0]
+   [XTEA initmap0 xtea-64-pt-0 xtea-128-ct-1]
+   [XTEA initmap1 zeros-64-pt  xtea-128-ct-2]
+   [XTEA initmap1 xtea-64-pt-0 xtea-128-ct-3]
+   [XTEA initmap2 xtea-64-pt-1 xtea-128-ct-4]
+   [XTEA initmap3 xtea-64-pt-2 xtea-128-ct-5]
+   [XTEA initmap4 xtea-64-pt-3 xtea-128-ct-6]
+   [XTEA initmap4 zeros-64-pt  xtea-128-ct-7]
+   [XTEA initmap0 xtea-64-pt-3 xtea-128-ct-8]
+   [XTEA initmap0 xtea-64-pt-4 xtea-128-ct-9]])
 
+;; ### XTEA Tests
+
+(deftest ^{:doc "Test XTEA spec test vectors"} testSpec
+  (testing "Spec"
+    (is (= true (every? true? (map encrypt-block xteaspec-test-vectors))))
+    (is (= true (every? true? (map decrypt-block xteaspec-test-vectors))))))
+
+;(deftest ^{:doc "Test XTEA block suites"} testBlock
+;  (testing "Block"
+;    (is (= true (every? true? (map encryptor xteablock-test-vectors))))
+;    (is (= true (every? true? (map decryptor xteablock-test-vectors))))))
+
+;(deftest ^{:doc "Test XTEA stream suites"} testStream
+;  (testing "Stream"
+;    (is (= true (every? true? (map encryptor xteas-test-vectors))))
+;    (is (= true (every? true? (map decryptor xteas-test-vectors))))))
+
+;(deftest ^{:doc "Test XTEA counter mode suite"} testCounter
+;  (testing "Counter"
+;    (is (= true (every? true? (map #(encryptor % :iv iv-64b) xteactr-test-vectors))))
+;    (is (= true (every? true? (map #(decryptor % :iv iv-64b) xteactr-test-vectors))))))
+
+(deftest ^{:doc "Test XTEA"} testXTEA
+  (testing "XTEA"
+    (testSpec)
+    ;(testBlock)
+    ;(testStream)
+    ;(testCounter)
+))
+
+(defn ^{:doc "Namespace hook to run tests in proper order"} test-ns-hook
+  []
+  (testXTEA))
