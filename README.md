@@ -14,31 +14,26 @@ Add the following in the dependencies section of your project.clj file
 
 ### Block Ciphers
 ```Clojure
-(:require [org.azjure.cryptsuite :as cs]
+(:require [org.azjure.cryptsuite :as cs :refer (->AESCBCPKCS7)]
           (org.azjure.cipher [cipher :as cipher]
-                             [blockcipher :as bc]
-                             [aes :refer (->AES]))
+                             [aes :refer (->AES)])
 ```
 Encrypt
 
 ```Clojure
-;; Initialize the record to use
-(def aes (->AES))
-;; Initialize the cipher.
-(def initmap (cipher/initialize aes {:key key}))
-;; Encrypt
-(cs/encrypt aes plaintext iv initmap)
+;; Initialize the cipher (key should be a vector of unsigned bytes).
+(def initmap (cipher/initialize (->AES) {:key key}))
+;; Encrypt (plaintext and iv should be vectors of unsigned bytes)
+(cs/encrypt (->AESCBCPKCS7) plaintext iv initmap)
 ```
 
 Decrypt
 
 ```Clojure
-;; Initialize the record to use
-(def aes (->AES))
-;; Initialize the cipher.
-(def initmap (cipher/initialize aes {:key key}))
-;; Encrypt
-(cs/decrypt aes ciphertext iv initmap)
+;; Initialize the cipher (key should be a vector of unsigned bytes).
+(def initmap (cipher/initialize (->AES) {:key key}))
+;; Decrypt (ciphertext and iv should be vectors of unsigned bytes)
+(cs/decrypt (->AESCBCPKCS7) ciphertext iv initmap)
 ```
 
 ### Stream Ciphers
