@@ -9,7 +9,7 @@
                    :dependencies [[org.clojure/tools.namespace "0.2.3"]
                                   [com.taoensso/timbre "2.1.2"]]}}
   :aliases {"build" ["install"]
-            "sdoc" ["do" "doc," "marg" "--multi" "src/" "test/"]}
+            "docs" ["do" "doc," "marg" "--multi" "src/" "test/"]}
   :jvm-opts ["-Xmx500m"]
   :plugins [[lein-marginalia "0.7.1"]
             [lein-clojars "0.9.1"]]

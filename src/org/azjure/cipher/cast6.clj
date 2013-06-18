@@ -6,8 +6,7 @@
     (:require (org.azjure [libbyte :refer :all]
                           [libcrypt :refer (+modw -modw +mod32)])
               (org.azjure.cipher [cipher :refer (Cipher)]
-                                 [blockcipher :refer (BlockCipher)]
-                                 [streamcipher :refer (StreamCipher)])))
+                                 [blockcipher :refer (BlockCipher)])))
 
 ;; #### s1
 ;; S-Box 1
@@ -460,9 +459,4 @@
     (process-bytes block (conj {:enc true} initmap)))
   (decrypt-block [_ block initmap]
     (process-bytes block (conj {:enc false} initmap)))
-  (blocksize [_] 128)
-  StreamCipher
-  (generate-keystream [_ initmap iv]
-    (process-bytes iv (conj {:enc true} initmap)))
-  (keystream-size-bytes [_] 16)
-  (iv-size-bytes [_] 16))
+  (blocksize [_] 128))

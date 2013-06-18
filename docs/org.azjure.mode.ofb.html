@@ -3037,7 +3037,7 @@ net.brehaut.ClojureTools = (function (SH) {
   org.azjure.mode.ofb
   (:require [clojure.core.reducers :as r]
             [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))</pre></td></tr><tr><td class="docs"><h3>process-bytes</h3>
+            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>process-bytes</h3>
 
 <p>Encrypt the given bytes vector with the given
 cipher, key and IV.</p>
@@ -3045,10 +3045,10 @@ cipher, key and IV.</p>
 <p>Evaluates to a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
-        kb (sc/keystream-size-bytes cipher)
+        kb (quot (bc/blocksize cipher) 8)
         ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
     (-&gt;&gt; (range (inc ks))
-         (reductions (fn [iv _] (sc/generate-keystream cipher key iv)) iv)
+         (reductions (fn [iv _] (bc/encrypt-block cipher iv key)) iv)
          (rest)
          (reduce into)
          (mapv bit-xor bytes))))</pre></td></tr><tr><td class="docs"><h3>OutputFeedback</h3>

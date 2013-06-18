@@ -6,7 +6,7 @@
 (ns ^{:author "Jason Ozias"}
   org.azjure.mode.cfb
   (:require [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))
+            [org.azjure.cipher.blockcipher :as bc]))
 
 ;; ### encrypt-byte
 ;; Encrypt a single byte given the cipher,
@@ -16,8 +16,9 @@
 ;; the encrypted byte.
 ;;
 ;; Evaluates to a byte value (0-255)
-(defn- encrypt-byte [cipher key iv byte]
-  (->> (sc/generate-keystream cipher key iv)
+(defn- ^{:doc "Encrypt a single byte"}
+  encrypt-byte [cipher key iv byte]
+  (->> (bc/encrypt-block cipher iv key)
        (first)
        (bit-xor byte)))
 
@@ -28,7 +29,7 @@
 ;; Evaluates to a vector of bytes
 (defn- shift-in [cipher reg val]
   (->> (conj reg val)
-       (take-last (sc/iv-size-bytes cipher))
+       (take-last (quot (bc/blocksize cipher) 8))
        (vec)))
 
 ;; ### cfb-round

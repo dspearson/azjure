@@ -6,8 +6,7 @@
   (:require [org.azjure.libbyte :refer (get-byte bytes-word word-bytes)]
             [org.azjure.libcrypt :refer (+modw)]
             (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)]
-                               [streamcipher :refer (StreamCipher)])))
+                               [blockcipher :refer (BlockCipher)])))
 
 ;; #### parr_init
 ;; The initial values for the P-array.
@@ -299,10 +298,4 @@
     (process-bytes block (conj {:enc true} initmap)))
   (decrypt-block [_ block initmap]
     (process-bytes block (conj {:enc false} initmap)))
-  (blocksize [_]
-    64)
-  StreamCipher
-  (generate-keystream [_ initmap iv]
-    (process-bytes iv (conj {:enc true} initmap)))
-  (keystream-size-bytes [_] 8)
-  (iv-size-bytes [_] 8))
+  (blocksize [_] 64))

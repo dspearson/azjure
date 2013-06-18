@@ -3037,7 +3037,9 @@ per round.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   org.azjure.mode.cfb
   (:require [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))</pre></td></tr><tr><td class="docs"><h3>encrypt-byte</h3>
+            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><p>Encrypt a single byte</p>
+
+<h3>encrypt-byte</h3>
 
 <p>Encrypt a single byte given the cipher,
 key, and initialization vector.  The
@@ -3046,8 +3048,9 @@ in and xor'd with the given byte to form
 the encrypted byte.</p>
 
 <p>Evaluates to a byte value (0-255)</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encrypt-byte [cipher key iv byte]
-  (-&gt;&gt; (sc/generate-keystream cipher key iv)
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  encrypt-byte [cipher key iv byte]
+  (-&gt;&gt; (bc/encrypt-block cipher iv key)
        (first)
        (bit-xor byte)))</pre></td></tr><tr><td class="docs"><h3>shift-in</h3>
 
@@ -3057,7 +3060,7 @@ into the last position.</p>
 <p>Evaluates to a vector of bytes</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- shift-in [cipher reg val]
   (-&gt;&gt; (conj reg val)
-       (take-last (sc/iv-size-bytes cipher))
+       (take-last (quot (bc/blocksize cipher) 8))
        (vec)))</pre></td></tr><tr><td class="docs"><h3>cfb-round</h3>
 
 <p>Function representing a Cipher Feedback round

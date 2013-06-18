@@ -34,8 +34,7 @@
   org.azjure.cipher.aes
   (:require [org.azjure.libbyte :refer [bytes-word word-bytes]] 
             (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)]
-                               [streamcipher :refer (StreamCipher)])))
+                               [blockcipher :refer (BlockCipher)])))
 
 ;; #### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.
@@ -812,12 +811,4 @@
          (process-block (mapv bytes-word (partition 4 block)))
          (mapv word-bytes)
          (reduce into)))
-  (blocksize [_] 128)
-  StreamCipher
-  (generate-keystream [_ initmap iv]
-    (->> (conj {:enc true} initmap)
-         (process-block (mapv bytes-word (partition 4 iv)))
-         (mapv word-bytes)
-         (reduce into)))
-  (keystream-size-bytes [_] 16)
-  (iv-size-bytes [_] 16))
+  (blocksize [_] 128))

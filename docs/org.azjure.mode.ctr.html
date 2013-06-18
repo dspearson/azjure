@@ -3041,7 +3041,7 @@ net.brehaut.ClojureTools = (function (SH) {
   (:require [clojure.core.reducers :as r]
             [org.azjure.libbyte :refer (dword-bytes)]
             [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))</pre></td></tr><tr><td class="docs"><h3>pad-iv</h3>
+            [org.azjure.cipher.blockcipher :as bc]))</pre></td></tr><tr><td class="docs"><h3>pad-iv</h3>
 
 <p>Add the counter bytes to the IV bytes up the the size
 of IV needed by the cipher. Currently,the counter will 
@@ -3049,7 +3049,7 @@ max out at 8 bytes.</p>
 
 <p>Evaluates to a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- pad-iv [cipher iv ctr]
-  (let [diff (- (sc/iv-size-bytes cipher) (count iv))]
+  (let [diff (- (quot (bc/blocksize cipher) 8) (count iv))]
     (reduce conj iv (take diff (dword-bytes ctr)))))</pre></td></tr><tr><td class="docs"><h3>process-bytes</h3>
 
 <p>Process the given byte vector with the given cipher,
@@ -3058,11 +3058,11 @@ key, and IV.</p>
 <p>Evaluates to a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
-        kb (sc/keystream-size-bytes cipher)
+        kb (quot (bc/blocksize cipher) 8)
         ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
     (-&gt;&gt; (range (inc ks))
          (r/map (partial pad-iv cipher iv))
-         (r/map (partial sc/generate-keystream cipher key))
+         (r/map #(bc/encrypt-block cipher % key))
          (into [])
          (reduce into)
          (mapv bit-xor bytes))))</pre></td></tr><tr><td class="docs"><h3>CounterMode</h3>

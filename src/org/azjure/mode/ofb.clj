@@ -6,7 +6,7 @@
   org.azjure.mode.ofb
   (:require [clojure.core.reducers :as r]
             [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))
+            [org.azjure.cipher.blockcipher :as bc]))
 
 ;; ### process-bytes
 ;; Encrypt the given bytes vector with the given
@@ -15,10 +15,10 @@
 ;; Evaluates to a vector of bytes.
 (defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
-        kb (sc/keystream-size-bytes cipher)
+        kb (quot (bc/blocksize cipher) 8)
         ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
     (->> (range (inc ks))
-         (reductions (fn [iv _] (sc/generate-keystream cipher key iv)) iv)
+         (reductions (fn [iv _] (bc/encrypt-block cipher iv key)) iv)
          (rest)
          (reduce into)
          (mapv bit-xor bytes))))

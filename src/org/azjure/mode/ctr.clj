@@ -8,7 +8,7 @@
   (:require [clojure.core.reducers :as r]
             [org.azjure.libbyte :refer (dword-bytes)]
             [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.streamcipher :as sc]))
+            [org.azjure.cipher.blockcipher :as bc]))
 
 ;; ### pad-iv
 ;; Add the counter bytes to the IV bytes up the the size
@@ -17,7 +17,7 @@
 ;;
 ;; Evaluates to a vector of bytes.
 (defn- pad-iv [cipher iv ctr]
-  (let [diff (- (sc/iv-size-bytes cipher) (count iv))]
+  (let [diff (- (quot (bc/blocksize cipher) 8) (count iv))]
     (reduce conj iv (take diff (dword-bytes ctr)))))
 
 ;; ### process-bytes
@@ -27,11 +27,11 @@
 ;; Evaluates to a vector of bytes.
 (defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
-        kb (sc/keystream-size-bytes cipher)
+        kb (quot (bc/blocksize cipher) 8)
         ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
     (->> (range (inc ks))
          (r/map (partial pad-iv cipher iv))
-         (r/map (partial sc/generate-keystream cipher key))
+         (r/map #(bc/encrypt-block cipher % key))
          (into [])
          (reduce into)
          (mapv bit-xor bytes))))

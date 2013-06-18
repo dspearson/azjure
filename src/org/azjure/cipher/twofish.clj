@@ -3,8 +3,7 @@
 ;; [https://www.schneier.com/paper-twofish-paper.pdf](https://www.schneier.com/paper-twofish-paper.pdf)
 (ns org.azjure.cipher.twofish
   (:require (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)]
-                               [streamcipher :refer (StreamCipher)])
+                               [blockcipher :refer (BlockCipher)])
             [org.azjure.libcrypt :refer (to-hex maybe +modw)]
             [org.azjure.libbyte :refer (bytes-word word-bytes reverse-bytes <<< >>>)]))
 
@@ -510,9 +509,4 @@
     (process-bytes bytes (conj {:enc true} initmap)))
   (decrypt-block [_ bytes initmap]
     (process-bytes bytes (conj {:enc false} initmap)))
-  (blocksize [_] 128)
-  StreamCipher
-  (generate-keystream [_ initmap iv]
-    (process-bytes iv (conj {:enc true} initmap)))
-  (keystream-size-bytes [_] 16)
-  (iv-size-bytes [_] 16))
+  (blocksize [_] 128))
