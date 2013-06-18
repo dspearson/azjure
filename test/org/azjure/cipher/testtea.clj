@@ -160,13 +160,26 @@
                                     0xE9 0x69 0xB8 0x4A 0xFA 0x11 0xAA 0x34]]])
 
 (def ^{:doc "Test vectors for TEA stream suites"} teas-test-vectors
-  [;[TEACFB initmap0 phrase []]
-   ;[TEAOFB initmap0 phrase []]
-])
+  [[TEACFB initmap0 phrase [0x92 0xCF 0x1A 0x24 0xC4 0x42 0xFE 0xA9
+                            0x60 0x4C 0x6D 0xDF 0xCC 0x0C 0x6C 0x8D
+                            0xF5 0x06 0xEE 0x47 0x1D 0x2C 0xAB 0x6B
+                            0xF6 0x89 0x00 0xF9 0x0F 0xB2 0xAA 0x58
+                            0xD9 0x73 0x9D 0xBD 0xC3 0xB9 0x39 0x09
+                            0x45 0x0F 0xB6 0xD8]]
+   [TEAOFB initmap0 phrase [0x92 0xD0 0xEC 0x8B 0xC3 0xFF 0x7D 0xF3
+                            0xC6 0x0C 0xFD 0x06 0xB5 0xFA 0xAD 0xAE
+                            0x2C 0xD3 0x61 0x85 0x46 0x11 0x9E 0xD4
+                            0xF7 0x43 0xCF 0x78 0x62 0x57 0x16 0x2A
+                            0xA4 0x0C 0xF5 0xBA 0x27 0x59 0xF1 0xD1
+                            0x92 0x52 0xD9 0xF2]]])
 
 (def ^{:doc "Test vectors for TEA counter mode suite"} teactr-test-vectors
-  [;[TEACTR initmap0 phrase []]
-])
+  [[TEACTR initmap0 phrase [0x1B 0xE8 0xE5 0x96 0x1A 0xDE 0xC4 0x54
+                            0x24 0xA0 0xE2 0xC4 0x04 0xDC 0xC3 0x17
+                            0x29 0xEF 0xF8 0x96 0x01 0xDE 0xC0 0x47
+                            0x3C 0xA0 0xEF 0xC0 0x0E 0xD9 0x8D 0x43
+                            0x27 0xE5 0xA0 0xDA 0x0A 0xD1 0xD4 0x17
+                            0x2B 0xEF 0xE7 0x98]]])
 
 ;; ### TEA Tests
 
@@ -180,23 +193,22 @@
     (is (= true (every? true? (map encryptor teablock-test-vectors))))
     (is (= true (every? true? (map decryptor teablock-test-vectors))))))
 
-;(deftest ^{:doc "Test TEA stream suites"} testStream
-;  (testing "Stream"
-;    (is (= true (every? true? (map encryptor teas-test-vectors))))
-;    (is (= true (every? true? (map decryptor teas-test-vectors))))))
+(deftest ^{:doc "Test TEA stream suites"} testStream
+  (testing "Stream"
+    (is (= true (every? true? (map #(encryptor % :iv iv-64b) teas-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-64b) teas-test-vectors))))))
 
-;(deftest ^{:doc "Test TEA counter mode suite"} testCounter
-;  (testing "Counter"
-;    (is (= true (every? true? (map #(encryptor % :iv iv-64b) teactr-test-vectors))))
-;    (is (= true (every? true? (map #(decryptor % :iv iv-64b) teactr-test-vectors))))))
+(deftest ^{:doc "Test TEA counter mode suite"} testCounter
+  (testing "Counter"
+    (is (= true (every? true? (map #(encryptor % :iv iv-32b) teactr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-32b) teactr-test-vectors))))))
 
 (deftest ^{:doc "Test TEA"} testTEA
   (testing "TEA"
     (testSpec)
     (testBlock)
-    ;(testStream)
-    ;(testCounter)
-))
+    (testStream)
+    (testCounter)))
 
 (defn ^{:doc "Namespace hook to run tests in proper order"} test-ns-hook
   []
