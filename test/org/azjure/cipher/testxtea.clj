@@ -174,14 +174,29 @@
                                      0xFF 0x06 0xB3 0x3A 0xDD 0x68 0x9C 0xA4
                                      0xB9 0x62 0xBA 0x50 0x29 0x36 0x61 0x06]]])
 
-(def ^{:doc "Test vectors for XTEA stream suites"} xteas-test-vectors
-  [;[XTEACFB initmap0 phrase []]
-   ;[XTEAOFB initmap0 phrase []]
-])
+(def ^{:doc "Test vectors for XTEA stream suites"}
+  xteas-test-vectors
+  [[XTEACFB initmap0 phrase [0xF1 0x57 0xF2 0x79 0x74 0x9F 0xBD 0x67
+                             0xB8 0xDF 0x1F 0x3C 0x8F 0x9D 0xD2 0xCB
+                             0x68 0x76 0xC8 0x9B 0xEC 0x8B 0x9E 0x37
+                             0x02 0xEF 0x42 0x8F 0x9C 0xBE 0xBB 0xA9
+                             0x5D 0x29 0x75 0xA8 0xE6 0x6C 0x8D 0x05
+                             0xC5 0x65 0x22 0x17]]
+   [XTEAOFB initmap0 phrase [0xF1 0xC4 0x9F 0x64 0xC2 0x8F 0x77 0xA7
+                             0x9B 0xBA 0xF7 0x60 0xDD 0xB6 0x25 0x81
+                             0x55 0xBE 0xC4 0x10 0xFD 0xD7 0x07 0x84
+                             0x84 0x6E 0x98 0xDF 0x1E 0xD8 0xFE 0x81
+                             0xEF 0x71 0xF0 0x6D 0xA2 0x8D 0x4D 0x4B
+                             0xEE 0xB7 0xFD 0x02]]])
 
-(def ^{:doc "Test vectors for XTEA counter mode suite"} xteactr-test-vectors
-  [;[XTEACTR initmap0 phrase []]
-])
+(def ^{:doc "Test vectors for XTEA counter mode suite"}
+  xteactr-test-vectors
+  [[XTEACTR initmap0 phrase [0x0E 0xFE 0x4A 0x2A 0xF9 0xAB 0x3A 0xDF
+                             0x31 0xB6 0x4D 0x78 0xE7 0xA9 0x3D 0x9C
+                             0x3C 0xF9 0x57 0x2A 0xE2 0xAB 0x3E 0xCC
+                             0x29 0xB6 0x40 0x7C 0xED 0xAC 0x73 0xC8
+                             0x32 0xF3 0x0F 0x66 0xE9 0xA4 0x2A 0x9C
+                             0x3E 0xF9 0x48 0x24]]])
 
 ;; ### XTEA Tests
 
@@ -195,23 +210,22 @@
     (is (= true (every? true? (map encryptor xteablock-test-vectors))))
     (is (= true (every? true? (map decryptor xteablock-test-vectors))))))
 
-;(deftest ^{:doc "Test XTEA stream suites"} testStream
-;  (testing "Stream"
-;    (is (= true (every? true? (map encryptor xteas-test-vectors))))
-;    (is (= true (every? true? (map decryptor xteas-test-vectors))))))
+(deftest ^{:doc "Test XTEA stream suites"} testStream
+  (testing "Stream"
+    (is (= true (every? true? (map #(encryptor % :iv iv-64b) xteas-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-64b) xteas-test-vectors))))))
 
-;(deftest ^{:doc "Test XTEA counter mode suite"} testCounter
-;  (testing "Counter"
-;    (is (= true (every? true? (map #(encryptor % :iv iv-64b) xteactr-test-vectors))))
-;    (is (= true (every? true? (map #(decryptor % :iv iv-64b) xteactr-test-vectors))))))
+(deftest ^{:doc "Test XTEA counter mode suite"} testCounter
+  (testing "Counter"
+    (is (= true (every? true? (map #(encryptor % :iv iv-32b) xteactr-test-vectors))))
+    (is (= true (every? true? (map #(decryptor % :iv iv-32b) xteactr-test-vectors))))))
 
 (deftest ^{:doc "Test XTEA"} testXTEA
   (testing "XTEA"
     (testSpec)
     (testBlock)
-    ;(testStream)
-    ;(testCounter)
-))
+    (testStream)
+    (testCounter)))
 
 (defn ^{:doc "Namespace hook to run tests in proper order"} test-ns-hook
   []
