@@ -8,6 +8,7 @@
   :profiles {:dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.3"]
                                   [com.taoensso/timbre "2.1.2"]]}}
+  :target-path "target/"
   :aliases {"build" ["install"]
             "docs" ["do" "doc," "marg" "--multi" "src/" "test/"]}
   :jvm-opts ["-Xmx500m"]
