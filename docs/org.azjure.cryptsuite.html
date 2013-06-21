@@ -3034,11 +3034,11 @@ net.brehaut.ClojureTools = (function (SH) {
   (:require (org.azjure.cipher [blockcipher :as bc]
                                [aes :refer (-&gt;Aes)]
                                [blowfish :refer (-&gt;Blowfish)]
+                               [twofish :refer (-&gt;Twofish)]
                                [cast5 :refer (-&gt;CAST5)]
                                [cast6 :refer (-&gt;CAST6)]
                                [tea :refer (-&gt;TEA)]
-                               [xtea :refer (-&gt;XTEA)]
-                               [twofish :refer (-&gt;Twofish)])
+                               [xtea :refer (-&gt;XTEA)])
             (org.azjure.mode [modeofoperation :as mode]
                              [ecb :refer (-&gt;ElectronicCodebook)]
                              [cbc :refer (-&gt;CipherBlockChaining)]
