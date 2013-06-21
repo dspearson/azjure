@@ -18,13 +18,14 @@
                                [cast5 :refer (->CAST5)]
                                [cast6 :refer (->CAST6)]
                                [tea :refer (->TEA)]
-                               [xtea :refer (->XTEA)]
-                               [salsa20 :refer (->Salsa20)]
-                               [chacha :refer (->Chacha)]
                                [twofish :refer (->Twofish)]
+                               [xtea :refer (->XTEA)]
+                               [chacha :refer (->Chacha)]
+                               [grain128 :refer (->Grain128)]
                                [hc128 :refer (->HC128)]
                                [hc256 :refer (->HC256)]
                                [rabbit :refer (->Rabbit)]
+                               [salsa20 :refer (->Salsa20)]
                                [trivium :refer (->Trivium)])
             [org.azjure.cryptsuite :refer :all]))
 

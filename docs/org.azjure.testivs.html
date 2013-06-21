@@ -3063,7 +3063,15 @@ defined at <a href="http://tools.ietf.org/rfc/rfc4503.txt">Rabbit Spec</a></p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   trivium-80-iv
   [0x00 0x00 0x00 0x00 0x00 0x00 0x80 0x00
-   0x00 0x00])</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
+   0x00 0x00])</pre></td></tr><tr><td class="docs"><h3>96-bit Initialization Vectors</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>96-bits of zeros as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  zeros-96-iv
+  (vec (take 12 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>96-bits of as a vector of bytes.</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  grain-96-iv
+  [0x01 0x23 0x45 0x67 0x89 0xab 0xcd 0xef
+   0x12 0x34 0x56 0x78])</pre></td></tr><tr><td class="docs"><h3>128-bit Initialization Vectors</h3>
 </td><td class="codes"></td></tr><tr><td class="docs"><p>128-bits of zeros as a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   zeros-128-iv
