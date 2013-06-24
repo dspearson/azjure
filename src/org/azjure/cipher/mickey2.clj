@@ -24,6 +24,30 @@ for initialized key/iv pairs"}
           54 56 58 60 61 63 64 65 66 67 71 72 79 80 81 82 87 88 89 90 91 92
           94 95 96 97})
 
+(def ^{:private true :doc "comp0 as defined in the [MICKEY2.0 Spec][M2]"}
+  comp0 [2 0 0 0 1 1 0 0 0 1 0 1 1 1 1 0 1 0 0 1 0 1 0 1 0 
+         1 0 1 0 1 1 0 1 0 0 1 0 0 0 0 0 0 0 1 0 1 0 1 0 1
+         0 0 0 0 1 0 1 0 0 1 1 1 1 0 0 1 0 1 0 1 1 1 1 1 1
+         1 1 1 0 1 0 1 1 1 1 1 1 0 1 0 1 0 0 0 0 0 0 1 1 2])
+
+(def ^{:private true :doc "comp1 as defined in the [MICKEY2.0 Spec][M2]"}
+  comp1 [2 1 0 1 1 0 0 1 0 1 1 1 1 0 0 1 0 1 0 0 0 1 1 0 1
+         0 1 1 1 0 1 1 1 1 0 0 0 1 1 0 1 0 1 1 1 0 0 0 0 1
+         0 0 0 1 0 1 1 1 0 0 0 1 1 1 1 1 1 0 1 0 1 1 1 0 1
+         1 1 1 0 0 0 1 0 0 0 0 1 1 1 0 0 0 1 0 0 1 1 0 0 2])
+
+(def ^{:private true :doc "fb0 as defined in the [MICKEY2.0 Spec][M2]"}
+  fb0 [1 1 1 1 0 1 0 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 1 1
+       1 1 1 1 0 0 1 1 0 0 0 0 0 0 1 1 1 0 0 1 0 0 1 0 1
+       0 1 0 0 1 0 1 1 1 1 0 1 0 1 0 1 0 0 0 0 0 0 0 0 0
+       1 1 0 1 0 0 0 1 1 0 1 1 1 0 0 1 1 1 0 0 1 1 0 0 0])
+
+(def ^{:private true :doc "fb1 as defined in the [MICKEY2.0 Spec][M2]"}
+  fb1 [1 1 1 0 1 1 1 0 0 0 0 1 1 1 0 1 0 0 1 1 0 0 0 1 0
+       0 1 1 0 0 1 0 1 1 0 0 0 1 1 0 0 0 0 0 1 1 0 1 1 0
+       0 0 1 0 0 0 1 0 0 1 0 0 1 0 1 1 0 1 0 1 0 0 1 0 1
+       0 0 0 1 1 1 1 0 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 1])
+
 (defn- ^{:doc "xor with the feedback bit if the index is in rtaps"}
   rtapper [feedback-bit]
   (fn [r idx]
@@ -45,17 +69,66 @@ for initialized key/iv pairs"}
       (reduce (rxor r) rprime (range 100))
       rprime)))
 
+(defn- comp-s [s]
+  (fn [sint idx]
+    (let [si (nth s idx)
+          si- (nth s (dec idx))
+          si+ (nth s (inc idx))
+          sicaret (->> (bit-xor (nth comp1 idx) si+)
+                       (bit-and (bit-xor (nth comp0 idx) si))
+                       (bit-xor si-))]
+      (assoc sint idx sicaret))))
+
+(defn- fb-s [s fb fbb]
+  (fn [sprime idx]
+    (assoc sprime idx (bit-xor (nth s idx) (bit-and (nth fb idx) fbb)))))
+
+(defn- ^{:doc "Clock the s register"}
+  clock-s [s input-bit control-bit]
+  (let [feedback-bit (bit-xor (nth s 99) input-bit)
+        scaret (assoc (assoc (reduce (comp-s s) s (range 1 99)) 0 0) 99 (nth s 98))]
+    (if (= 0 control-bit)
+      (reduce (fb-s scaret fb0 feedback-bit) scaret (range 100))
+      (reduce (fb-s scaret fb1 feedback-bit) scaret (range 100)))))
+
+(defn- ^{:doc "Clock the key generator"}
+  clock-kg [mixing]
+  (fn [[r s] input-bit]
+    (let [cbr (bit-xor (nth s 34) (nth r 67))
+          cbs (bit-xor (nth s 67) (nth r 33))
+          ibr (if mixing (bit-xor input-bit (nth s 50)) input-bit)
+          ibs input-bit]
+      [(clock-r r ibr cbr)
+       (clock-s s ibs cbs)])))
+
+(defn- key-stream-round [[r s out] _]
+  (let [[nr ns] ((clock-kg false) [r s] 0)]
+    [nr ns (conj out (bit-xor (nth r 0)(nth s 0)))]))
+
 (defn- ^{:doc "Swap the state in the atom at uid with the default state"}
   swapkiv! [uid {:keys [key iv]}]
   (if (contains? @mickey2-key-streams uid)
     (swap! mickey2-key-streams assoc uid
            (assoc (uid @mickey2-key-streams) :upper 0 :ks []))
-    (clock-r (vec (take 100 (cycle [1]))) 0 1)
-    ))
+    (let [init (vec (take 100 (cycle [0])))
+          ivbits (reduce into (mapv byte->bits iv))
+          keybits (reduce into (mapv byte->bits key))
+          clkfn (clock-kg true)
+          ivloaded (reduce clkfn [init init] ivbits) ; Load IV
+          keyloaded (reduce clkfn ivloaded keybits) ; Load key 
+          [r s] (reduce clkfn keyloaded init) ; Preclock
+          ]
+      (swap! mickey2-key-streams assoc uid {:r r :s s}))))
 
 (defn- ^{:doc "Swap any existing keystream at uid with a newly generated one"}
   swapks! [uid upper]
-  (let [ks nil]
+  (let [r (:r (uid @mickey2-key-streams))
+        s (:s (uid @mickey2-key-streams))
+        ks (->> (range (* 8 upper)) ; 8 bits per byte 
+                (reduce key-stream-round [r s []])
+                (peek)
+                (partition 8)
+                (mapv (comp bits->byte reverse)))]
     (swap! mickey2-key-streams assoc uid
            (assoc (uid @mickey2-key-streams) :upper upper :ks ks))))
 
