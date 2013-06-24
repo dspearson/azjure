@@ -24,6 +24,7 @@
                                [grain128 :refer (->Grain128)]
                                [hc128 :refer (->HC128)]
                                [hc256 :refer (->HC256)]
+                               [mickey2 :refer (->Mickey2)]
                                [rabbit :refer (->Rabbit)]
                                [salsa20 :refer (->Salsa20)]
                                [trivium :refer (->Trivium)])
