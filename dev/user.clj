@@ -9,7 +9,8 @@
                         [libbyte :refer :all]
                         [testkeys :refer :all]
                         [testivs :refer :all]
-                        [testplaintext :refer :all])
+                        [testplaintext :refer :all]
+                        [testciphertext :refer :all])
             (org.azjure.cipher [cipher :as cipher]
                                [blockcipher :as bc]
                                [streamcipher :as sc]

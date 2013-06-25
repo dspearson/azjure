@@ -3037,7 +3037,10 @@ Do not use these initialization vectors to encrypt
 anything you wish to keep secret.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns ^{:author &quot;Jason Ozias&quot;}
   org.azjure.testivs)</pre></td></tr><tr><td class="docs"><h3>32-bit Initialization Vectors</h3>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>A sample 32-bit initialization vector as a vector of bytes.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>A 32-bit initialization vector of zeros as a vector of bytes</p>
+</td><td class="codes"><pre class="brush: clojure">(def 
+  zeros-32-iv
+  (vec (take 4 (cycle [0]))))</pre></td></tr><tr><td class="docs"><p>A sample 32-bit initialization vector as a vector of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
   iv-32b
   [0xFE 0xDC 0xBA 0x98])</pre></td></tr><tr><td class="docs"><h3>64-bit Initialization Vectors</h3>

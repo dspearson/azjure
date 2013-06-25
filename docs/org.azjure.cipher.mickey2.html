@@ -3086,8 +3086,9 @@ for initialized key/iv pairs</p>
         rprime (reduce (rtapper feedback-bit) rprime (range 100))]
     (if (= 1 control-bit)
       (reduce (rxor r) rprime (range 100))
-      rprime)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- comp-s [s]
+      rprime)))</pre></td></tr><tr><td class="docs"><p>Calculate a new sint value at idx</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  comp-s [s]
   (fn [sint idx]
     (let [si (nth s idx)
           si- (nth s (dec idx))
@@ -3095,8 +3096,9 @@ for initialized key/iv pairs</p>
           sicaret (-&gt;&gt; (bit-xor (nth comp1 idx) si+)
                        (bit-and (bit-xor (nth comp0 idx) si))
                        (bit-xor si-))]
-      (assoc sint idx sicaret))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- fb-s [s fb fbb]
+      (assoc sint idx sicaret))))</pre></td></tr><tr><td class="docs"><p>Calculate a new sprime value at idx</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  fb-s [s fb fbb]
   (fn [sprime idx]
     (assoc sprime idx (bit-xor (nth s idx) (bit-and (nth fb idx) fbb)))))</pre></td></tr><tr><td class="docs"><p>Clock the s register</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 
@@ -3114,8 +3116,10 @@ for initialized key/iv pairs</p>
           ibr (if mixing (bit-xor input-bit (nth s 50)) input-bit)
           ibs input-bit]
       [(clock-r r ibr cbr)
-       (clock-s s ibs cbs)])))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn- key-stream-round [[r s out] _]
+       (clock-s s ibs cbs)])))</pre></td></tr><tr><td class="docs"><p>Generate a single keystream bit and conj it on to the output
+vector</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- 
+  key-stream-round [[r s out] _]
   (let [[nr ns] ((clock-kg false) [r s] 0)]
     [nr ns (conj out (bit-xor (nth r 0)(nth s 0)))]))</pre></td></tr><tr><td class="docs"><p>Swap the state in the atom at uid with the default state</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- 

@@ -69,7 +69,8 @@ for initialized key/iv pairs"}
       (reduce (rxor r) rprime (range 100))
       rprime)))
 
-(defn- comp-s [s]
+(defn- ^{:doc "Calculate a new sint value at idx"}
+  comp-s [s]
   (fn [sint idx]
     (let [si (nth s idx)
           si- (nth s (dec idx))
@@ -79,7 +80,8 @@ for initialized key/iv pairs"}
                        (bit-xor si-))]
       (assoc sint idx sicaret))))
 
-(defn- fb-s [s fb fbb]
+(defn- ^{:doc "Calculate a new sprime value at idx"}
+  fb-s [s fb fbb]
   (fn [sprime idx]
     (assoc sprime idx (bit-xor (nth s idx) (bit-and (nth fb idx) fbb)))))
 
@@ -101,7 +103,9 @@ for initialized key/iv pairs"}
       [(clock-r r ibr cbr)
        (clock-s s ibs cbs)])))
 
-(defn- key-stream-round [[r s out] _]
+(defn- ^{:doc "Generate a single keystream bit and conj it on to the output
+vector"}
+  key-stream-round [[r s out] _]
   (let [[nr ns] ((clock-kg false) [r s] 0)]
     [nr ns (conj out (bit-xor (nth r 0)(nth s 0)))]))
 

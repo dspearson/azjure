@@ -11,6 +11,10 @@
 
 ;; ### 32-bit Initialization Vectors
 
+(def ^{:doc "A 32-bit initialization vector of zeros as a vector of bytes"}
+  zeros-32-iv
+  (vec (take 4 (cycle [0]))))
+
 (def ^{:doc "A sample 32-bit initialization vector as a vector of bytes."}
   iv-32b
   [0xFE 0xDC 0xBA 0x98])

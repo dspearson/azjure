@@ -12,6 +12,7 @@
             (org.azjure.cipher [cipher :as cipher]
                                [streamcipher :as sc]
                                [grain128 :refer (->Grain128)])))
+
 ;; ### Record Definitions
 
 (def ^{:doc "Grain128 record to be used in the tests"} grain128 (->Grain128))

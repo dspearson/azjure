@@ -87,8 +87,9 @@ See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/or
 2. ChaCha (Chacha) - [ChaCha Spec](http://cr.yp.to/chacha/chacha-20080128.pdf)
 3. HC-128 (HC128) - [HC-128 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
 4. HC-256 (HC256) - [HC-256 Spec](http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf)
-5. Rabbit (Rabbit) - [Rabbit Spec](http://tools.ietf.org/rfc/rfc4503.txt)
-6. Trivium (Trivium) - [Trivium Spec](http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf)
+5. MICKEY2.0 (MICKEY2.0) - [MICKEY2.0 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/mickey/mickey_p3.pdf)
+6. Rabbit (Rabbit) - [Rabbit Spec](http://tools.ietf.org/rfc/rfc4503.txt)
+7. Trivium (Trivium) - [Trivium Spec](http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf)
 
 ## Supported Modes
 Cipher modes describe the method for encrypting multiple blocks with block ciphers.
