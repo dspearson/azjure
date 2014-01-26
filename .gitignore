@@ -3,7 +3,7 @@
 target
 \#*
 .\#*
-.lein-repl-history
+.lein-*
 pom.xml
 pom.xml.asc
 *.swp
