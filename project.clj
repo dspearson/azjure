@@ -4,11 +4,12 @@
   :license {:name "GPLv3"
             :url "http://www.gnu.org/licenses/gpl.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/math.numeric-tower "0.0.4"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]
+                 [com.taoensso/timbre "3.0.0-RC4"]]
   :profiles {:dev {:source-paths ["dev"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.4"]
-                                  [com.taoensso/timbre "3.0.0-RC4"]]
-                   :plugins [[codox "0.6.6"]]}}
+                   :dependencies [[org.clojure/tools.namespace "0.2.4"]]
+                   :plugins [[codox "0.6.6"]]}
+             :uberjar {:aot :all}}
   :aliases {"package" ["do" "clean," "uberjar"]
             "most" ["do" "clean," "doc," "package"]
             "dep" ["do" "deploy," "deploy" "clojars"]
@@ -21,9 +22,9 @@
                          {:url "http://www.ozias.net/artifactory/libs-release-local"
                           :creds :gpg}]]
   :scm {:name "git"
-         :url "https://github.com/CraZySacX/azjure"}
+        :url "https://github.com/CraZySacX/azjure"}
   :codox {:output-dir "api"
           :exclude [leiningen.version]
           :sources ["src" "test"]
-          :src-dir-uri "http://github.com/CraZySacX/overbuild/blob/master/"
+          :src-dir-uri "http://github.com/CraZySacX/azjure/blob/master/"
           :src-linenum-anchor-prefix "L"})
