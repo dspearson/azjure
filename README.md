@@ -8,7 +8,7 @@ Add the following in the dependencies section of your project.clj file
 
 ```Clojure
 :dependencies [...
-               [org.azjure/azjure "0.1.0"]
+               [org.azjure/azjure "0.1.1"]
                ...]
 ```
 
