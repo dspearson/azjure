@@ -1,10 +1,8 @@
-.emacs.bmk
-.dsbranches
+# Directories
 target
-\#*
-.\#*
-.lein-*
+api
+
+# Files
 pom.xml
 pom.xml.asc
-*.swp
-docs/.html
+version.clj
