@@ -1,16 +1,16 @@
 ;; # Chacha Stream Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Chacha stream cipher"}
-  org.azjure.cipher.testchacha
+
+(ns org.azjure.cipher.testchacha
+  "Test suite for the Chacha stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [chacha :refer (->Chacha)])))
+            [org.azjure.cipher.chacha :refer [->Chacha]]
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "Chacha record to be used in the tests"} chacha (->Chacha))

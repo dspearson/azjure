@@ -1,12 +1,13 @@
 ;; ## Camellia Cipher
 ;; Designed to meet the spec at
 ;; [RFC3713](http://tools.ietf.org/html/rfc3713)
-(ns ^{:author "Jason Ozias"}
-    org.azjure.cipher.camellia
-    (:require [clojure.string :refer (join)]
-              (org.azjure [libbyte :refer [<<< bytes-dword]]
-                          [libcrypt :refer (to-hex)])
-              [org.azjure.cipher.blockcipher :refer [BlockCipher]]))
+
+(ns org.azjure.cipher.camellia
+  {:author "Jason Ozias"}
+  (:require [clojure.string :refer [join]]
+            [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.libbyte :refer [<<< bytes-dword]]
+            [org.azjure.libcrypt :refer [to-hex]]))
 
 (def mask128 (BigInteger. "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" 16))
 (def mask64  (BigInteger. "FFFFFFFFFFFFFFFF" 16))

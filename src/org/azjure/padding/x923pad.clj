@@ -2,11 +2,11 @@
 ;; Padding implementation that will pad a byte array to
 ;; the proper length given a block cipher with zeros and
 ;; a final byte indicating how many pad bytes were added.
-(ns ^{:author "Jason Ozias"}
-  org.azjure.padding.x923pad
-  (:require [org.azjure.libcrypt :refer (mbpb)]
-            [org.azjure.padding.pad :refer (Pad remaining)]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.padding.x923pad
+  {:author "Jason Ozias"}
+  (:require [org.azjure.libcrypt :refer [mbpb]]
+            [org.azjure.padding.pad :refer [Pad remaining]]))
 
 ;; ### pad-bytes
 ;; Pad the given vector of bytes to the appropriate block size

@@ -1,16 +1,16 @@
 ;; # Salsa20 Stream Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Salsa20 stream cipher"}
-  org.azjure.cipher.testsalsa20
+
+(ns org.azjure.cipher.testsalsa20
+  "Test suite for the Salsa20 stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [salsa20 :refer (->Salsa20)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.salsa20 :refer [->Salsa20]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "Salsa20 record to be used in the tests"} s20 (->Salsa20))

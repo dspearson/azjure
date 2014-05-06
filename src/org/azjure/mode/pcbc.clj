@@ -6,11 +6,12 @@
 ;; > changes in the ciphertext to propagate indefinitely when decrypting, as
 ;; > well as when encrypting."
 ;;
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.pcbc
-  (:require [org.azjure.libcrypt :refer [mbpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.mode.pcbc
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.libcrypt :refer [mbpb]]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### encrypt-block
 ;; Evaluates to a function over the given cipher and key.

@@ -7,11 +7,12 @@
 ;; > plaintext blocks processed up to that point. To make each message unique, an
 ;; > initialization vector must be used in the first block."
 ;;
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.cbc
-  (:require [org.azjure.libcrypt :refer [mbpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.mode.cbc
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.libcrypt :refer [mbpb]]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### encrypt-block
 ;; Evaluates to a function over the given cipher, initialization vector and key.

@@ -1,11 +1,11 @@
 ;; ## TEA
 ;; Tiny Encryption Algorithm
+
 (ns org.azjure.cipher.tea
-  (:require (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)])
-            [org.azjure.libcrypt :refer :all]
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
             [org.azjure.libbyte :refer :all]
-            [taoensso.timbre.profiling :as profiling :refer (p profile)]))
+            [org.azjure.libcrypt :refer :all]))
 
 (def ^{:doc "Golden ratio remainder."}
   delta 0x9E3779B9)

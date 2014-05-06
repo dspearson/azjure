@@ -1,17 +1,16 @@
 ;; # HC256 Stream Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the HC256 stream cipher"}
-  org.azjure.cipher.testhc256
+(ns org.azjure.cipher.testhc256
+  "Test suite for the HC256 stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [hc256 :refer (->HC256)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.hc256 :refer [->HC256]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "HC256 record to be used in the tests"} hc256 (->HC256))

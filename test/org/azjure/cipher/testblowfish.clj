@@ -1,37 +1,26 @@
 ;; # Blowfish Block Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Blowfish block cipher"}
-  org.azjure.cipher.testblowfish
+(ns org.azjure.cipher.testblowfish
+  "Test suite for the Blowfish block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->BFECBPKCS7)]
-                        [cryptsuite :refer (->BFECBZERO)]
-                        [cryptsuite :refer (->BFECBISO10126)]
-                        [cryptsuite :refer (->BFECBX923)]
-                        [cryptsuite :refer (->BFECBISO7816)]
-                        [cryptsuite :refer (->BFCBCPKCS7)]
-                        [cryptsuite :refer (->BFCBCZERO)]
-                        [cryptsuite :refer (->BFCBCISO10126)]
-                        [cryptsuite :refer (->BFCBCX923)]
-                        [cryptsuite :refer (->BFCBCISO7816)]
-                        [cryptsuite :refer (->BFPCBCPKCS7)]
-                        [cryptsuite :refer (->BFPCBCZERO)]
-                        [cryptsuite :refer (->BFPCBCISO10126)]
-                        [cryptsuite :refer (->BFPCBCX923)]
-                        [cryptsuite :refer (->BFPCBCISO7816)]
-                        [cryptsuite :refer (->BFCFB)]
-                        [cryptsuite :refer (->BFOFB)]
-                        [cryptsuite :refer (->BFCTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [streamcipher :as sc]
-                               [blowfish :refer (->Blowfish)])))
+            [org.azjure.cipher.blowfish :refer [->Blowfish]]
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cryptsuite :refer [->BFCBCISO10126
+                                           ->BFCBCISO7816 ->BFCBCPKCS7
+                                           ->BFCBCX923 ->BFCBCZERO
+                                           ->BFCFB ->BFCTR
+                                           ->BFECBISO10126
+                                           ->BFECBISO7816 ->BFECBPKCS7
+                                           ->BFECBX923 ->BFECBZERO
+                                           ->BFOFB ->BFPCBCISO10126
+                                           ->BFPCBCISO7816
+                                           ->BFPCBCPKCS7 ->BFPCBCX923
+                                           ->BFPCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

@@ -1,6 +1,7 @@
 ;; ## BlockCipher Protocol
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.blockcipher)
+
+(ns org.azjure.cipher.blockcipher
+  {:author "Jason Ozias"})
 
 ;; ### BlockCipher
 ;; This protocol defines three functions

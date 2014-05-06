@@ -1,16 +1,16 @@
 ;; # Rabbit Stream Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Rabbit stream cipher"}
-  org.azjure.cipher.testrabbit
+
+(ns org.azjure.cipher.testrabbit
+  "Test suite for the Rabbit stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [rabbit :refer (->Rabbit)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.rabbit :refer [->Rabbit]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "Rabbit record to be used in the tests"}

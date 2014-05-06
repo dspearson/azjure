@@ -4,9 +4,10 @@
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
 ;; [TRI]: http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&view=markup
 ;; [HC256]: http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf
-(ns ^{:author "Jason Ozias"
-      :doc "Test ciphertext vectors."}
-  org.azjure.testciphertext)
+
+(ns org.azjure.testciphertext
+  "Test ciphertext vectors."
+  {:author "Jason Ozias"})
 
 ;; ### Ciphertext generated with 40-bit keys.
 

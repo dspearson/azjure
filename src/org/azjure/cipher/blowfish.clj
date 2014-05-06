@@ -1,12 +1,13 @@
 ;; ## Blowfish Cipher
 ;; Designed to meet the spec at
 ;; [http://www.schneier.com/paper-blowfish-fse.html](http://www.schneier.com/paper-blowfish-fse.html)
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.blowfish
-  (:require [org.azjure.libbyte :refer (get-byte bytes-word word-bytes)]
-            [org.azjure.libcrypt :refer (+modw)]
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)])))
+
+(ns org.azjure.cipher.blowfish
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.libbyte :refer [bytes-word get-byte word-bytes]]
+            [org.azjure.libcrypt :refer [+modw]]))
 
 ;; #### parr_init
 ;; The initial values for the P-array.

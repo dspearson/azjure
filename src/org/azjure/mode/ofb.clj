@@ -2,11 +2,11 @@
 ;; Output Feedback mode
 ;;
 ;; [Block Cipher Mode of Operation](http://en.wikipedia.org/wiki/Cipher_block_chaining)
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.ofb
-  (:require [clojure.core.reducers :as r]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.mode.ofb
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### process-bytes
 ;; Encrypt the given bytes vector with the given

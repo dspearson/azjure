@@ -2,12 +2,13 @@
 ;;
 ;; [TRI]: http://www.ecrypt.eu.org/stream/ciphers/trivium/trivium.pdf
 ;; Designed to meet the [Trivium Spec][TRI]
+
 (ns org.azjure.cipher.trivium
-  (:require [clojure.math.numeric-tower :refer (expt)]
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer (bytes->keyword to-hex)]
-            [org.azjure.libbyte :refer :all]))
+  (:require [clojure.math.numeric-tower :refer [expt]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.cipher.streamcipher :refer [StreamCipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer [bytes->keyword]]))
 
 (def ^{:doc "Trivium key streams."}
   trivium-key-streams (atom {}))

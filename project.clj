@@ -1,30 +1,50 @@
-(defproject org.azjure/azjure "0.1.2-SNAPSHOT"
+(defproject org.ozias.cljlibs/azjure "0.2.0-SNAPSHOT"
   :description "Encryption Library in Clojure"
   :url "https://github.com/CraZySacX/azjure"
-  :license {:name "GPLv3"
-            :url "http://www.gnu.org/licenses/gpl.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :license {:name "MIT"
+            :url  "http://opensource.org/licenses/MIT"}
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
-                 [com.taoensso/timbre "3.0.1"]]
-  :profiles {:dev {:source-paths ["dev"]
-                   :dependencies [[org.clojure/tools.namespace "0.2.4"]]
-                   :plugins [[codox "0.6.6"]]}
-             :uberjar {:aot :all}}
-  :aliases {"package" ["do" "clean," "uberjar"]
-            "most" ["do" "clean," "doc," "package"]
-            "dep" ["do" "deploy," "deploy" "clojars"]
-            "all" ["do" "most," "dep"]}
+                 [org.ozias.cljlibs/logging "0.1.5"]]
+  :profiles {:dev {:source-paths
+                    ["dev"]
+                   :dependencies
+                    [[org.clojars.jozias/midje "1.6.3"]
+                     [org.clojure/tools.namespace "0.2.4"]
+                     [org.ozias.cljlibs/scm "0.1.3"]]
+                   :plugins
+                    [[codox "0.7.2"]
+                     [lein-midje "3.1.3"]
+                     [org.ozias.plugins/lein-git-version "1.1.3"]]
+                   :aliases
+                    {"package"   ["do" "clean," "install"]
+                     "slamhound" ["run" "-m" "slam.hound"]
+                     "chk"       ["do"
+                                  "archaic" "upgrade,"
+                                  "slamhound" "src/,"
+                                  "slamhound" "test/,"
+                                  "eastwood" "{:namespaces [:source-paths]},"
+                                  "kibit,"
+                                  "bikeshed" "-v,"
+                                  "check,"
+                                  "midje"]
+                     "most"      ["do" "clean," "doc," "chk," "package"]
+                     "dep"       ["do" "deploy," "deploy" "clojars"]
+                     "all"       ["do" "most," "dep"]}}}
   :jvm-opts ["-Xms1024m" "-Xmx1024m"]
-  :deploy-repositories [["snapshots" 
-                         {:url "http://www.ozias.net/artifactory/libs-snapshot-local"
-                          :creds :gpg}]
-                        ["releases"
-                         {:url "http://www.ozias.net/artifactory/libs-release-local"
-                          :creds :gpg}]]
+  :deploy-repositories
+  [["snapshots"
+    {:url   "http://www.ozias.net/artifactory/libs-snapshot-local"
+     :creds :gpg}]
+   ["releases"
+    {:url   "http://www.ozias.net/artifactory/libs-release-local"
+     :creds :gpg}]]
   :scm {:name "git"
-        :url "https://github.com/CraZySacX/azjure"}
-  :codox {:output-dir "api"
-          :exclude [leiningen.version]
-          :sources ["src" "test"]
-          :src-dir-uri "http://github.com/CraZySacX/azjure/blob/master/"
-          :src-linenum-anchor-prefix "L"})
+        :url  "https://github.com/CraZySacX/azjure"}
+  :codox {:output-dir                "api"
+          :exclude                   [org.ozias.cljlibs.version]
+          :sources                   ["src" "test"]
+          :src-dir-uri               "http://github.com/CraZySacX/azjure/blob/master/"
+          :src-linenum-anchor-prefix "L"}
+  :manifest {"Implementation-Version" "0.2.0-SNAPSHOT"}
+  :git-version {:file {:assoc-in-keys [[:manifest "Implementation-Version"]]}})

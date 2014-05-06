@@ -1,8 +1,9 @@
 ;; ## Pad Protocol
 ;; Pad protocol definition and some useful functions across 
 ;; all padding implementations
-(ns ^{:author "Jason Ozias"}
-    org.azjure.padding.pad)
+
+(ns org.azjure.padding.pad
+  {:author "Jason Ozias"})
 
 ;; ### remaining
 ;; Calculate the remaining number of bytes to add.

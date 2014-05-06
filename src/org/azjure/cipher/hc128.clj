@@ -2,12 +2,13 @@
 ;; 
 ;; [HC128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
 ;; Designed to meet the [HC-128 Spec][HC128]
+
 (ns org.azjure.cipher.hc128
-  (:require [clojure.math.numeric-tower :refer (expt)]
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [streamcipher :refer [StreamCipher]])
-            (org.azjure [libcrypt :refer :all]
-                        [libbyte :refer :all])))
+  (:require [clojure.math.numeric-tower :refer [expt]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.cipher.streamcipher :refer [StreamCipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer :all]))
 
 (def ^{:doc "Used to store upper bounds and current keystreams
 for initialized key/iv pairs"} 

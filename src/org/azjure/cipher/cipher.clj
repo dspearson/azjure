@@ -1,6 +1,7 @@
 ;; ## Cipher Protocol
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.cipher)
+
+(ns org.azjure.cipher.cipher
+  {:author "Jason Ozias"})
 
 ;; ### Cipher
 ;; This protocol defines three functions

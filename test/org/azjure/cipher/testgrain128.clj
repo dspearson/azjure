@@ -1,17 +1,16 @@
 ;; # Grain128 Stream Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Grain128 stream cipher"}
-  org.azjure.cipher.testgrain128
+(ns org.azjure.cipher.testgrain128
+  "Test suite for the Grain128 stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [grain128 :refer (->Grain128)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.grain128 :refer [->Grain128]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

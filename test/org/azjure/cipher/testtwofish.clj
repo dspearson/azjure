@@ -1,36 +1,27 @@
 ;; # Twofish Block Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Twofish block cipher"}
-  org.azjure.cipher.testtwofish
+
+(ns org.azjure.cipher.testtwofish
+  "Test suite for the Twofish block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->TFECBPKCS7)]
-                        [cryptsuite :refer (->TFECBZERO)]
-                        [cryptsuite :refer (->TFECBISO10126)]
-                        [cryptsuite :refer (->TFECBX923)]
-                        [cryptsuite :refer (->TFECBISO7816)]
-                        [cryptsuite :refer (->TFCBCPKCS7)]
-                        [cryptsuite :refer (->TFCBCZERO)]
-                        [cryptsuite :refer (->TFCBCISO10126)]
-                        [cryptsuite :refer (->TFCBCX923)]
-                        [cryptsuite :refer (->TFCBCISO7816)]
-                        [cryptsuite :refer (->TFPCBCPKCS7)]
-                        [cryptsuite :refer (->TFPCBCZERO)]
-                        [cryptsuite :refer (->TFPCBCISO10126)]
-                        [cryptsuite :refer (->TFPCBCX923)]
-                        [cryptsuite :refer (->TFPCBCISO7816)]
-                        [cryptsuite :refer (->TFCFB)]
-                        [cryptsuite :refer (->TFOFB)]
-                        [cryptsuite :refer (->TFCTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [streamcipher :as sc]
-                               [twofish :refer (->Twofish)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.twofish :refer [->Twofish]]
+            [org.azjure.cryptsuite :refer [->TFCBCISO10126
+                                           ->TFCBCISO7816 ->TFCBCPKCS7
+                                           ->TFCBCX923 ->TFCBCZERO
+                                           ->TFCFB ->TFCTR
+                                           ->TFECBISO10126
+                                           ->TFECBISO7816 ->TFECBPKCS7
+                                           ->TFECBX923 ->TFECBZERO
+                                           ->TFOFB ->TFPCBCISO10126
+                                           ->TFPCBCISO7816
+                                           ->TFPCBCPKCS7 ->TFPCBCX923
+                                           ->TFPCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "Twofish record to be used in the tests"} TF (->Twofish))

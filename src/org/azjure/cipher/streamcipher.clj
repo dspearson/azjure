@@ -1,6 +1,7 @@
 ;; ## StreamCipher Protocol
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.streamcipher)
+
+(ns org.azjure.cipher.streamcipher
+  {:author "Jason Ozias"})
 
 ;; ### StreamCipher
 ;; This protocol defines three functions

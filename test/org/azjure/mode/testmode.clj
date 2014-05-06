@@ -1,21 +1,20 @@
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.testmode
+(ns org.azjure.mode.testmode
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [testkeys :refer :all]
-                        [testivs :refer :all]
-                        [testciphertext :refer :all]
-                        [testplaintext :refer :all])
-            (org.azjure.mode [modeofoperation :as mode]
-                             [ecb :refer (->ElectronicCodebook)]
-                             [cbc :refer (->CipherBlockChaining)]
-                             [pcbc :refer (->PropagatingCipherBlockChaining)]
-                             [cfb :refer (->CipherFeedback)]
-                             [ofb :refer (->OutputFeedback)]
-                             [ctr :refer (->CounterMode)])
-            (org.azjure.cipher [cipher :as c]
-                               [blockcipher :as bc]
-                               [blowfish :refer (->Blowfish)]
-                               [twofish :refer (->Twofish)])))
+            [org.azjure.cipher.blowfish :refer [->Blowfish]]
+            [org.azjure.cipher.cipher :as c]
+            [org.azjure.cipher.twofish :refer [->Twofish]]
+            [org.azjure.mode.cbc :refer [->CipherBlockChaining]]
+            [org.azjure.mode.cfb :refer [->CipherFeedback]]
+            [org.azjure.mode.ctr :refer [->CounterMode]]
+            [org.azjure.mode.ecb :refer [->ElectronicCodebook]]
+            [org.azjure.mode.modeofoperation :as mode]
+            [org.azjure.mode.ofb :refer [->OutputFeedback]]
+            [org.azjure.mode.pcbc :refer [->PropagatingCipherBlockChaining]]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; #### Modes
 ;; Setup the mode records for use in tests

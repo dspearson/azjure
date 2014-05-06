@@ -1,37 +1,32 @@
 ;; ## CAST6 Block Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the CAST6 block cipher"}
-  org.azjure.cipher.testcast6
+(ns org.azjure.cipher.testcast6
+  "Test suite for the CAST6 block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->CAST6ECBPKCS7)]
-                        [cryptsuite :refer (->CAST6ECBZERO)]
-                        [cryptsuite :refer (->CAST6ECBISO10126)]
-                        [cryptsuite :refer (->CAST6ECBX923)]
-                        [cryptsuite :refer (->CAST6ECBISO7816)]
-                        [cryptsuite :refer (->CAST6CBCPKCS7)]
-                        [cryptsuite :refer (->CAST6CBCZERO)]
-                        [cryptsuite :refer (->CAST6CBCISO10126)]
-                        [cryptsuite :refer (->CAST6CBCX923)]
-                        [cryptsuite :refer (->CAST6CBCISO7816)]
-                        [cryptsuite :refer (->CAST6PCBCPKCS7)]
-                        [cryptsuite :refer (->CAST6PCBCZERO)]
-                        [cryptsuite :refer (->CAST6PCBCISO10126)]
-                        [cryptsuite :refer (->CAST6PCBCX923)]
-                        [cryptsuite :refer (->CAST6PCBCISO7816)]
-                        [cryptsuite :refer (->CAST6CFB)]
-                        [cryptsuite :refer (->CAST6OFB)]
-                        [cryptsuite :refer (->CAST6CTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [streamcipher :as sc]
-                               [cast6 :refer (->CAST6)])))
+            [org.azjure.cipher.cast6 :refer [->CAST6]]
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cryptsuite :refer [->CAST6CBCISO10126
+                                           ->CAST6CBCISO7816
+                                           ->CAST6CBCPKCS7
+                                           ->CAST6CBCX923
+                                           ->CAST6CBCZERO ->CAST6CFB
+                                           ->CAST6CTR
+                                           ->CAST6ECBISO10126
+                                           ->CAST6ECBISO7816
+                                           ->CAST6ECBPKCS7
+                                           ->CAST6ECBX923
+                                           ->CAST6ECBZERO ->CAST6OFB
+                                           ->CAST6PCBCISO10126
+                                           ->CAST6PCBCISO7816
+                                           ->CAST6PCBCPKCS7
+                                           ->CAST6PCBCX923
+                                           ->CAST6PCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

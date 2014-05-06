@@ -1,37 +1,32 @@
 ;; ## CAST5 Block Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the CAST5 block cipher"}
-  org.azjure.cipher.testcast5
+(ns org.azjure.cipher.testcast5
+  "Test suite for the CAST5 block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->CAST5ECBPKCS7)]
-                        [cryptsuite :refer (->CAST5ECBZERO)]
-                        [cryptsuite :refer (->CAST5ECBISO10126)]
-                        [cryptsuite :refer (->CAST5ECBX923)]
-                        [cryptsuite :refer (->CAST5ECBISO7816)]
-                        [cryptsuite :refer (->CAST5CBCPKCS7)]
-                        [cryptsuite :refer (->CAST5CBCZERO)]
-                        [cryptsuite :refer (->CAST5CBCISO10126)]
-                        [cryptsuite :refer (->CAST5CBCX923)]
-                        [cryptsuite :refer (->CAST5CBCISO7816)]
-                        [cryptsuite :refer (->CAST5PCBCPKCS7)]
-                        [cryptsuite :refer (->CAST5PCBCZERO)]
-                        [cryptsuite :refer (->CAST5PCBCISO10126)]
-                        [cryptsuite :refer (->CAST5PCBCX923)]
-                        [cryptsuite :refer (->CAST5PCBCISO7816)]
-                        [cryptsuite :refer (->CAST5CFB)]
-                        [cryptsuite :refer (->CAST5OFB)]
-                        [cryptsuite :refer (->CAST5CTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [streamcipher :as sc]
-                               [cast5 :refer (->CAST5)])))
+            [org.azjure.cipher.cast5 :refer [->CAST5]]
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cryptsuite :refer [->CAST5CBCISO10126
+                                           ->CAST5CBCISO7816
+                                           ->CAST5CBCPKCS7
+                                           ->CAST5CBCX923
+                                           ->CAST5CBCZERO ->CAST5CFB
+                                           ->CAST5CTR
+                                           ->CAST5ECBISO10126
+                                           ->CAST5ECBISO7816
+                                           ->CAST5ECBPKCS7
+                                           ->CAST5ECBX923
+                                           ->CAST5ECBZERO ->CAST5OFB
+                                           ->CAST5PCBCISO10126
+                                           ->CAST5PCBCISO7816
+                                           ->CAST5PCBCPKCS7
+                                           ->CAST5PCBCX923
+                                           ->CAST5PCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

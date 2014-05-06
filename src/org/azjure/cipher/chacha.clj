@@ -3,12 +3,13 @@
 ;; [C20]: http://cr.yp.to/chacha/chacha-20080128.pdf
 ;; [S20]: http://cr.yp.to/snuffle/spec.pdf
 ;; Designed to meet the [ChaCha Spec][C20]
+
 (ns org.azjure.cipher.chacha
-  (:require [clojure.math.numeric-tower :refer (expt)]
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer :all]
-            [org.azjure.libbyte :refer :all]))
+  (:require [clojure.math.numeric-tower :refer [expt]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.cipher.streamcipher :refer [StreamCipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer :all]))
 
 (def ^{:doc "Used to store keystreams for nonces"}
   chacha-key-streams

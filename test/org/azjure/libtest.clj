@@ -1,10 +1,9 @@
 (ns org.azjure.libtest
-  (:require [clojure.test :refer (is)]
-            (org.azjure [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [cryptsuite :as cs])
-            (org.azjure.cipher [blockcipher :as bc]
-                               [streamcipher :as sc])))
+  (:require [clojure.test :refer [is]]
+            [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.cipher.streamcipher :as sc]
+            [org.azjure.cryptsuite :as cs]
+            [org.azjure.testivs :refer :all]))
 
 (def ^{:doc "For type comparison"} array-of-bytes-type
   (Class/forName "[B")) 

@@ -2,12 +2,13 @@
 ;;
 ;; [Rabbit]: http://tools.ietf.org/rfc/rfc4503.txt
 ;; Designed to meet the [Rabbit Spec][Rabbit]
+
 (ns org.azjure.cipher.rabbit
-  (:require [clojure.math.numeric-tower :refer (expt)]
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [streamcipher :refer [StreamCipher]])
-            [org.azjure.libcrypt :refer (bytes->keyword +mod8 +modw to-hex)]
-            [org.azjure.libbyte :refer :all]))
+  (:require [clojure.math.numeric-tower :refer [expt]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.cipher.streamcipher :refer [StreamCipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer [+mod8 +modw bytes->keyword]]))
 
 (def ^{:doc "Used to store keystreams data by key"}
   state-maps (atom {}))

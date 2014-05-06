@@ -1,12 +1,13 @@
 ;; ## CAST5 Cipher
 ;; Designed to meet the spec at
 ;; [http://tools.ietf.org/html/rfc2144](http://tools.ietf.org/html/rfc2144)
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.cast5
-  (:require (org.azjure [libbyte :refer :all]
-                        [libcrypt :refer (+modw -modw)])
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)])))
+
+(ns org.azjure.cipher.cast5
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer [+modw -modw]]))
 
 ;; #### s1
 ;; S-Box 1

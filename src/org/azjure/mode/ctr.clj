@@ -3,12 +3,13 @@
 ;; > "Like OFB, counter mode turns a block cipher into a stream cipher.
 ;; > It generates the next keystream block by encrypting successive values of a 'counter'."
 ;;
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.ctr
+
+(ns org.azjure.mode.ctr
+  {:author "Jason Ozias"}
   (:require [clojure.core.reducers :as r]
-            [org.azjure.libbyte :refer (dword-bytes)]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+            [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.libbyte :refer [dword-bytes]]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### pad-iv
 ;; Add the counter bytes to the IV bytes up the the size

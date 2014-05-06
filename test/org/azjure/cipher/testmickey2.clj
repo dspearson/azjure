@@ -1,17 +1,16 @@
 ;; # Mickey2 Stream Cipher Tests
 
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Mickey2 stream cipher"}
-  org.azjure.cipher.testmickey2
+(ns org.azjure.cipher.testmickey2
+  "Test suite for the Mickey2 stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [mickey2 :refer (->Mickey2)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.mickey2 :refer [->Mickey2]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

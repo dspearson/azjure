@@ -6,10 +6,11 @@
 ;;
 ;; <em>Note</em>:  This block cipher mode is not recommended for encryption as
 ;; the result can expose patterns.  It is however useful for testing purposes.
+
 (ns org.azjure.mode.ecb
-  (:require [org.azjure.libcrypt :refer [mbpb]]
-            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.libcrypt :refer [mbpb]]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### ElectronicCodebook
 ;; Extend the ModeOfOperation protocol through the ElectronicCodebook record

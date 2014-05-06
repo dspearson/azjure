@@ -1,35 +1,28 @@
 ;; # TEA Block Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the TEA block cipher"}
-  org.azjure.cipher.testtea
+
+(ns org.azjure.cipher.testtea
+  "Test suite for the TEA block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->TEAECBPKCS7)]
-                        [cryptsuite :refer (->TEAECBZERO)]
-                        [cryptsuite :refer (->TEAECBISO10126)]
-                        [cryptsuite :refer (->TEAECBX923)]
-                        [cryptsuite :refer (->TEAECBISO7816)]
-                        [cryptsuite :refer (->TEACBCPKCS7)]
-                        [cryptsuite :refer (->TEACBCZERO)]
-                        [cryptsuite :refer (->TEACBCISO10126)]
-                        [cryptsuite :refer (->TEACBCX923)]
-                        [cryptsuite :refer (->TEACBCISO7816)]
-                        [cryptsuite :refer (->TEAPCBCPKCS7)]
-                        [cryptsuite :refer (->TEAPCBCZERO)]
-                        [cryptsuite :refer (->TEAPCBCISO10126)]
-                        [cryptsuite :refer (->TEAPCBCX923)]
-                        [cryptsuite :refer (->TEAPCBCISO7816)]
-                        [cryptsuite :refer (->TEACFB)]
-                        [cryptsuite :refer (->TEAOFB)]
-                        [cryptsuite :refer (->TEACTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [tea :refer (->TEA)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.tea :refer [->TEA]]
+            [org.azjure.cryptsuite :refer [->TEACBCISO10126
+                                           ->TEACBCISO7816
+                                           ->TEACBCPKCS7 ->TEACBCX923
+                                           ->TEACBCZERO ->TEACFB
+                                           ->TEACTR ->TEAECBISO10126
+                                           ->TEAECBISO7816
+                                           ->TEAECBPKCS7 ->TEAECBX923
+                                           ->TEAECBZERO ->TEAOFB
+                                           ->TEAPCBCISO10126
+                                           ->TEAPCBCISO7816
+                                           ->TEAPCBCPKCS7 ->TEAPCBCX923
+                                           ->TEAPCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

@@ -1,35 +1,29 @@
 ;; # XTEA Block Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the XTEA block cipher"}
-  org.azjure.cipher.testxtea
+
+(ns org.azjure.cipher.testxtea
+  "Test suite for the XTEA block cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all]
-                        [cryptsuite :as cs]
-                        [cryptsuite :refer (->XTEAECBPKCS7)]
-                        [cryptsuite :refer (->XTEAECBZERO)]
-                        [cryptsuite :refer (->XTEAECBISO10126)]
-                        [cryptsuite :refer (->XTEAECBX923)]
-                        [cryptsuite :refer (->XTEAECBISO7816)]
-                        [cryptsuite :refer (->XTEACBCPKCS7)]
-                        [cryptsuite :refer (->XTEACBCZERO)]
-                        [cryptsuite :refer (->XTEACBCISO10126)]
-                        [cryptsuite :refer (->XTEACBCX923)]
-                        [cryptsuite :refer (->XTEACBCISO7816)]
-                        [cryptsuite :refer (->XTEAPCBCPKCS7)]
-                        [cryptsuite :refer (->XTEAPCBCZERO)]
-                        [cryptsuite :refer (->XTEAPCBCISO10126)]
-                        [cryptsuite :refer (->XTEAPCBCX923)]
-                        [cryptsuite :refer (->XTEAPCBCISO7816)]
-                        [cryptsuite :refer (->XTEACFB)]
-                        [cryptsuite :refer (->XTEAOFB)]
-                        [cryptsuite :refer (->XTEACTR)])
-            (org.azjure.cipher [cipher :as cipher]
-                               [blockcipher :as bc]
-                               [xtea :refer (->XTEA)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.xtea :refer [->XTEA]]
+            [org.azjure.cryptsuite :refer [->XTEACBCISO10126
+                                           ->XTEACBCISO7816
+                                           ->XTEACBCPKCS7 ->XTEACBCX923
+                                           ->XTEACBCZERO ->XTEACFB
+                                           ->XTEACTR ->XTEAECBISO10126
+                                           ->XTEAECBISO7816
+                                           ->XTEAECBPKCS7 ->XTEAECBX923
+                                           ->XTEAECBZERO ->XTEAOFB
+                                           ->XTEAPCBCISO10126
+                                           ->XTEAPCBCISO7816
+                                           ->XTEAPCBCPKCS7
+                                           ->XTEAPCBCX923
+                                           ->XTEAPCBCZERO]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 
 ;; ### Record Definitions
 

@@ -6,8 +6,9 @@
 ;; anything you wish to keep secret.
 ;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
 ;; [HC256]: http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf
-(ns ^{:author "Jason Ozias"}
-  org.azjure.testivs)
+
+(ns org.azjure.testivs
+  {:author "Jason Ozias"})
 
 ;; ### 32-bit Initialization Vectors
 

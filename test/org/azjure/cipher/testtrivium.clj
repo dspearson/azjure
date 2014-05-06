@@ -1,16 +1,16 @@
 ;;  ## Trivium Stream Cipher Tests
-(ns ^{:author "Jason Ozias"
-      :doc "Test suite for the Trivium stream cipher"}
-  org.azjure.cipher.testtrivium
+
+(ns org.azjure.cipher.testtrivium
+  "Test suite for the Trivium stream cipher"
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure [libtest :refer :all]
-                        [testivs :refer :all]
-                        [testkeys :refer :all]
-                        [testplaintext :refer :all]
-                        [testciphertext :refer :all])
-            (org.azjure.cipher [cipher :as cipher]
-                               [streamcipher :as sc]
-                               [trivium :refer (->Trivium)])))
+            [org.azjure.cipher.cipher :as cipher]
+            [org.azjure.cipher.trivium :refer [->Trivium]]
+            [org.azjure.libtest :refer :all]
+            [org.azjure.testciphertext :refer :all]
+            [org.azjure.testivs :refer :all]
+            [org.azjure.testkeys :refer :all]
+            [org.azjure.testplaintext :refer :all]))
 ;; ### Record Definitions
 
 (def ^{:doc "Trivium record to be used in the tests"}

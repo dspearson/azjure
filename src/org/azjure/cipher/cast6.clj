@@ -1,12 +1,13 @@
 ;; ## CAST6 Cipher
 ;; Designed to meet the spec at
 ;; [RFC2612](http://tools.ietf.org/html/rfc2612)
-(ns ^{:author "Jason Ozias"}
-    org.azjure.cipher.cast6
-    (:require (org.azjure [libbyte :refer :all]
-                          [libcrypt :refer (+modw -modw +mod32)])
-              (org.azjure.cipher [cipher :refer (Cipher)]
-                                 [blockcipher :refer (BlockCipher)])))
+
+(ns org.azjure.cipher.cast6
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.libbyte :refer :all]
+            [org.azjure.libcrypt :refer [+mod32 +modw -modw]]))
 
 ;; #### s1
 ;; S-Box 1

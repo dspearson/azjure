@@ -1,11 +1,11 @@
 ;; ## Zeropad
 ;; Padding implementation that will pad a byte array to
 ;; the proper length given a block cipher with zeros
-(ns ^{:author "Jason Ozias"}
-  org.azjure.padding.zeropad
-  (:require [org.azjure.libcrypt :refer (mbpb)]
-            [org.azjure.padding.pad :refer (Pad remaining)]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.padding.zeropad
+  {:author "Jason Ozias"}
+  (:require [org.azjure.libcrypt :refer [mbpb]]
+            [org.azjure.padding.pad :refer [Pad remaining]]))
 
 ;; ### pad-bytes
 ;; Pad the given vector of bytes to the appropriate block size

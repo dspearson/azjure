@@ -1,11 +1,13 @@
 ;; ## Twofish
 ;; Designed to meet the spec at
 ;; [https://www.schneier.com/paper-twofish-paper.pdf](https://www.schneier.com/paper-twofish-paper.pdf)
+
 (ns org.azjure.cipher.twofish
-  (:require (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)])
-            [org.azjure.libcrypt :refer (to-hex maybe +modw)]
-            [org.azjure.libbyte :refer (bytes-word word-bytes reverse-bytes <<< >>>)]))
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.libbyte :refer [<<< >>> bytes-word
+                                        reverse-bytes word-bytes]]
+            [org.azjure.libcrypt :refer [+modw maybe]]))
 
 ;; #### q0
 ;; S-box used during key schedule and MDS creation.

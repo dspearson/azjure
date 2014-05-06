@@ -1,9 +1,10 @@
 ;; ## libcrypt
 ;; Library functions
-(ns ^{:author "Jason Ozias"}
-  org.azjure.libcrypt
-  (:require [org.azjure.libbyte :refer (bytes-word)]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.libcrypt
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.libbyte :refer [bytes-word]]))
 
 ;; ### to-hex
 ;; Print a value as hex prefixed by 0x.

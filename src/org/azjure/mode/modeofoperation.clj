@@ -1,4 +1,5 @@
 ;; ## Mode Of Operation Protocol
+
 (ns org.azjure.mode.modeofoperation)
 
 ;; ### ModeOfOperation

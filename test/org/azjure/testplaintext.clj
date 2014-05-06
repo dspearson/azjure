@@ -5,9 +5,10 @@
 ;; [R2612_10]: http://tools.ietf.org/html/rfc2612#page-10
 ;; [BF]: http://www.schneier.com/code/vectors.txt
 ;; [TF]: http://www.schneier.com/paper-twofish-paper.pdf
-(ns ^{:author "Jason Ozias"
-      :doc "Test plaintext vectors."}
-  org.azjure.testplaintext)
+
+(ns org.azjure.testplaintext
+  "Test plaintext vectors."
+  {:author "Jason Ozias"})
 
 ;; ### Plaintext Strings
 

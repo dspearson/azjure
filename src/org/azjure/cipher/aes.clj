@@ -30,11 +30,12 @@
 ;; <td style="border: 1px solid black;text-align: center;">14</td>
 ;; </tr>
 ;; </table>
-(ns ^{:author "Jason Ozias"}
-  org.azjure.cipher.aes
-  (:require [org.azjure.libbyte :refer [bytes-word word-bytes]] 
-            (org.azjure.cipher [cipher :refer (Cipher)]
-                               [blockcipher :refer (BlockCipher)])))
+
+(ns org.azjure.cipher.aes
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :refer [BlockCipher]]
+            [org.azjure.cipher.cipher :refer [Cipher]]
+            [org.azjure.libbyte :refer [bytes-word word-bytes]]))
 
 ;; #### Sbox
 ;; Substitution box used during encryption as a vector of 256 bytes.

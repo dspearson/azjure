@@ -1,27 +1,27 @@
 ;; ## Crypt Suite Protocol
-(ns ^{:author "Jason Ozias"} 
-  org.azjure.cryptsuite
-  (:require (org.azjure.cipher [blockcipher :as bc]
-                               [aes :refer (->Aes)]
-                               [blowfish :refer (->Blowfish)]
-                               [twofish :refer (->Twofish)]
-                               [cast5 :refer (->CAST5)]
-                               [cast6 :refer (->CAST6)]
-                               [tea :refer (->TEA)]
-                               [xtea :refer (->XTEA)])
-            (org.azjure.mode [modeofoperation :as mode]
-                             [ecb :refer (->ElectronicCodebook)]
-                             [cbc :refer (->CipherBlockChaining)]
-                             [pcbc :refer (->PropagatingCipherBlockChaining)]
-                             [cfb :refer (->CipherFeedback)]
-                             [ofb :refer (->OutputFeedback)]
-                             [ctr :refer (->CounterMode)])
-            (org.azjure.padding [pad :as padder]
-                                [pkcs7pad :refer (->PKCS7pad)]
-                                [zeropad :refer (->Zeropad)]
-                                [iso10126pad :refer (->ISO10126pad)]
-                                [x923pad :refer (->X923pad)]
-                                [iso7816pad :refer (->ISO7816pad)])))
+
+(ns org.azjure.cryptsuite
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.aes :refer [->Aes]]
+            [org.azjure.cipher.blowfish :refer [->Blowfish]]
+            [org.azjure.cipher.cast5 :refer [->CAST5]]
+            [org.azjure.cipher.cast6 :refer [->CAST6]]
+            [org.azjure.cipher.tea :refer [->TEA]]
+            [org.azjure.cipher.twofish :refer [->Twofish]]
+            [org.azjure.cipher.xtea :refer [->XTEA]]
+            [org.azjure.mode.cbc :refer [->CipherBlockChaining]]
+            [org.azjure.mode.cfb :refer [->CipherFeedback]]
+            [org.azjure.mode.ctr :refer [->CounterMode]]
+            [org.azjure.mode.ecb :refer [->ElectronicCodebook]]
+            [org.azjure.mode.modeofoperation :as mode]
+            [org.azjure.mode.ofb :refer [->OutputFeedback]]
+            [org.azjure.mode.pcbc :refer [->PropagatingCipherBlockChaining]]
+            [org.azjure.padding.iso10126pad :refer [->ISO10126pad]]
+            [org.azjure.padding.iso7816pad :refer [->ISO7816pad]]
+            [org.azjure.padding.pad :as padder]
+            [org.azjure.padding.pkcs7pad :refer [->PKCS7pad]]
+            [org.azjure.padding.x923pad :refer [->X923pad]]
+            [org.azjure.padding.zeropad :refer [->Zeropad]]))
 
 ;; ### CipherSuite
 ;; This protocol defines two functions

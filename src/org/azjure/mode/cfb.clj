@@ -3,10 +3,11 @@
 ;; per round.
 ;;
 ;; [Block Cipher Mode of Operation](http://en.wikipedia.org/wiki/Cipher_block_chaining)
-(ns ^{:author "Jason Ozias"}
-  org.azjure.mode.cfb
-  (:require [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]
-            [org.azjure.cipher.blockcipher :as bc]))
+
+(ns org.azjure.mode.cfb
+  {:author "Jason Ozias"}
+  (:require [org.azjure.cipher.blockcipher :as bc]
+            [org.azjure.mode.modeofoperation :refer [ModeOfOperation]]))
 
 ;; ### encrypt-byte
 ;; Encrypt a single byte given the cipher,

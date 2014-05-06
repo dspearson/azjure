@@ -1,16 +1,17 @@
 ;; ## Test Padding Methods
 ;; Test suite for padding methods
-(ns ^{:author "Jason Ozias"}
-  org.azjure.padding.testpad
+
+(ns org.azjure.padding.testpad
+  {:author "Jason Ozias"}
   (:require [clojure.test :refer :all]
-            (org.azjure.cipher [blowfish :refer (->Blowfish)]
-                               [twofish :refer (->Twofish)])
-            (org.azjure.padding [zeropad :refer (->Zeropad)]
-                                [pkcs7pad :refer (->PKCS7pad)]
-                                [x923pad :refer (->X923pad)]
-                                [iso10126pad :refer (->ISO10126pad)]
-                                [iso7816pad :refer (->ISO7816pad)]
-                                [pad :as padder])))
+            [org.azjure.cipher.blowfish :refer [->Blowfish]]
+            [org.azjure.cipher.twofish :refer [->Twofish]]
+            [org.azjure.padding.iso10126pad :refer [->ISO10126pad]]
+            [org.azjure.padding.iso7816pad :refer [->ISO7816pad]]
+            [org.azjure.padding.pad :as padder]
+            [org.azjure.padding.pkcs7pad :refer [->PKCS7pad]]
+            [org.azjure.padding.x923pad :refer [->X923pad]]
+            [org.azjure.padding.zeropad :refer [->Zeropad]]))
 
 ;; #### PKCS7, ZERO, X923, ISO10126, ISO7816
 ;; Setup the Pad records for usage in tests

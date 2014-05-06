@@ -1,8 +1,9 @@
 ;; ## libbyte
 ;; Byte manipulation library
-(ns ^{:author "Jason Ozias"}
-  org.azjure.libbyte
-  (:require [clojure.math.numeric-tower :refer (expt)]))
+
+(ns org.azjure.libbyte
+  {:author "Jason Ozias"}
+  (:require [clojure.math.numeric-tower :refer [expt]]))
 
 (def ^{:doc "32-bit mask"}
   mask32 0xFFFFFFFF)

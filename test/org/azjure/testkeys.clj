@@ -12,9 +12,10 @@
 ;; [HC256]: http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf
 ;; [RABBIT]: http://tools.ietf.org/rfc/rfc4503.txt
 ;; [TRI]: http://www.ecrypt.eu.org/stream/svn/viewcvs.cgi/ecrypt/trunk/submissions/trivium/unverified.test-vectors?rev=210&view=markup
-(ns ^{:author "Jason Ozias"
-      :doc "Test keys vectors"}
-  org.azjure.testkeys)
+
+(ns org.azjure.testkeys
+  "Test keys vectors"
+  {:author "Jason Ozias"})
 
 ;; ### 40-bit Keys
 
