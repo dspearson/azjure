@@ -33,14 +33,14 @@
 ;; #### test-vectors
 ;; The mode test vectors 
 (def test-vectors
-  [[ECB  TF pt-1 tf-ecb ]
-   [CBC  TF pt-1 tf-cbc ]
+  [[ECB TF pt-1 tf-ecb]
+   [CBC TF pt-1 tf-cbc]
    [PCBC TF pt-1 tf-pcbc]
-   [OFB  TF pt-1 tf-ofb ]
-   [CFB  TF pt-1 tf-cfb ]])
+   [OFB TF pt-1 tf-ofb]
+   [CFB TF pt-1 tf-cfb]])
 
 (def ctr-test-vectors
-  [[CTR  TF pt-1 tf-ctr]])
+  [[CTR TF pt-1 tf-ctr]])
 
 ;; ## encrypt-blocks
 ;; Encrypt a vector of blocks.

@@ -65,7 +65,7 @@ indices"}
   (let [paddediv (into iv (vec (take (- 16 (count iv)) (cycle [0xFF]))))
         keybits (reduce into (mapv (comp vec reverse byte->bits) key))
         ivbits (reduce into (mapv (comp vec reverse byte->bits) paddediv))]
-  [keybits ivbits]))
+    [keybits ivbits]))
 
 (defn- ^{:doc "Swap the state in the atom at uid with the default state"}
   swapkiv! [uid {:keys [key iv]}]
@@ -79,7 +79,7 @@ indices"}
   swapks! [uid upper]
   (let [nfsr (:nfsr (uid @grain128-key-streams))
         lfsr (:lfsr (uid @grain128-key-streams))
-        ks (->> (range (* 8 upper)) ; 8 bits per byte
+        ks (->> (range (* 8 upper))                         ; 8 bits per byte
                 (reduce keystream-round [nfsr lfsr []])
                 (peek)
                 (partition 8)

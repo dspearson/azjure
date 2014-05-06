@@ -6,7 +6,7 @@
             [org.azjure.testivs :refer :all]))
 
 (def ^{:doc "For type comparison"} array-of-bytes-type
-  (Class/forName "[B")) 
+  (Class/forName "[B"))
 
 ;; ### Testing helper functions
 
@@ -14,7 +14,7 @@
   [obj]
   (= (type obj) array-of-bytes-type))
 
-(defn- ^{:doc "Convert a vector of bytes to a bytearray"} b->barr 
+(defn- ^{:doc "Convert a vector of bytes to a bytearray"} b->barr
   [bytes]
   (if (not (byte-array? bytes))
     (byte-array (mapv byte bytes))
@@ -32,7 +32,7 @@
 
 ;; ### Block Cipher testing helper functions
 
-(defn ^{:doc "Helper function for BlockCipher encryption testing"} encrypt-block 
+(defn ^{:doc "Helper function for BlockCipher encryption testing"} encrypt-block
   [[cipher initmap cleartext ciphertext]]
   (is (= ciphertext (bc/encrypt-block cipher cleartext initmap))))
 
@@ -42,7 +42,7 @@
 
 ;; ### Stream Cipher testing helper function
 
-(defn- ^{:doc "xor the given bytes with the generated keystream."} xor-bytes 
+(defn- ^{:doc "xor the given bytes with the generated keystream."} xor-bytes
   [cipher initmap bytes]
   (mapv bit-xor bytes (sc/generate-keystream cipher initmap [0 (count bytes)])))
 

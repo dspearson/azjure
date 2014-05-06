@@ -42,7 +42,7 @@
 ;; represents the running state of each encrypt round.
 ;; The second vector represents the next value to use
 ;; as an IV.
-(defn- cfb-round [cipher key enc] 
+(defn- cfb-round [cipher key enc]
   (fn [[out iv] byte]
     (let [ebyte (encrypt-byte cipher key iv byte)
           sval (if enc ebyte byte)]

@@ -11,6 +11,7 @@
             [org.azjure.testivs :refer :all]
             [org.azjure.testkeys :refer :all]
             [org.azjure.testplaintext :refer :all]))
+
 ;; ### Record Definitions
 
 (def ^{:doc "Trivium record to be used in the tests"}
@@ -34,11 +35,11 @@
 
 (def ^{:doc "Test vectors from Trivium spec"}
   triviumspec-test-vectors
-  [[trivium (assoc initmap0 :lower 0   :upper 64 ) zeros-64 trivium-80-ct-0]
+  [[trivium (assoc initmap0 :lower 0 :upper 64) zeros-64 trivium-80-ct-0]
    [trivium (assoc initmap0 :lower 192 :upper 256) zeros-64 trivium-80-ct-1]
    [trivium (assoc initmap0 :lower 256 :upper 320) zeros-64 trivium-80-ct-2]
    [trivium (assoc initmap0 :lower 448 :upper 512) zeros-64 trivium-80-ct-3]
-   [trivium (assoc initmap1 :lower 0   :upper 64 ) zeros-64 trivium-80-ct-4]
+   [trivium (assoc initmap1 :lower 0 :upper 64) zeros-64 trivium-80-ct-4]
    [trivium (assoc initmap1 :lower 192 :upper 256) zeros-64 trivium-80-ct-5]
    [trivium (assoc initmap1 :lower 256 :upper 320) zeros-64 trivium-80-ct-6]
    [trivium (assoc initmap1 :lower 448 :upper 512) zeros-64 trivium-80-ct-7]])
@@ -46,13 +47,13 @@
 ;; ### Trivium Tests
 
 (deftest ^{:doc "Test Trivium stream suites"}
-  testStream
+         testStream
   (testing "Stream"
     (is (= true (every? true? (map stream-encryptor triviumspec-test-vectors))))
     (is (= true (every? true? (map stream-decryptor triviumspec-test-vectors))))))
 
 (deftest ^{:doc "Test Trivium"}
-  testTrivium
+         testTrivium
   (testing "Trivium"
     (testStream)))
 

@@ -16,7 +16,7 @@
 (defn- process-bytes [cipher key iv bytes]
   (let [len (count bytes)
         kb (quot (bc/blocksize cipher) 8)
-        ks (if (not (zero? (rem len kb))) (inc (quot len kb)) (quot len kb))]
+        ks (if-not (zero? (rem len kb)) (inc (quot len kb)) (quot len kb))]
     (->> (range (inc ks))
          (reductions (fn [iv _] (bc/encrypt-block cipher iv key)) iv)
          (rest)

@@ -37,8 +37,8 @@
 ;;
 ;; evaluates to 0x11
 (defn get-byte [num word]
-  (let [shift (* 8 (- num 1))
-        sftfn (if (= 0 shift) word (bit-shift-right word shift))]
+  (let [shift (* 8 (dec num))
+        sftfn (if (zero? shift) word (bit-shift-right word shift))]
     (bit-and sftfn 0xFF)))
 
 ;; ### last-byte
@@ -56,12 +56,12 @@
 ;; > 0x12ab1f3b
 ;;
 ;; This is the inverse of word-bytes.
-(defn bytes-word 
+(defn bytes-word
   ([vec le]
-     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
-       (reduce bit-or (map #(bit-shift-left (nth vec %1) %2) (range 4) rng))))
+   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
+     (reduce bit-or (map #(bit-shift-left (nth vec %1) %2) (range 4) rng))))
   ([vec]
-     (bytes-word vec false)))
+   (bytes-word vec false)))
 
 (defn bytes-dword [vec]
   (apply bit-or
@@ -87,19 +87,19 @@
 ;; > [0x3b 0x1f 0xab 0x12]
 ;;
 ;; This is the inverse of byte-words.
-(defn word-bytes 
+(defn word-bytes
   ([word le]
-     (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
-       (mapv #(last-byte (bit-shift-right word %)) rng)))
+   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
+     (mapv #(last-byte (bit-shift-right word %)) rng)))
   ([word]
-     (word-bytes word false)))
+   (word-bytes word false)))
 
-(defn dword-bytes 
+(defn dword-bytes
   ([dword le]
-     (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
-       (mapv #(last-byte (bit-shift-right dword %)) rng)))
+   (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
+     (mapv #(last-byte (bit-shift-right dword %)) rng)))
   ([dword]
-     (dword-bytes dword false)))
+   (dword-bytes dword false)))
 
 ;; ### reverse-bytes
 ;; Reverse the bytes in a word
@@ -120,9 +120,9 @@
 (def minv-shift (memoize inv-shift))
 
 (defn shift-dispatch [word shift bits]
-  (cond 
-   (or (instance? BigInteger word) (> bits 32)) :a 
-   :else :default))
+  (cond
+    (or (instance? BigInteger word) (> bits 32)) :a
+    :else :default))
 
 ;; ### <<<
 ;; Circular left shift
@@ -135,28 +135,28 @@
 ;; evaluates to
 ;;
 ;; > 0x34567812
-(defmulti <<<-mm shift-dispatch) 
+(defmulti <<<-mm shift-dispatch)
 
-(defmethod <<<-mm :a [word shift bits] 
+(defmethod <<<-mm :a [word shift bits]
   (let [biw (if (instance? BigInteger word) word (BigInteger. (str word)))
         sft (mod shift bits)
-        mask (BigInteger. (str (- (expt 2 bits) 1)))]
-    (if (zero? sft) 
+        mask (BigInteger. (str (dec (expt 2 bits))))]
+    (if (zero? sft)
       word
       (.or
-       (.and (.shiftLeft biw sft) mask)
-       (.shiftRight biw (minv-shift sft bits))))))
+        (.and (.shiftLeft biw sft) mask)
+        (.shiftRight biw (minv-shift sft bits))))))
 
 (defmethod <<<-mm :default [word shift bits]
   (let [sft (mod shift bits)
-        mask (- (expt 2 bits) 1)]
-    (if (zero? sft) 
+        mask (dec (expt 2 bits))]
+    (if (zero? sft)
       word
       (bit-or
-       (bit-and (bit-shift-left word sft) mask)
-       (bit-shift-right word (minv-shift sft bits))))))
+        (bit-and (bit-shift-left word sft) mask)
+        (bit-shift-right word (minv-shift sft bits))))))
 
-(defn <<< 
+(defn <<<
   ([word shift bits] (<<<-mm word shift bits))
   ([word shift] (<<<-mm word shift 32)))
 
@@ -173,11 +173,11 @@
 ;; > 0x78123456
 (defn >>>
   ([word shift bits]
-     (<<< word (minv-shift shift bits)))
+   (<<< word (minv-shift shift bits)))
   ([word shift]
-     (>>> word shift 32)))
+   (>>> word shift 32)))
 
-(defn- ^{:doc "Shift a BigInteger x right by n bits."} shift-right 
+(defn- ^{:doc "Shift a BigInteger x right by n bits."} shift-right
   [x n]
   (.shiftRight x n))
 

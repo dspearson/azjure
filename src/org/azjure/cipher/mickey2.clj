@@ -26,7 +26,7 @@ for initialized key/iv pairs"}
           94 95 96 97})
 
 (def ^{:private true :doc "comp0 as defined in the [MICKEY2.0 Spec][M2]"}
-  comp0 [2 0 0 0 1 1 0 0 0 1 0 1 1 1 1 0 1 0 0 1 0 1 0 1 0 
+  comp0 [2 0 0 0 1 1 0 0 0 1 0 1 1 1 1 0 1 0 0 1 0 1 0 1 0
          1 0 1 0 1 1 0 1 0 0 1 0 0 0 0 0 0 0 1 0 1 0 1 0 1
          0 0 0 0 1 0 1 0 0 1 1 1 1 0 0 1 0 1 0 1 1 1 1 1 1
          1 1 1 0 1 0 1 1 1 1 1 1 0 1 0 1 0 0 0 0 0 0 1 1 2])
@@ -57,7 +57,7 @@ for initialized key/iv pairs"}
       r)))
 
 (defn- ^{:doc "xor the original value with the new value"}
-  rxor [r] 
+  rxor [r]
   (fn [rprime idx]
     (assoc rprime idx (bit-xor (nth r idx) (nth rprime idx)))))
 
@@ -90,7 +90,7 @@ for initialized key/iv pairs"}
   clock-s [s input-bit control-bit]
   (let [feedback-bit (bit-xor (nth s 99) input-bit)
         scaret (assoc (assoc (reduce (comp-s s) s (range 1 99)) 0 0) 99 (nth s 98))]
-    (if (= 0 control-bit)
+    (if (zero? control-bit)
       (reduce (fb-s scaret fb0 feedback-bit) scaret (range 100))
       (reduce (fb-s scaret fb1 feedback-bit) scaret (range 100)))))
 
@@ -108,7 +108,7 @@ for initialized key/iv pairs"}
 vector"}
   key-stream-round [[r s out] _]
   (let [[nr ns] ((clock-kg false) [r s] 0)]
-    [nr ns (conj out (bit-xor (nth r 0)(nth s 0)))]))
+    [nr ns (conj out (bit-xor (nth r 0) (nth s 0)))]))
 
 (defn- ^{:doc "Swap the state in the atom at uid with the default state"}
   swapkiv! [uid {:keys [key iv]}]
@@ -119,9 +119,9 @@ vector"}
           ivbits (reduce into (mapv byte->bits iv))
           keybits (reduce into (mapv byte->bits key))
           clkfn (clock-kg true)
-          ivloaded (reduce clkfn [init init] ivbits) ; Load IV
-          keyloaded (reduce clkfn ivloaded keybits) ; Load key 
-          [r s] (reduce clkfn keyloaded init) ; Preclock
+          ivloaded (reduce clkfn [init init] ivbits)        ; Load IV
+          keyloaded (reduce clkfn ivloaded keybits)         ; Load key
+          [r s] (reduce clkfn keyloaded init)               ; Preclock
           ]
       (swap! mickey2-key-streams assoc uid {:r r :s s}))))
 
@@ -129,7 +129,7 @@ vector"}
   swapks! [uid upper]
   (let [r (:r (uid @mickey2-key-streams))
         s (:s (uid @mickey2-key-streams))
-        ks (->> (range (* 8 upper)) ; 8 bits per byte 
+        ks (->> (range (* 8 upper))                         ; 8 bits per byte
                 (reduce key-stream-round [r s []])
                 (peek)
                 (partition 8)

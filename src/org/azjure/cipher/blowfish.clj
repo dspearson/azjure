@@ -18,7 +18,7 @@
 
 ;; #### sbox0_init
 ;; The initial values for the 1st sbox.
-(def sbox0_init 
+(def sbox0_init
   [0xd1310ba6 0x98dfb5ac 0x2ffd72db 0xd01adfb7 0xb8e1afed 0x6a267e96 0xba7c9045 0xf12c7f99
    0x24a19947 0xb3916cf7 0x0801f2e2 0x858efc16 0x636920d8 0x71574e69 0xa458fea3 0xf4933d7e
    0x0d95748f 0x728eb658 0x718bcd58 0x82154aee 0x7b54a41d 0xc25a59b5 0x9c30d539 0x2af26013
@@ -160,7 +160,7 @@
    0x85cbfe4e 0x8ae88dd8 0x7aaaf9b0 0x4cf9aa7e 0x1948c25c 0x02fb8a8c 0x01c36ae4 0xd6ebe1f9
    0x90d4f869 0xa65cdea0 0x3f09252d 0xc208e69f 0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])
 
-(def ks-init {:parr parr_init
+(def ks-init {:parr  parr_init
               :sbox0 sbox0_init :sbox1 sbox1_init
               :sbox2 sbox2_init :sbox3 sbox3_init})
 
@@ -181,11 +181,11 @@
 ;; Evaluates to a 32-bit word.
 (defn- roundfn [word ks]
   (+modw
-   (bit-xor
-    (+modw (nth (:sbox0 ks) (get-byte 4 word))
-            (nth (:sbox1 ks) (get-byte 3 word)))
-    (nth (:sbox2 ks) (get-byte 2 word)))
-   (nth (:sbox3 ks) (get-byte 1 word))))
+    (bit-xor
+      (+modw (nth (:sbox0 ks) (get-byte 4 word))
+             (nth (:sbox1 ks) (get-byte 3 word)))
+      (nth (:sbox2 ks) (get-byte 2 word)))
+    (nth (:sbox3 ks) (get-byte 1 word))))
 
 ;; ### feistel-round
 ;; 
@@ -199,7 +199,7 @@
 (defn- feistel-round [[left right ks] idx]
   (let [l (bit-xor left (nth (:parr ks) idx))
         r (bit-xor (roundfn l ks) right)]
-  [r l ks]))
+    [r l ks]))
 
 ;; ### blowfish
 ;; The Blowfish cipher.

@@ -11,6 +11,7 @@
             [org.azjure.testivs :refer :all]
             [org.azjure.testkeys :refer :all]
             [org.azjure.testplaintext :refer :all]))
+
 ;; ### Record Definitions
 
 (def ^{:doc "Chacha record to be used in the tests"} chacha (->Chacha))
@@ -18,10 +19,10 @@
 ;; ### Chacha Initialization
 
 (def ^{:doc "Initialization map to be used in the suite tests."} initmap0
- (cipher/initialize chacha {:key zeros-128-key :nonce zeros-64-iv}))
+  (cipher/initialize chacha {:key zeros-128-key :nonce zeros-64-iv}))
 
 (def ^{:doc "Initialization map to be used in the suite tests."} initmap1
- (cipher/initialize chacha {:key zeros-256-key :nonce zeros-64-iv}))
+  (cipher/initialize chacha {:key zeros-256-key :nonce zeros-64-iv}))
 
 ;; ### Specification Test Vectors
 ;; Each row is

@@ -16,8 +16,8 @@
 ;; the given cipher
 (defn- pad-bytes [bytes cipher]
   (let [rem (remaining (count bytes) (mbpb cipher))
-        randompad (reduce conj bytes (take rem (repeatedly #(rand-int 256))))]
-    (assoc randompad (- (count randompad) 1) rem)))
+        randompad (reduce conj bytes (repeatedly rem #(rand-int 256)))]
+    (assoc randompad (dec (count randompad)) rem)))
 
 ;; ### unpad-bytes
 ;; Unpad the given vector of bytes.

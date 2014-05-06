@@ -52,7 +52,7 @@ in [Salsa20 Spec][S20]"}
         [z10 z11 z8 z9] (quarterround [y10 y11 y8 y9])
         [z15 z12 z13 z14] (quarterround [y15 y12 y13 y14])]
     [z0 z1 z2 z3 z4 z5 z6 z7 z8 z9 z10 z11 z12 z13 z14 z15]))
-  
+
 (defn- ^{:doc "columnround function as defined 
 in [Salsa20 Spec][S20]"}
   columnround [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
@@ -114,10 +114,10 @@ bound of the range."} gen-key-stream
   (swap! salsa20-key-streams assoc noncekw {:counter 0}))
 
 (defn- ^{:doc "Reset the keystream in the map in the atom
-at noncekw."} resetks! 
+at noncekw."} resetks!
   [noncekw initmap [lower upper :as range]]
   (let [ks (gen-key-stream (conj {:kw noncekw} initmap) range)]
-    (swap! salsa20-key-streams assoc noncekw 
+    (swap! salsa20-key-streams assoc noncekw
            (assoc (noncekw @salsa20-key-streams) :upper upper :ks ks))))
 
 (defn- ^{:doc "Generate a keyword from the nonce."} gen-keyword

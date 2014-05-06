@@ -60,44 +60,42 @@ Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."}
 
 (defn- ^{:doc "Add the key to the subkeys vector."}
   append-key [ks key i]
-  (->> (nth key i)
-       (conj ks)))
+  (conj ks (nth key i)))
 
 (defn- ^{:doc "Add the IV to the subkeys vector."}
   append-iv [ks iv i]
-  (->> (mod i 8) 
+  (->> (mod i 8)
        (nth iv)
        (conj ks)))
 
 (defn- ^{:doc "Add the newly calculated word values to the 
 subkeys vector."}
   append-new [ks i]
-  (->> (+modw
-        (f2 (nth ks (- i 2)))
-        (nth ks (- i 7))
-        (f1 (nth ks (- i 15)))
-        (nth ks (- i 16))
-        i)
-       (conj ks)))
+  (conj ks (+modw
+             (f2 (nth ks (- i 2)))
+             (nth ks (- i 7))
+             (f1 (nth ks (- i 15)))
+             (nth ks (- i 16))
+             i)))
 
 (defn- ^{:doc "Add one word to the key schedule vector
 based on the round number"}
   key-round [key iv]
   (fn [ks round]
     (cond
-      (< round 8)  (append-key ks key round)
+      (< round 8) (append-key ks key round)
       (< round 16) (append-iv ks iv round)
-      :else        (append-new ks round))))
+      :else (append-new ks round))))
 
 (defn- ^{:doc "Expand the key into a vector of 2560 32-bit words."}
-  expand-key 
+  expand-key
   ([{:keys [key iv] :as initmap}]
-     {:pre [(contains? initmap :key) (contains? initmap :iv)
-            (vector? key) (vector? iv)
-            (= 32 (count key)) (= 32 (count iv))]}
-     (let [kw (mapv bytes-word (partition 4 key))
-           iw (mapv bytes-word (partition 4 iv))]
-       (reduce (key-round kw iw) [] (range 2560)))))
+   {:pre [(contains? initmap :key) (contains? initmap :iv)
+          (vector? key) (vector? iv)
+          (= 32 (count key)) (= 32 (count iv))]}
+   (let [kw (mapv bytes-word (partition 4 key))
+         iw (mapv bytes-word (partition 4 iv))]
+     (reduce (key-round kw iw) [] (range 2560)))))
 
 (defn- ^{:doc "conj a value from the key schedule onto the p sbox."}
   p-round [ek]
@@ -119,25 +117,23 @@ based on the round number"}
 
 (defn- ^{:doc "Calculate and place a new value in the p sbox at index j"}
   new-p [p q j]
-  (->> (+modw
-        (nth p j)
-        (nth p (-mod1024 j 10))
-        (g1 
-         (nth p (-mod1024 j 3))
-         (nth p (-mod1024 j 1023))
-         q))
-       (assoc p j)))
+  (assoc p j (+modw
+               (nth p j)
+               (nth p (-mod1024 j 10))
+               (g1
+                 (nth p (-mod1024 j 3))
+                 (nth p (-mod1024 j 1023))
+                 q))))
 
 (defn- ^{:doc "Calculate and place a new value in the q sbox at index j"}
   new-q [p q j]
-  (->> (+modw
-        (nth q j)
-        (nth q (-mod1024 j 10))
-        (g2 
-         (nth q (-mod1024 j 3))
-         (nth q (-mod1024 j 1023))
-         p))
-       (assoc q j)))
+  (assoc q j (+modw
+               (nth q j)
+               (nth q (-mod1024 j 10))
+               (g2
+                 (nth q (-mod1024 j 3))
+                 (nth q (-mod1024 j 1023))
+                 p))))
 
 (defn- ^{:doc "Calculate an output word during the lower 1024."}
   sp [p q j]
@@ -153,8 +149,8 @@ in [HC-256 Spec][HC256]."}
   (fn [[p q out] round]
     (let [j (mod round 1024)]
       (cond
-       (< (mod round 2048) 1024) (let [np (new-p p q j)] [np q (if ke out (conj out (sp np q j)))])
-       :else (let [nq (new-q p q j)] [p nq (if ke out (conj out (sq p nq j)))])))))
+        (< (mod round 2048) 1024) (let [np (new-p p q j)] [np q (if ke out (conj out (sp np q j)))])
+        :else (let [nq (new-q p q j)] [p nq (if ke out (conj out (sq p nq j)))])))))
 
 (defn- ^{:doc "Recalculate the sboxes during key expansion."}
   gen-sboxes [p q]

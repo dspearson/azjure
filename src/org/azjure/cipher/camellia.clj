@@ -10,17 +10,17 @@
             [org.azjure.libcrypt :refer [to-hex]]))
 
 (def mask128 (BigInteger. "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" 16))
-(def mask64  (BigInteger. "FFFFFFFFFFFFFFFF" 16))
-(def mask32  (BigInteger. "FFFFFFFF" 16))
-(def mask8   (BigInteger. "FF" 16))
-(def sigma1  (BigInteger. "A09E667F3BCC908B" 16))
-(def sigma2  (BigInteger. "B67AE8584CAA73B2" 16))
-(def sigma3  (BigInteger. "C6EF372FE94F82BE" 16))
-(def sigma4  (BigInteger. "54FF53A5F1D36F1C" 16))
-(def sigma5  (BigInteger. "10E527FADE682D1D" 16))
-(def sigma6  (BigInteger. "B05688C2B3E6C1FD" 16))
+(def mask64 (BigInteger. "FFFFFFFFFFFFFFFF" 16))
+(def mask32 (BigInteger. "FFFFFFFF" 16))
+(def mask8 (BigInteger. "FF" 16))
+(def sigma1 (BigInteger. "A09E667F3BCC908B" 16))
+(def sigma2 (BigInteger. "B67AE8584CAA73B2" 16))
+(def sigma3 (BigInteger. "C6EF372FE94F82BE" 16))
+(def sigma4 (BigInteger. "54FF53A5F1D36F1C" 16))
+(def sigma5 (BigInteger. "10E527FADE682D1D" 16))
+(def sigma6 (BigInteger. "B05688C2B3E6C1FD" 16))
 
-(def sbox1 
+(def sbox1
   [0x70 0x82 0x2c 0xec 0xb3 0x27 0xc0 0xe5 0xe4 0x85 0x57 0x35 0xea 0x0c 0xae 0x41
    0x23 0xef 0x6b 0x93 0x45 0x19 0xa5 0x21 0xed 0x0e 0x4f 0x4e 0x1d 0x65 0x92 0xbd
    0x86 0xb8 0xaf 0x8f 0x7c 0xeb 0x1f 0xce 0x3e 0x30 0xdc 0x5f 0x5e 0xc5 0x0b 0x1a
@@ -92,11 +92,11 @@
    0xfe 0x40 0x44 0x28 0xcf 0xd3 0xb2 0x7b 0xc3 0xbb 0xb5 0xc9 0x7a 0x43 0x91 0xc1
    0x24 0x15 0x08 0xe3 0xe8 0xad 0xa8 0xf4 0x60 0x77 0xfc 0xc7 0x69 0x80 0x50 0x9e])
 
-(defn- to-bi 
+(defn- to-bi
   ([val radix]
-     (BigInteger. (str val) radix))
+   (BigInteger. (str val) radix))
   ([val]
-     (to-bi val 10)))
+   (to-bi val 10)))
 
 (defn- gen-t [x]
   [(nth sbox1 (.shiftRight x 56))
@@ -160,8 +160,7 @@
 ;;  0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77
 ;;  0x88 0x99 0xaa 0xbb 0xcc 0xdd 0xee 0xff]
 (defn- expand-key [key]
-  (let [kw (->> (partition 8 key)
-                (mapv #(bytes-dword %)))]
+  (let [kw (mapv bytes-dword (partition 8 key))]
     (condp = (count key)
       16 [kw [0 0]]
       24 [(vec (take 2 kw)) [(last kw) (bit-not (last kw))]]
@@ -179,11 +178,11 @@
 ;; Evaluates to a vector of four 32-bit words.
 (defn- process-block [block key enc]
   (let [ks (expand-key key)
-        kl (-> (mapv (partial to-hex) (first ks))
+        kl (-> (mapv to-hex (first ks))
                (join)
                (clojure.string/replace #"0x" "")
                (BigInteger. 16))
-        kr (-> (mapv (partial to-hex) (last ks))
+        kr (-> (mapv to-hex (last ks))
                (join)
                (clojure.string/replace #"0x" "")
                (BigInteger. 16))
@@ -265,7 +264,7 @@
         d1 (.xor d1 kw4)
         _ (println (str "D1:  " (to-hex d1)))
         _ (println (str "D2:  " (to-hex d2)))]
-  (.or (.shiftLeft d2 64) d1)))
+    (.or (.shiftLeft d2 64) d1)))
 
 ;; ### Camellia
 ;; Extend the BlockCipher protocol through the Camellia record type.

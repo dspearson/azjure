@@ -69,7 +69,7 @@ defined at [Rabbit Spec][RABBIT]"}
   (vec (take 16 (cycle [0]))))
 
 (def ^{:doc "A sample 128-bit initialization vector as a vector of 16 bytes."}
-  iv-128b 
+  iv-128b
   [0x0f 0x0e 0x0d 0x0c 0x0b 0x0a 0x09 0x08
    0x07 0x06 0x05 0x04 0x03 0x02 0x01 0x00])
 
@@ -79,7 +79,7 @@ defined at [HC-128 Spec][HC128]"}
   zeros-128-iv)
 
 (def ^{:doc "HC-128 128-bit IV as a vector of bytes as
-defined at [HC-128 Spec][HC128]"} 
+defined at [HC-128 Spec][HC128]"}
   hc-128-iv-1
   [0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00])
@@ -87,11 +87,11 @@ defined at [HC-128 Spec][HC128]"}
 ;; ### 256-bit Initialization Vectors
 
 (def ^{:doc "256-bits of zeros as a vector of bytes."}
-  zeros-256-iv 
+  zeros-256-iv
   (vec (take 32 (cycle [0]))))
 
 (def ^{:doc "HC-256 256-bit IV as a vector of bytes as
-defined at [HC-256 Spec][HC256]"} 
+defined at [HC-256 Spec][HC256]"}
   hc-256-256-iv-1
   [0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00
    0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00

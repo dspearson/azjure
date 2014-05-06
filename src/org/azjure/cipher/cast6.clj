@@ -199,7 +199,7 @@
 ;; Evaluates to a 32-bit word
 (defn- roundfn [[word kmi kri round]]
   (let [rnd (mod round 3)]
-    (condp = rnd 
+    (condp = rnd
       0 (-> (+modw kmi word)
             (rotate kri)
             (f1))
@@ -257,7 +257,7 @@
           lower (* round 8)
           upper (+ 8 lower)
           kwfn (kappa-word tm tr [g f e d c b a h])]
-      (->> (-> #(kwfn %1 %2)
+      (->> (-> kwfn
                (reduce [h] (range lower upper))
                (subvec 1)
                (rseq))
@@ -292,9 +292,9 @@
          (take-nth 2)
          (rest)
          (reduce into)
-         ((juxt 
-           #(reduce into (mapv (partial rev) (partition 4 (take-nth 2 (rest %)))))
-           #(mapv (partial bit-and 0x1f) (take-nth 2 %)))))))
+         ((juxt
+            #(reduce into (mapv rev (partition 4 (take-nth 2 (rest %)))))
+            #(mapv (partial bit-and 0x1f) (take-nth 2 %)))))))
 
 ;; ### mkey-schedule
 ;; Memoization of key-schedule
@@ -305,17 +305,17 @@
 ;; converts to a vector of 32-bit words.
 ;;
 ;; Evaluates to a vector of 8 32-bit words
-(defn- expand-key 
+(defn- expand-key
   ([key]
-     {:pre [(vector? key) (> (count key) 15) (< (count key) 33)]}
-  (let [l (count key)]
-    (->> (if (< l 32)
-           (->> (cycle [0])
-                (take (- 32 l))
-                (reduce conj key))
-           key)
-         (partition 4)
-         (mapv bytes-word)))))
+   {:pre [(vector? key) (> (count key) 15) (< (count key) 33)]}
+   (let [l (count key)]
+     (->> (if (< l 32)
+            (->> (cycle [0])
+                 (take (- 32 l))
+                 (reduce conj key))
+            key)
+          (partition 4)
+          (mapv bytes-word)))))
 
 ;; ### q-word
 ;; Generates one q word
@@ -341,10 +341,10 @@
   (fn [[a b c d] round]
     (let [lower (* round 4)
           qwfn (q-word km kr [c b a d])]
-      (->> (-> #(qwfn %1 %2)
+      (->> (-> qwfn
                (reduce [d] (range lower (+ 4 lower)))
                (subvec 1)
-               (rseq)) 
+               (rseq))
            ((juxt #(vec (rest %)) first))
            (flatten)
            (vec)))))
@@ -357,7 +357,7 @@
 (defn- qbar-word [km kr iw ow]
   (fn [words round]
     (let [m4 (mod round 4)]
-      (->> [(if (zero? m4) (first words) (nth ow m4)) 
+      (->> [(if (zero? m4) (first words) (nth ow m4))
             (nth km round) (nth kr round) m4]
            (roundfn)
            (bit-xor (nth iw m4))
@@ -376,7 +376,7 @@
           upper (+ 4 lower)
           qbwfn (qbar-word km kr [c b a d] [0 c b a])]
       (->> (range (dec upper) (dec lower) -1)
-           (reduce #(qbwfn %1 %2) [])
+           (reduce qbwfn [])
            ((juxt #(vec (rest %)) first))
            (flatten)
            (vec)))))
@@ -430,15 +430,14 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of four 32-bit words.
-(defn- process-block 
+(defn- process-block
   ([block {:keys [km kr enc] :as initmap}]
-     {:pre [(contains? initmap :km) (contains? initmap :kr) (contains? initmap :enc)
-            (vector? km) (vector? kr)
-            (= (count km) 48)(= (count kr) 48)]}
-  (let [keys (if enc [km kr] (flip-key-schedule [km kr]))
-        castfn (cast6 keys)]
-    (->> (range 12)
-         (reduce castfn block)))))
+   {:pre [(contains? initmap :km) (contains? initmap :kr) (contains? initmap :enc)
+          (vector? km) (vector? kr)
+          (= (count km) 48) (= (count kr) 48)]}
+   (let [keys (if enc [km kr] (flip-key-schedule [km kr]))
+         castfn (cast6 keys)]
+     (reduce castfn block (range 12)))))
 
 (defn- process-bytes [block initmap]
   (->> initmap

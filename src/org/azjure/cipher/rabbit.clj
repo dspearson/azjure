@@ -25,11 +25,11 @@
   max-stream-length-bytes (expt 2 70))
 
 (def ^{:doc "The initial state. X and C are empty vectors
-and the carry bit is 0."} 
-  initial-state [[][] 0])
+and the carry bit is 0."}
+  initial-state [[] [] 0])
 
 (def ^{:doc "Constants used during a counter update."}
-  avec [0x4D34D34D 0xD34D34D3 0x34D34D34 0x4D34D34D 
+  avec [0x4D34D34D 0xD34D34D3 0x34D34D34 0x4D34D34D
         0xD34D34D3 0x34D34D34 0x4D34D34D 0xD34D34D3])
 
 (defn- ^{:doc "Adds two 32-bit values mod 2^32 and squares them generating
@@ -40,7 +40,7 @@ a 64-bit result."}
 (defn- ^{:doc "Take two 32-bit values and generate one 32-bit value."}
   gfn [word1 word2]
   (let [squared (square word1 word2)]
-    (bit-xor (bit-and (bit-shift-right squared 32) 0xFFFFFFFF) 
+    (bit-xor (bit-and (bit-shift-right squared 32) 0xFFFFFFFF)
              (bit-and squared 0xFFFFFFFF))))
 
 (defn- ^{:doc "A g-function round.  Conj's the result of gfn to the 
@@ -52,10 +52,10 @@ supplied g vector."}
 (defn- ^{:doc "Update the counter vector and carry bit based
 on the given round."}
   next-counters-b-round [[c b] round]
-  (let [t (+ (nth c round) (nth avec round) b) 
+  (let [t (+ (nth c round) (nth avec round) b)
         ; Note "normal" addition above to catch carry bit if the add
         ; overflows 32 bits.
-        b (bit-shift-right t 32)] 
+        b (bit-shift-right t 32)]
     [(assoc c round (bit-and t 0xFFFFFFFF)) b]))
 
 (defn- ^{:doc "Update the counter vector and carry bit in the
@@ -82,13 +82,13 @@ vector."}
         evenfn (next-x-even g)
         oddfn (next-x-odd g)]
     [[(evenfn [0 7 6])
-      (oddfn  [1 0 7])
+      (oddfn [1 0 7])
       (evenfn [2 1 0])
-      (oddfn  [3 2 1])
+      (oddfn [3 2 1])
       (evenfn [4 3 2])
-      (oddfn  [5 4 3])
+      (oddfn [5 4 3])
       (evenfn [6 5 4])
-      (oddfn  [7 6 5])] c b]))
+      (oddfn [7 6 5])] c b]))
 
 (defn- ^{:doc "Used to convert the X vector in [x c b] from words to bytes."}
   bytes-word-x [state]
@@ -137,27 +137,26 @@ generation."}
          (bytes-word)
          (bit-xor (nth c cidx)))))
 
-(defn- ^{:doc "Update a counter value based on the given iv and round."} 
+(defn- ^{:doc "Update a counter value based on the given iv and round."}
   update-counters-pre-ss-round [iv]
   (fn [c round]
     (let [xfn (xor-counter c iv)]
-      (->> (condp = (mod round 4)
-             0 (xfn [round 1 0])
-             1 (xfn [round 3 1])
-             2 (xfn [round 3 2])
-             3 (xfn [round 2 0]))
-           (assoc c round)))))
+      (assoc c round (condp = (mod round 4)
+                       0 (xfn [round 1 0])
+                       1 (xfn [round 3 1])
+                       2 (xfn [round 3 2])
+                       3 (xfn [round 2 0]))))))
 
-(defn- ^{:doc "Update the counters vector before starting state calculation."} 
+(defn- ^{:doc "Update the counters vector before starting state calculation."}
   update-counters-pre-ss [[x c b] iv]
   (let [ivec (mapv vec (reverse (partition 2 iv)))]
     [x (reduce (update-counters-pre-ss-round ivec) c (range 8)) b]))
 
-(defn- ^{:doc "Get the 2 most significant bytes from the given word."} 
+(defn- ^{:doc "Get the 2 most significant bytes from the given word."}
   ms2b [word]
   (bit-shift-right word 16))
 
-(defn- ^{:doc "Get the 2 least significant bytes from the given word."} 
+(defn- ^{:doc "Get the 2 least significant bytes from the given word."}
   ls2b [word]
   (bit-and word 0xFFFF))
 
@@ -170,8 +169,8 @@ into an output word."}
   outw<-x [x]
   (fn [[idx0 idx1 idx2 idx3]]
     (bit-or
-     (bit-xor (ls2b (nth x idx0)) (ms2b (nth x idx1)))
-     (bit-shift-left (bit-xor (ms2b (nth x idx2)) (ls2b (nth x idx3))) 16))))
+      (bit-xor (ls2b (nth x idx0)) (ms2b (nth x idx1)))
+      (bit-shift-left (bit-xor (ms2b (nth x idx2)) (ls2b (nth x idx3))) 16))))
 
 (defn- ^{:doc "Represents one Rabbit round.  This will update the initmap
 with the current starting state for the next round (:ss), and will place
@@ -179,19 +178,18 @@ the 128-bits (as four 32-bit words) of generated keystream into :out."}
   rabbit-round [{:keys [ss out] :as initmap} r]
   (let [[xn cn bn] (next-state ss 0)
         exfn (outw<-x xn)]
-    (assoc initmap 
+    (assoc initmap
       :ss [xn cn bn]
-      :out (->> [(exfn [6 3 6 1])
-                 (exfn [4 1 4 7])
-                 (exfn [2 7 2 5])
-                 (exfn [0 5 0 3])]
-                (into out)))))
+      :out (into out [(exfn [6 3 6 1])
+                      (exfn [4 1 4 7])
+                      (exfn [2 7 2 5])
+                      (exfn [0 5 0 3])]))))
 
 (defn- ^{:doc "Evaluates to the master state.  The master state is
 based soley on the key, so only needs to be calculated for new key
 values.  If a master state is found at the baseuid, that is used.
 If a master state is found at the current uid is found, that is used.
-Otherwise, a new master state is calculated."} 
+Otherwise, a new master state is calculated."}
   master-state [baseuid uid key]
   (if (contains? @state-maps baseuid)
     (:ms (baseuid @state-maps))
@@ -211,35 +209,35 @@ the starting state is calculated based upon the initialization vector."}
 
 (defn- ^{:doc "Reset the state at uid in the state-maps atom.  If no
 state map exists at :baseuid one will be generated for efficiencies
-with new IVs for the same key.  Then reset the statemap at :uid."} 
-  resetstatemap! 
+with new IVs for the same key.  Then reset the statemap at :uid."}
+  resetstatemap!
   ([key iv uid]
-     {:pre [(vector? key)(keyword? uid)
-            (or (nil? iv)(vector? iv))
-            (= 16 (count key))
-            (or (nil? iv)(= 8 (count iv)))]}
-  (let [baseuid (bytes->keyword key)
-        ms (master-state baseuid uid key)]
-    (if-not (contains? @state-maps baseuid)
-      (swap! state-maps assoc baseuid 
-             {:ms ms :ss (starting-state baseuid ms nil)}))
-    (swap! state-maps assoc uid
-           {:ms ms :ss (starting-state uid ms iv)}))))
+   {:pre [(vector? key) (keyword? uid)
+          (or (nil? iv) (vector? iv))
+          (= 16 (count key))
+          (or (nil? iv) (= 8 (count iv)))]}
+   (let [baseuid (bytes->keyword key)
+         ms (master-state baseuid uid key)]
+     (if-not (contains? @state-maps baseuid)
+       (swap! state-maps assoc baseuid
+              {:ms ms :ss (starting-state baseuid ms nil)}))
+     (swap! state-maps assoc uid
+            {:ms ms :ss (starting-state uid ms iv)}))))
 
 (defn- ^{:doc "Swap any existing keystream in the state map at :uid with
-a newly generated one."} 
+a newly generated one."}
   swapstatemapks!
   ([uid [lower upper]]
-     {:pre [(< upper max-stream-length-bytes)]}
-  (let [rounds (inc (quot upper 16)) ; Each round generates 16-bytes (128-bits)
-        rounds (if (zero? (rem upper 16)) rounds (inc rounds))
-        statemap (uid @state-maps)
-        out (reduce rabbit-round (conj {:out []} statemap) (range rounds))]
-    (swap! state-maps assoc uid
-           (assoc (uid @state-maps) 
-             :ss (:ss out) 
-             :upper upper 
-             :ks (reduce into (mapv word-bytes (:out out))))))))
+   {:pre [(< upper max-stream-length-bytes)]}
+   (let [rounds (inc (quot upper 16))                       ; Each round generates 16-bytes (128-bits)
+         rounds (if (zero? (rem upper 16)) rounds (inc rounds))
+         statemap (uid @state-maps)
+         out (reduce rabbit-round (conj {:out []} statemap) (range rounds))]
+     (swap! state-maps assoc uid
+            (assoc (uid @state-maps)
+              :ss (:ss out)
+              :upper upper
+              :ks (reduce into (mapv word-bytes (:out out))))))))
 
 ;; ### Rabbit
 ;; Extend the StreamCipher and Cipher protocol thorough the Rabbit record type.

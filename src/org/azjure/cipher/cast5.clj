@@ -325,7 +325,7 @@
 ;; Evaluates to a vector of 4 bytes.
 (defn- get-bytes [kw [a b c d :as order]]
   (->> order
-       (mapv #(mflip %))
+       (mapv mflip)
        (mapv #(get-byte % kw))))
 
 ;; ### xor-line
@@ -344,13 +344,13 @@
 (defn- xor-line [w1 w2 [a b c d :as order] w3 fsbox idx]
   (let [barr (get-bytes w2 order)
         lb (get-byte (mflip idx) w3)]
-    (bit-xor 
-     w1 
-     (nth s5 (nth barr 0)) 
-     (nth s6 (nth barr 1)) 
-     (nth s7 (nth barr 2)) 
-     (nth s8 (nth barr 3))
-     (nth fsbox lb))))
+    (bit-xor
+      w1
+      (nth s5 (nth barr 0))
+      (nth s6 (nth barr 1))
+      (nth s7 (nth barr 2))
+      (nth s8 (nth barr 3))
+      (nth fsbox lb))))
 
 ;; ### gen-words
 ;; Generate 4 temporary 32-bit words for use in subkey generation.
@@ -366,12 +366,12 @@
 ;; Evaluates to a vector of 4 32-bit temporary words.
 (defn- gen-words [words [i0 i1 i2 i3 i4 i5 :as indices]]
   (let [seed (nth words i0)
-        down (nth words i5) 
+        down (nth words i5)
         ow0 (xor-line (nth words i1) seed [1 3 0 2] down s7 0)
-        ow1 (xor-line (nth words i2) ow0  [0 2 1 3] down s8 2)
-        ow2 (xor-line (nth words i3) ow1  [3 2 1 0] down s5 1)
-        ow3 (xor-line (nth words i4) ow2  [2 1 3 0] down s6 3)]
-  [ow0 ow1 ow2 ow3]))
+        ow1 (xor-line (nth words i2) ow0 [0 2 1 3] down s8 2)
+        ow2 (xor-line (nth words i3) ow1 [3 2 1 0] down s5 1)
+        ow3 (xor-line (nth words i4) ow2 [2 1 3 0] down s6 3)]
+    [ow0 ow1 ow2 ow3]))
 
 ;; ### gen-subkey-word
 ;; Generate one subkey word (K<sub>1</sub>) as defined at
@@ -387,11 +387,11 @@
 ;; Evaluates to a 32-bit word.
 (defn- gen-subkey-word [[a b c d e] w0 w1 tail]
   (bit-xor
-   (nth s5 (get-byte (mflip a) w0))
-   (nth s6 (get-byte (mflip b) w0))
-   (nth s7 (get-byte (mflip c) w1))
-   (nth s8 (get-byte (mflip d) w1))
-   (nth tail e)))
+    (nth s5 (get-byte (mflip a) w0))
+    (nth s6 (get-byte (mflip b) w0))
+    (nth s7 (get-byte (mflip c) w1))
+    (nth s8 (get-byte (mflip d) w1))
+    (nth tail e)))
 
 ;; ### gen-tails
 ;; Generate a vector of 4 bytes that are used as the tail
@@ -442,14 +442,14 @@
   (let [rnd (mod round 4)
         tails (get-tails words rnd)]
     (cond
-      (or (= rnd 0)(= rnd 3)) [(gen-subkey-word [0 1 3 2 0] w2 w1 tails)
-                               (gen-subkey-word [2 3 1 0 1] w2 w1 tails)
-                               (gen-subkey-word [0 1 3 2 2] w3 w0 tails)
-                               (gen-subkey-word [2 3 1 0 3] w3 w0 tails)]
-      (or (= rnd 1)(= rnd 2)) [(gen-subkey-word [3 2 0 1 0] w0 w3 tails)
-                               (gen-subkey-word [1 0 2 3 1] w0 w3 tails)
-                               (gen-subkey-word [3 2 0 1 2] w1 w2 tails)
-                               (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))
+      (or (zero? 0) (= rnd 3)) [(gen-subkey-word [0 1 3 2 0] w2 w1 tails)
+                                (gen-subkey-word [2 3 1 0 1] w2 w1 tails)
+                                (gen-subkey-word [0 1 3 2 2] w3 w0 tails)
+                                (gen-subkey-word [2 3 1 0 3] w3 w0 tails)]
+      (or (= rnd 1) (= rnd 2)) [(gen-subkey-word [3 2 0 1 0] w0 w3 tails)
+                                (gen-subkey-word [1 0 2 3 1] w0 w3 tails)
+                                (gen-subkey-word [3 2 0 1 2] w1 w2 tails)
+                                (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))
 
 ;; ### expand-key
 ;; Generate enough key material to support the creation of the subkeys.
@@ -460,11 +460,9 @@
 ;; Evaluates to a vector of 8 vectors containing 4 32-bit words each.
 ;; These serve as input material for the generate-subkey function.
 (defn- expand-key [key]
-  (->
-   (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
-        (take 8)
-        (reduce #(conj %1 (gen-words (last %1) %2)) [key]))
-   (subvec 1)))
+  (subvec 1 (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
+                 (take 8)
+                 (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))
 
 ;; ### generate-subkeys
 ;; Generates 32 32-bit words that make up the key schedule defined at
@@ -478,7 +476,7 @@
 ;; Evalutates to a vector of 32 32-bit words.
 (defn- generate-subkeys [key]
   (->> (range 8)
-       (mapv #(generate-subkey %1 %2) (expand-key key))
+       (mapv generate-subkey (expand-key key))
        (reduce into)))
 
 ;; #### mgen-subkeys
@@ -513,7 +511,7 @@
 ;; Rounds 3, 6, 9, 12, and 15 use f function Type 3.
 (defn- roundfn [word kmi kri round]
   (let [rnd (mod round 3)]
-    (condp = rnd 
+    (condp = rnd
       0 (-> (+modw kmi word)
             (rotate kri)
             (f1))
@@ -531,18 +529,18 @@
           (roundfn ri (nth km round) (nth kr round))
           (bit-xor li))]))
 
-(defn- key-schedule 
+(defn- key-schedule
   ([key]
-     {:pre [(vector? key) (and (> (count key) 4) (< (count key) 17))]}
-  (->> (cycle [0])
-       (take (- 16 (count key)))
-       (reduce conj key)
-       (partition 4)
-       (mapv bytes-word)
-       (mgen-subkeys)
-       ((juxt 
-         #(subvec % 0 16) 
-         #(mapv (partial bit-and 0x1f) (subvec % 16 (count %))))))))
+   {:pre [(vector? key) (and (> (count key) 4) (< (count key) 17))]}
+   (->> (cycle [0])
+        (take (- 16 (count key)))
+        (reduce conj key)
+        (partition 4)
+        (mapv bytes-word)
+        (mgen-subkeys)
+        ((juxt
+           #(subvec % 0 16)
+           #(mapv (partial bit-and 0x1f) (subvec % 16 (count %))))))))
 
 (def mkey-schedule (memoize key-schedule))
 
@@ -556,18 +554,18 @@
 ;; if you are decrypting the block.
 ;;
 ;; Evaluates to a vector of two 32-bit words.
-(defn- process-block 
+(defn- process-block
   ([block {:keys [km kr rc enc] :as initmap}]
-     {:pre [(contains? initmap :km)(contains? initmap :kr)
-            (contains? initmap :rc)(contains? initmap :enc)
-            (vector? km)(vector? kr)
-            (number? rc)
-            (or (= 12 rc)(= 16 rc))
-            (= 16 (count km))(= 16 (count kr))]}
-  (->> (if enc (range rc) (range (dec rc) -1 -1))
-       (reduce (cast5 [km kr]) block)
-       reverse
-       (into []))))
+   {:pre [(contains? initmap :km) (contains? initmap :kr)
+          (contains? initmap :rc) (contains? initmap :enc)
+          (vector? km) (vector? kr)
+          (number? rc)
+          (or (= 12 rc) (= 16 rc))
+          (= 16 (count km)) (= 16 (count kr))]}
+   (->> (if enc (range rc) (range (dec rc) -1 -1))
+        (reduce (cast5 [km kr]) block)
+        reverse
+        (into []))))
 
 (defn- process-bytes [block initmap]
   (->> initmap

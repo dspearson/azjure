@@ -19,10 +19,10 @@
 ;;
 ;; The function takes the current ciphertext and the block to encrypt.
 ;; The block is encrypted and conj'd onto the ciphertext.
-(defn- encrypt-block [cipher iv key] 
+(defn- encrypt-block [cipher iv key]
   (fn [ciphertext bytes]
-    (let [civ (if (empty? ciphertext) 
-                iv 
+    (let [civ (if (empty? ciphertext)
+                iv
                 (subvec ciphertext (- (count ciphertext) (mbpb cipher))))]
       (reduce conj ciphertext (bc/encrypt-block cipher (mapv bit-xor bytes civ) key)))))
 
@@ -37,8 +37,8 @@
     (let [lower (* (mbpb cipher) idx)
           upper (+ (mbpb cipher) lower)
           block (subvec ciphertext lower upper)
-          civ (if (= 0 idx)
-                iv 
+          civ (if (zero? idx)
+                iv
                 (subvec ciphertext (- lower (mbpb cipher)) (- upper (mbpb cipher))))]
       (reduce conj plaintext (mapv bit-xor (bc/decrypt-block cipher block key) civ)))))
 
@@ -49,4 +49,4 @@
   (encrypt [_ cipher key iv bytes]
     (reduce (encrypt-block cipher iv key) [] (partition (mbpb cipher) bytes)))
   (decrypt [_ cipher key iv bytes]
-    (reduce (decrypt-block cipher bytes iv key) []  (range (/ (count bytes) (mbpb cipher))))))    
+    (reduce (decrypt-block cipher bytes iv key) [] (range (/ (count bytes) (mbpb cipher))))))

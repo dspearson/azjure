@@ -148,7 +148,7 @@ defined at [Twofish paper][TF]"} tf-192-key
    0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77])
 
 ;; ### 256-bit Keys
- 
+
 (def ^{:doc "256-bits of zeros as a vector of bytes."} zeros-256-key
   (vec (take 32 (cycle [0]))))
 

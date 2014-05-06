@@ -11,7 +11,7 @@
             [org.azjure.libcrypt :refer :all]))
 
 (def ^{:doc "Used to store upper bounds and current keystreams
-for initialized key/iv pairs"} 
+for initialized key/iv pairs"}
   hc128-key-streams (atom {}))
 
 ;;     {:keyiv1 {:upper val :ks [keystream vector]}
@@ -45,12 +45,12 @@ Takes three 32-bit word values and evaluates to a 32-bit word."}
 (defn- ^{:doc "h1 function as defined in [HC-128 Spec][HC128].
 Uses the q sbox and a 32-bit word value and evaluates to a 32-bit word."}
   h1 [q word]
-  (+modw (nth q (get-byte 1 word))(nth q (+ (get-byte 3 word) 256))))
+  (+modw (nth q (get-byte 1 word)) (nth q (+ (get-byte 3 word) 256))))
 
 (defn- ^{:doc "h2 function as defined in [HC-128 Spec][HC128].
 Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."}
   h2 [p word]
-  (+modw (nth p (get-byte 1 word))(nth p (+ (get-byte 3 word) 256))))
+  (+modw (nth p (get-byte 1 word)) (nth p (+ (get-byte 3 word) 256))))
 
 (defn- ^{:doc "Add the key to the subkeys vector."}
   append-key [ks key i]
@@ -67,32 +67,31 @@ Uses the p sbox and a 32-bit word value and evaluates to a 32-bit word."}
 (defn- ^{:doc "Add the newly calculated word values to the 
 subkeys vector."}
   append-new [ks i]
-  (->> (+modw
-        (f2 (nth ks (- i 2)))
-        (nth ks (- i 7))
-        (f1 (nth ks (- i 15)))
-        (nth ks (- i 16))
-        i)
-       (conj ks)))
+  (conj ks (+modw
+             (f2 (nth ks (- i 2)))
+             (nth ks (- i 7))
+             (f1 (nth ks (- i 15)))
+             (nth ks (- i 16))
+             i)))
 
 (defn- ^{:doc "Add one word to the key schedule vector
 based on the round number"}
   key-round [key iv]
   (fn [ks round]
     (cond
-      (< round 8)  (append-key ks key round)
+      (< round 8) (append-key ks key round)
       (< round 16) (append-iv ks iv round)
-      :else        (append-new ks round))))
+      :else (append-new ks round))))
 
 (defn- ^{:doc "Expand the key into a vector of 1280 32-bit words."}
-  expand-key  
+  expand-key
   ([{:keys [key iv] :as initmap}]
-     {:pre [(contains? initmap :key) (contains? initmap :iv)
-            (vector? key) (vector? iv)
-            (= 16 (count key)) (= 16 (count iv))]}
-     (let [kw (mapv bytes-word (partition 4 key))
-           iw (mapv bytes-word (partition 4 iv))]
-       (reduce (key-round kw iw) [] (range 1280)))))
+   {:pre [(contains? initmap :key) (contains? initmap :iv)
+          (vector? key) (vector? iv)
+          (= 16 (count key)) (= 16 (count iv))]}
+   (let [kw (mapv bytes-word (partition 4 key))
+         iw (mapv bytes-word (partition 4 iv))]
+     (reduce (key-round kw iw) [] (range 1280)))))
 
 (defn- ^{:doc "conj a value from the key schedule onto the p sbox."} p-round
   [ek]
@@ -114,23 +113,21 @@ based on the round number"}
 
 (defn- ^{:doc "Calculate and place a new value in the p sbox at index j"} new-p
   [p j]
-  (->> (+modw
-        (nth p j)
-        (g1 
-         (nth p (-mod512 j 3))
-         (nth p (-mod512 j 10))
-         (nth p (-mod512 j 511))))
-       (assoc p j)))
+  (assoc p j (+modw
+               (nth p j)
+               (g1
+                 (nth p (-mod512 j 3))
+                 (nth p (-mod512 j 10))
+                 (nth p (-mod512 j 511))))))
 
 (defn- ^{:doc "Calculate and place a new value in the q sbox at index j"} new-q
   [q j]
-  (->> (+modw
-        (nth q j)
-        (g2 
-         (nth q (-mod512 j 3))
-         (nth q (-mod512 j 10))
-         (nth q (-mod512 j 511))))
-       (assoc q j)))
+  (assoc q j (+modw
+               (nth q j)
+               (g2
+                 (nth q (-mod512 j 3))
+                 (nth q (-mod512 j 10))
+                 (nth q (-mod512 j 511))))))
 
 (defn- ^{:doc "Calculate an output word during the lower 512."} sp
   [p q j]
@@ -145,8 +142,8 @@ in [HC-128 Spec][HC128]."} hc128
   [[p q _] round]
   (let [j (mod round 512)]
     (cond
-     (< (mod round 1024) 512) (let [np (new-p p j)] [np q (sp np q j)])
-     :else (let [nq (new-q q j)] [p nq (sq p nq j)]))))
+      (< (mod round 1024) 512) (let [np (new-p p j)] [np q (sp np q j)])
+      :else (let [nq (new-q q j)] [p nq (sq p nq j)]))))
 
 (defn- ^{:doc "Recalculate a p word given a round."} p-ks-round
   [{:keys [p q] :as pq} round]
@@ -188,12 +185,11 @@ in [HC-128 Spec][HC128]."} hc128
     (swap! hc128-key-streams assoc uid
            (assoc (uid @hc128-key-streams) :upper 0 :ks []))
     (let [ek (expand-key initmap)
-          sboxmap (-> (remap-p {:p (gen-p ek) :q (gen-q ek)})
-                      (remap-q))]
+          sboxmap (remap-q (remap-p {:p (gen-p ek) :q (gen-q ek)}))]
       (swap! hc128-key-streams assoc uid sboxmap))))
 
 (defn- ^{:doc "Reset the keystream in the map in the atom
-at uid."} 
+at uid."}
   swapks! [{:keys [uid upper] :as initmap}]
   (let [p (:p (uid @hc128-key-streams))
         q (:q (uid @hc128-key-streams))

@@ -33,24 +33,24 @@
       [(teafn [y nz a b]) nz])))
 
 (defn- ^{:doc "TEA cipher algorithm"}
-  cipher 
+  cipher
   ([bytes key enc]
-     {:pre [(vector? bytes)(vector? key)
-            (= (count bytes) 8)(= (count key) 16)]}
-  (let [c-words (mapv bytes-word (partition 4 bytes))
-        key-words (mapv bytes-word (partition 4 key))
-        rng (if enc (range 32)(range 31 -1 -1))
-        roundfn (if enc (encipher-round key-words)(decipher-round key-words))]
-    (reduce roundfn c-words rng))))
+   {:pre [(vector? bytes) (vector? key)
+          (= (count bytes) 8) (= (count key) 16)]}
+   (let [c-words (mapv bytes-word (partition 4 bytes))
+         key-words (mapv bytes-word (partition 4 key))
+         rng (if enc (range 32) (range 31 -1 -1))
+         roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
+     (reduce roundfn c-words rng))))
 
 ;; ### TEA
 ;; Extend the Cipher and BlockCipher thorough the TEA record type
 
 (defrecord TEA []
   Cipher
-  (initialize [_ {:keys [key] :as initmap}] 
+  (initialize [_ {:keys [key] :as initmap}]
     initmap)
-  (keysizes-bytes [_] 
+  (keysizes-bytes [_]
     [16])
   BlockCipher
   (encrypt-block [_ bytes {:keys [key] :as initmap}]

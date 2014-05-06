@@ -11,6 +11,7 @@
             [org.azjure.testivs :refer :all]
             [org.azjure.testkeys :refer :all]
             [org.azjure.testplaintext :refer :all]))
+
 ;; ### Record Definitions
 
 (def ^{:doc "Rabbit record to be used in the tests"}
@@ -60,13 +61,13 @@
 ;; ### Rabbit Tests
 
 (deftest ^{:doc "Test Rabbit stream suites"}
-  testStream
+         testStream
   (testing "Stream"
     (is (= true (every? true? (map stream-encryptor rabbitspec-test-vectors))))
     (is (= true (every? true? (map stream-decryptor rabbitspec-test-vectors))))))
 
 (deftest ^{:doc "Test Rabbit"}
-  testRabbit
+         testRabbit
   (testing "Rabbit"
     (testStream)))
 

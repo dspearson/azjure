@@ -61,10 +61,10 @@ in [Salsa20 Spec][S20]"}
         [z10 z11 z8 z9] (quarterround [y10 y11 y8 y9])
         [z15 z12 z13 z14] (quarterround [y15 y12 y13 y14])]
     [z0 z1 z2 z3 z4 z5 z6 z7 z8 z9 z10 z11 z12 z13 z14 z15]))
-  
+
 (defn- ^{:doc "columnround function as defined 
 in [Salsa20 Spec][S20]"}
-  columnround[[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
+  columnround [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
   (let [[y0 y4 y8 y12] (quarterround [x0 x4 x8 x12])
         [y5 y9 y13 y1] (quarterround [x5 x9 x13 x1])
         [y10 y14 y2 y6] (quarterround [x10 x14 x2 x6])
@@ -118,7 +118,7 @@ bound of the range."} gen-key-stream
         rounds (if (not= 0 (rem upper 64)) (inc rounds) rounds)]
     (reduce (chacha-round c k0 k1 uid nonce) [] (range rounds))))
 
-(defn- ^{:doc "Reset the map in the atom at uid to defaults."} 
+(defn- ^{:doc "Reset the map in the atom at uid to defaults."}
   swapuid! [{:keys [uid]}]
   (swap! chacha-key-streams assoc uid {:counter 0}))
 

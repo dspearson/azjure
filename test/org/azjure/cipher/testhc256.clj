@@ -11,6 +11,7 @@
             [org.azjure.testivs :refer :all]
             [org.azjure.testkeys :refer :all]
             [org.azjure.testplaintext :refer :all]))
+
 ;; ### Record Definitions
 
 (def ^{:doc "HC256 record to be used in the tests"} hc256 (->HC256))

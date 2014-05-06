@@ -17,17 +17,17 @@
     (let [addsubfn (if enc +modw -modw)]
       ((if enc +modw -modw) y
        (bit-xor
-        (+modw (bit-xor (bsl32 z 4)(bsr32 z 5)) z)
-        (+modw sum (nth key (bit-and sum 3))))))))
-  
+         (+modw (bit-xor (bsl32 z 4) (bsr32 z 5)) z)
+         (+modw sum (nth key (bit-and sum 3))))))))
+
 ;z+= (y<<4 ^ y>>5) + y ^ sum + k[sum>>11 &3] ;
 (defn- ^{:doc "XTEA z calculation"}
   calc-z [key enc]
   (fn [[y z sum]]
     ((if enc +modw -modw) z
      (bit-xor
-      (+modw (bit-xor (bsl32 y 4)(bsr32 y 5)) y)
-      (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))
+       (+modw (bit-xor (bsl32 y 4) (bsr32 y 5)) y)
+       (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))
 
 (defn- ^{:doc "Encipher round"}
   encipher-round [key]
@@ -46,24 +46,24 @@
       [(yfn [y nz (*modw round delta)]) nz])))
 
 (defn- ^{:doc "TEA cipher algorithm"}
-  cipher 
+  cipher
   ([bytes key enc]
-     {:pre [(vector? bytes)(vector? key)
-            (= (count bytes) 8)(= (count key) 16)]}
-  (let [c-words (mapv bytes-word (partition 4 bytes))
-        key-words (mapv bytes-word (partition 4 key))
-        rng (if enc (range 32)(range 31 -1 -1))
-        roundfn (if enc (encipher-round key-words)(decipher-round key-words))]
-    (reduce roundfn c-words rng))))
+   {:pre [(vector? bytes) (vector? key)
+          (= (count bytes) 8) (= (count key) 16)]}
+   (let [c-words (mapv bytes-word (partition 4 bytes))
+         key-words (mapv bytes-word (partition 4 key))
+         rng (if enc (range 32) (range 31 -1 -1))
+         roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
+     (reduce roundfn c-words rng))))
 
 ;; ### XTEA
 ;; Extend the Cipher and BlockCipher thorough the XTEA record type
 
 (defrecord XTEA []
   Cipher
-  (initialize [_ {:keys [key] :as initmap}] 
+  (initialize [_ {:keys [key] :as initmap}]
     initmap)
-  (keysizes-bytes [_] 
+  (keysizes-bytes [_]
     [16])
   BlockCipher
   (encrypt-block [_ bytes {:keys [key] :as initmap}]

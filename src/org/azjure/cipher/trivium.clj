@@ -51,9 +51,9 @@
 (defn- ^{:doc "A Trivium starting state calculation round."}
   starting-state-round [state round]
   (let [asone (reduce into state)
-        t1 (calc-tx [65  90  91  92  170] asone)
+        t1 (calc-tx [65 90 91 92 170] asone)
         t2 (calc-tx [161 174 175 176 263] asone)
-        t3 (calc-tx [242 285 286 287 68 ] asone)]
+        t3 (calc-tx [242 285 286 287 68] asone)]
     (rotate-all t1 t2 t3 state)))
 
 (defn- ^{:doc "Generate the Trivium starting state, given
@@ -64,19 +64,19 @@ the initial state."}
 (defn- ^{:doc "Calculate a new t-value from the state during encryption."}
   calc-new-t [t [idx0 idx1 idx2] state]
   (bit-xor t
-           (bit-and (nth state idx0)(nth state idx1))
+           (bit-and (nth state idx0) (nth state idx1))
            (nth state idx2)))
 
 (defn- ^{:doc "A key stream generation round.  Generates 1-bit of key stream."}
   key-stream-round [[state out] round]
   (let [asone (reduce into state)
-        t1 (bit-xor (nth asone 65)(nth asone 92))
-        t2 (bit-xor (nth asone 161)(nth asone 176))
-        t3 (bit-xor (nth asone 242)(nth asone 287))
+        t1 (bit-xor (nth asone 65) (nth asone 92))
+        t2 (bit-xor (nth asone 161) (nth asone 176))
+        t3 (bit-xor (nth asone 242) (nth asone 287))
         outbit (bit-xor t1 t2 t3)
-        nt1 (calc-new-t t1 [90  91  170] asone) 
+        nt1 (calc-new-t t1 [90 91 170] asone)
         nt2 (calc-new-t t2 [174 175 263] asone)
-        nt3 (calc-new-t t3 [285 286  68] asone)]
+        nt3 (calc-new-t t3 [285 286 68] asone)]
     [(rotate-all nt1 nt2 nt3 state)
      (conj out outbit)]))
 
@@ -87,24 +87,24 @@ the initial state."}
 (defn- ^{:doc "Reset the state at uid in the keystreams atom."}
   resetks!
   ([uid]
-     {:pre [(keyword? uid)]}
-     (swap! trivium-key-streams assoc uid {})))
+   {:pre [(keyword? uid)]}
+   (swap! trivium-key-streams assoc uid {})))
 
 (defn- ^{:doc "Swap any existing keystream in the keystream atom at :uid
 with a newly generated one."}
   swapks!
   ([key iv uid [lower upper]]
-     {:pre [(vector? key)(vector? iv)(keyword? uid)
-            (= 10 (count key))(= 10 (count iv))
-            (< upper max-stream-length-bytes)]}
-     (let [rounds (* 8 upper) ; Each round generates 1-bit.
-           out (->> (initialize-state key iv)
-                    (starting-state)
-                    (key-stream rounds)
-                    (last)
-                    (partition 8)
-                    (mapv bits->byte))]
-       (swap! trivium-key-streams assoc uid {:ks out :upper upper}))))
+   {:pre [(vector? key) (vector? iv) (keyword? uid)
+          (= 10 (count key)) (= 10 (count iv))
+          (< upper max-stream-length-bytes)]}
+   (let [rounds (* 8 upper)                                 ; Each round generates 1-bit.
+         out (->> (initialize-state key iv)
+                  (starting-state)
+                  (key-stream rounds)
+                  (last)
+                  (partition 8)
+                  (mapv bits->byte))]
+     (swap! trivium-key-streams assoc uid {:ks out :upper upper}))))
 
 ;; ### Trivium
 ;; Extend the StreamCipher and Cipher protocol thorough the Trivium record type.
