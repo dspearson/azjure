@@ -1,4 +1,4 @@
-(defproject org.ozias.cljlibs/azjure "0.2.0-SNAPSHOT"
+(defproject azjure "0.2.0-SNAPSHOT"
   :description "Encryption Library in Clojure"
   :url "https://github.com/CraZySacX/azjure"
   :license {:name "MIT"
@@ -42,7 +42,7 @@
   :scm {:name "git"
         :url  "https://github.com/CraZySacX/azjure"}
   :codox {:output-dir                "api"
-          :exclude                   [org.ozias.cljlibs.version]
+          :exclude                   [azjure.version]
           :sources                   ["src" "test"]
           :src-dir-uri               "http://github.com/CraZySacX/azjure/blob/master/"
           :src-linenum-anchor-prefix "L"}

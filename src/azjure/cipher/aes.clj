@@ -31,9 +31,9 @@
 ;; </tr>
 ;; </table>
 
-(ns org.ozias.cljlibs.azjure.cipher.aes
+(ns azjure.cipher.aes
   (:require [org.azjure.libbyte :refer [bytes-word word-bytes]]
-            [org.ozias.cljlibs.azjure.core :refer :all]))
+            [azjure.core :refer :all]))
 
 (def ^{:private true :doc "Vector of valid key sizes in bits"}
   key-sizes [128 192 256])
