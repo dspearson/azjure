@@ -1,4 +1,5 @@
-(ns azjure.encoders)
+(ns azjure.encoders
+  (:require [org.azjure.libbyte :refer [word-bytes]]))
 
 (def maskv [63 4032 258048 16515072])
 (def b64-alphabet
@@ -89,15 +90,39 @@
        (reduce into)
        (apply str)))
 
+(defn- decode-shift [v]
+  (map bit-shift-left v (range 18 (dec (* 6 (- 4 (count v)))) -6)))
+
+(defn- base64x->bv [s alphabet]
+  (let [v (map #(.indexOf alphabet (.toString %)) s)]
+    (->> (partition 4 v)
+         (map #(remove (fn [x] (= -1 x)) %))
+         (map decode-shift)
+         (map (partial apply bit-xor))
+         (mapv word-bytes)
+         (map rest)
+         (map vec)
+         (reduce into))))
+
 (defn ^{:added "0.2.0"} bv->base64
-  "Converter a vector of bytes to a Base64 string"
+  "Convert a vector of bytes to a Base64 string"
   [bv]
   (bv->base64x bv b64-alphabet))
 
+(defn ^{:added "0.2.0"} base64->bv
+  "Convert a Base64 string to a vector of bytes"
+  [s]
+  (base64x->bv s b64-alphabet))
+
 (defn ^{:added "0.2.0"} bv->base64url
-  "Converter a vector of bytes to a Base64 url safe string"
+  "Convert a vector of bytes to a Base64 url safe string"
   [bv]
   (bv->base64x bv b64url-alphabet))
+
+(defn ^{:added "0.2.0"} base64url->bv
+  "Convert a Base64 url safe string to a vector of bytes"
+  [s]
+  (base64x->bv s b64url-alphabet))
 
 (defmulti encryption-output-encoder :eoe)
 (defmethod encryption-output-encoder :str [_ bv] (bv->str bv))
@@ -116,9 +141,13 @@
 (defmulti encryption-input-decoder :eid)
 (defmethod encryption-input-decoder :str [_ s] (str->bv s))
 (defmethod encryption-input-decoder :hex [_ s] (hex->bv s))
+(defmethod encryption-input-decoder :base64 [_ s] (base64->bv s))
+(defmethod encryption-input-decoder :base64url [_ s] (base64url->bv s))
 (defmethod encryption-input-decoder :default [_ bv] bv)
 
 (defmulti decryption-input-decoder :did)
 (defmethod decryption-input-decoder :str [_ s] (str->bv s))
 (defmethod decryption-input-decoder :hex [_ s] (hex->bv s))
+(defmethod encryption-input-decoder :base64 [_ s] (base64->bv s))
+(defmethod encryption-input-decoder :base64url [_ s] (base64url->bv s))
 (defmethod decryption-input-decoder :default [_ bv] bv)

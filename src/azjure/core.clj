@@ -28,11 +28,16 @@
     (def aim1 {:type :aes
                :mode :cbc
                :pad  :x923
+               :key  [0 1 2 3 4 5 6 7 7 8 10 11 12 13 14 15]
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim2 {:type :aes
+               :mode :cbc
+               :pad  :x923
                :eid  :str
                :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
-    (def aim2 {:type :aes
+    (def aim3 {:type :aes
                :mode :ecb
                :pad  :x923
                :eid  :str
@@ -41,18 +46,27 @@
                :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
-    (def aim3 {:type :aes
+    (def aim4 {:type :aes
                :mode :cbc
                :pad  :x923
                :eid  :str
                :eoe  :base64
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
-    (def aim4 {:type :aes
+    (def aim5 {:type :aes
                :mode :cbc
                :pad  :x923
                :eid  :str
                :eoe  :base64url
+               :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim6 {:type :aes
+               :mode :cbc
+               :pad  :x923
+               :eid  :base64
+               :eoe  :hex
+               :did  :hex
+               :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]}))
   )
