@@ -1,7 +1,5 @@
 (ns azjure.core
-  (:require (azjure.cipher [cipher :refer :all]
-                           [blockcipher :refer :all]
-                           [streamcipher :refer :all])
+  (:require [azjure.cipher.cipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]
             [azjure.padders :refer :all]))

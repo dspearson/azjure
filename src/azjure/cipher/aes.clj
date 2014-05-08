@@ -32,9 +32,9 @@
 ;; </table>
 
 (ns azjure.cipher.aes
-  (:require [org.azjure.libbyte :refer [bytes-word word-bytes]]
-            (azjure.cipher [cipher :refer :all]
-                           [blockcipher :refer :all])))
+  (:require [azjure.cipher.blockcipher :refer :all]
+            [azjure.cipher.cipher :refer :all]
+            [org.azjure.libbyte :refer [bytes-word word-bytes]]))
 
 (def ^{:private true :doc "Vector of valid key sizes in bits"}
   key-sizes [128 192 256])
