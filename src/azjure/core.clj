@@ -68,5 +68,25 @@
                :did  :hex
                :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]}))
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim7 {:type :aes
+               :mode :ofb
+               :pad  :x923
+               :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim8 {:type :aes
+               :mode :cfb
+               :pad  :x923
+               :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim9 {:type :aes
+               :mode :pcbc
+               :pad  :x923
+               :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+               :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+    (def aim10 {:type :aes
+                :mode :ctr
+                :pad  :x923
+                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]}))
   )
