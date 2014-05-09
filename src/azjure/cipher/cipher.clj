@@ -1,4 +1,5 @@
-(ns azjure.cipher.cipher)
+(ns ^{:author "Jason Ozias"}
+    azjure.cipher.cipher)
 
 (defmulti initialize
           "Takes an initmap and assocs any additional keys needed by the

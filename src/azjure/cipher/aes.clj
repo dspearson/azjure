@@ -1,12 +1,12 @@
-(ns azjure.cipher.aes
+(ns ^{:author "Jason Ozias"}
+    azjure.cipher.aes
   "AES Cipher
 
   Defined to meet the spec at
   http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf"
-  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
-            [org.azjure.libbyte :refer [bytes-word word-bytes]]))
+            [azjure.libbyte :refer [bytes-word word-bytes]]))
 
 (def ^{:private true
        :doc     "Vector of valid key sizes in bits"}
@@ -57,8 +57,8 @@
 (def ^{:private true
        :doc     "Substitution box as a vector of 256 bytes.
 
-  Use (nth invsbox (bit-and n 0xff)) to look up the substition value for n, where n
-  is a byte."}
+  Use (nth invsbox (bit-and n 0xff)) to look up the substition value for n,
+  where n is a byte."}
   invsbox [0x52 0x09 0x6a 0xd5 0x30 0x36 0xa5 0x38
            0xbf 0x40 0xa3 0x9e 0x81 0xf3 0xd7 0xfb
            0x7c 0xe3 0x39 0x82 0x9b 0x2f 0xff 0x87
@@ -524,7 +524,10 @@
 ;; * Evaluates to a 60 word vector for a 256-bit key.
 ;;
 (defn- expand-key
-  ([key] {:pre [(vector? key) (or (= (count key) 4) (= (count key) 6) (= (count key) 8))]}
+  ([key] {:pre [(vector? key)
+                (or (= (count key) 4)
+                    (= (count key) 6)
+                    (= (count key) 8))]}
    (let [nb 4
          nk (count key)
          nr (+ nk 6)]
@@ -747,7 +750,8 @@
 ;; ### process-block
 ;; Process a block for encryption or decryption.
 ;;
-;; 1. <em>block</em>: A vector of 16 byte values representing a block of 4 words.
+;; 1. <em>block</em>: A vector of 16 byte values representing a block of 4
+;; words.
 ;; 2. <em>key</em>: A 4,6, or 8-word vector representing a
 ;; 128, 192, or 256 bit key.
 ;; 3. <em>enc</em>: true if you are encrypting the block, false

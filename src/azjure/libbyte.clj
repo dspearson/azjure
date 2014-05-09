@@ -1,8 +1,6 @@
-;; ## libbyte
-;; Byte manipulation library
-
-(ns org.azjure.libbyte
-  {:author "Jason Ozias"}
+(ns ^{:author "Jason Ozias"}
+    azjure.libbyte
+  (:import (clojure.lang BigInt))
   (:require [clojure.math.numeric-tower :refer [expt]]))
 
 (def ^{:doc "32-bit mask"}
@@ -70,8 +68,8 @@
               (range 56 -1 -8))))
 
 ;; ### word-bytes
-;; Takes a 32-bit word and creates a vector of 
-;; the 4 bytes individually. If <em>le</em> 
+;; Takes a 32-bit word and creates a vector of
+;; the 4 bytes individually. If <em>le</em>
 ;; (little endian) is true, the order of the vector
 ;; will be LSB to MSB. Otherwise, the order of the
 ;; vector will be MSB to LSB.
@@ -108,7 +106,7 @@
 ;;
 ;; evaluates to
 ;; > 0x67452301
-;; 
+;;
 (defn reverse-bytes [word]
   (-> #(last-byte (bit-shift-right word %1))
       (mapv (range 0 32 8))
@@ -119,7 +117,7 @@
 
 (def minv-shift (memoize inv-shift))
 
-(defn shift-dispatch [word shift bits]
+(defn shift-dispatch [word _ bits]
   (cond
     (or (instance? BigInteger word) (> bits 32)) :a
     :else :default))
@@ -144,8 +142,8 @@
     (if (zero? sft)
       word
       (.or
-        (.and (.shiftLeft biw sft) mask)
-        (.shiftRight biw (minv-shift sft bits))))))
+        (.and (.shiftLeft ^BigInteger biw sft) mask)
+        (.shiftRight ^BigInteger biw (minv-shift sft bits))))))
 
 (defmethod <<<-mm :default [word shift bits]
   (let [sft (mod shift bits)
@@ -178,18 +176,18 @@
    (>>> word shift 32)))
 
 (defn- ^{:doc "Shift a BigInteger x right by n bits."} shift-right
-  [x n]
+  [^BigInteger x n]
   (.shiftRight x n))
 
 (defn- ^{:doc "Convert a BigInt to a vector of byte values."} bi->bv
-  [x]
+  [^BigInt x]
   (let [x (.toBigInteger x)
         mask (BigInteger. "FF" 16)]
-    (mapv #(.and (shift-right x %) mask) (range 56 -1 -8))))
+    (mapv #(.and ^BigInteger (shift-right x %) mask) (range 56 -1 -8))))
 
 (defn ^{:doc "Convert a value to a vector of byte values."} x->bv
   [x]
-  (if (instance? clojure.lang.BigInt x)
+  (if (instance? BigInt x)
     (bi->bv x)
     (mapv #(bit-and (bit-shift-right x %) 0xFF) (range 56 -1 -8))))
 

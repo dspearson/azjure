@@ -1,4 +1,5 @@
-(ns azjure.padders
+(ns ^{:author "Jason Ozias"}
+    azjure.padders
   (:require [azjure.cipher.blockcipher :refer [blocksize-bits]]))
 
 (defmulti pad

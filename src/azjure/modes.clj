@@ -1,4 +1,5 @@
-(ns azjure.modes
+(ns ^{:author "Jason Ozias"}
+    azjure.modes
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.padders :refer [bytes-per-block]])
   (:import (clojure.lang BigInt)))
@@ -85,14 +86,15 @@
 
 (defn bytes->val [bv]
   (let [l (count bv)]
-    (reduce #(.or %1 %2) (map #(.shiftLeft (.toBigInteger (bigint (nth bv %1))) %2)
-                              (range l)
-                              (range (* 8 (dec l)) -1 -8)))))
+    (reduce #(.or ^BigInteger %1 ^BigInteger %2)
+            (map #(.shiftLeft (.toBigInteger (bigint (nth bv %1))) %2)
+                 (range l)
+                 (range (* 8 (dec l)) -1 -8)))))
 
 (defmulti last-byte class)
 
 (defmethod last-byte BigInt [^BigInt v]
-  (.longValue (.and v (bigint 0xff))))
+  (.longValue (.and (.toBigInteger v) (.toBigInteger (bigint 0xff)))))
 
 (defmethod last-byte BigInteger [^BigInteger v]
   (.longValue (.and v (.toBigInteger (bigint 0xff)))))
@@ -107,39 +109,52 @@
          acc []]
     (cond (and (zero? curr) (empty? acc)) [0]
           (zero? curr) (vec (reverse acc))
-          :else (recur (.shiftRight curr 8) (conj acc (last-byte curr))))))
+          :else (recur (.shiftRight curr 8)
+                       (conj acc (last-byte curr))))))
 
 (defmethod val->bytes BigInt [^BigInt v]
   (loop [curr (.toBigInteger v)
          acc []]
     (cond (and (zero? curr) (empty? acc)) [0]
           (zero? curr) (vec (reverse acc))
-          :else (recur (.shiftRight curr 8) (conj acc (last-byte curr))))))
+          :else (recur (.shiftRight curr 8)
+                       (conj acc (last-byte curr))))))
 
 (defmethod val->bytes Long [v]
   (loop [curr v
          acc []]
     (cond (and (zero? curr) (empty? acc)) [0]
           (zero? curr) (vec (reverse acc))
-          :else (recur (unsigned-bit-shift-right curr 8) (conj acc (last-byte curr))))))
+          :else (recur (unsigned-bit-shift-right curr 8)
+                       (conj acc (last-byte curr))))))
 
-(defmulti xor (fn [x _] (class x)))
-(defmethod xor Long [x y]
-  (bit-xor x y))
-(defmethod xor BigInteger [^BigInteger x y]
-  (.xor x (.toBigInteger (bigint y))))
+(defmulti ^{:private true}
+          xor
+          "xor over BigIntegers or Longs"
+          (fn [x _] (class x)))
 
-(defn- nonce-seq [iv]
+(defmethod xor Long [x y] (bit-xor x y))
+(defmethod xor BigInteger [^BigInteger x y] (.xor x (.toBigInteger (bigint y))))
+
+(defn- nonce-seq
+  "Generate a lazy sequence of nonces for a given IV."
+  [iv]
   (map (partial xor (bytes->val iv)) (range)))
 
-(defn- expand [bv n]
+(defn- expand
+  "Prepend the given vector with 0's out to length n"
+  [bv n]
   (into (vec (take n (repeat 0))) bv))
 
-(defn- nonces [n iv]
+(defn- nonces
+  "Grab n nonces from the nonce sequence for the given IV."
+  [n iv]
   (map #(expand % (- (count iv) (count %)))
        (map val->bytes (take n (nonce-seq iv)))))
 
-(defn- process-blocks-ctr [m bv]
+(defn- process-blocks-ctr
+  "Encrypt/decrypt blocks in Counter (CTR) mode."
+  [m bv]
   (let [blocks (partition (bytes-per-block (:type m)) bv)]
     (->> blocks
          (map (fn [nonce b] (mapv bit-xor b (encrypt-block m nonce)))

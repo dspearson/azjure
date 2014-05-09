@@ -1,8 +1,8 @@
-(ns azjure.core
+(ns ^{:author "Jason Ozias"}
+    azjure.core
   "Encrypt/Decrypt API
 
   See https://github.com/CraZySacX/azjure for usage"
-  {:author "Jason Ozias"}
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]

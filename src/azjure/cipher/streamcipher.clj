@@ -1,5 +1,14 @@
-(ns azjure.cipher.streamcipher)
+(ns ^{:author "Jason Ozias"}
+    azjure.cipher.streamcipher)
 
-(defmulti iv-size-bytes :type)
-(defmulti keystream-size-bytes :type)
-(defmulti generate-keystream :type)
+(defmulti iv-size-bits
+          "Evaluates to the IV size in bits supported by the stream cipher in
+  bits"
+          :type)
+(defmulti keystream-size-bits
+          "Evaluates to the keystream size supported by the stream cipher in
+  bits"
+          :type)
+(defmulti generate-keystream
+          "Generate the stream cipher keystream"
+          :type)

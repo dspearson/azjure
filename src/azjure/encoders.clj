@@ -1,6 +1,7 @@
-(ns azjure.encoders
-  (:require [clojure.string :as str]
-            [org.azjure.libbyte :refer [word-bytes]]))
+(ns ^{:author "Jason Ozias"}
+    azjure.encoders
+  (:require [azjure.libbyte :refer [word-bytes]]
+            [clojure.string :as str]))
 
 (def maskv [63 4032 258048 16515072])
 (def b64-alphabet
@@ -16,7 +17,7 @@
 
   (l->hex 5) => \"05\"
   (l->hex 204) => \"cc\""
-  [l]
+  [^Long l]
   (let [val (Integer/toHexString (.intValue l))]
     (if (= 1 (count val))
       (str "0" val)
@@ -55,7 +56,7 @@
 
 (defn ^{:added "0.2.0"} str->bv
   "Convert a string to a vector of bytes"
-  [str]
+  [^String str]
   (vec (.getBytes str)))
 
 (defn- mask6 [l idx]
@@ -94,7 +95,7 @@
 (defn- decode-shift [v]
   (map bit-shift-left v (range 18 (dec (* 6 (- 4 (count v)))) -6)))
 
-(defn- base64x->bv [s alphabet]
+(defn- base64x->bv [s ^String alphabet]
   (let [v (map #(.indexOf alphabet (str %)) s)]
     (->> (partition 4 v)
          (map #(remove (fn [x] (= -1 x)) %))
