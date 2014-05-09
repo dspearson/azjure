@@ -1,7 +1,6 @@
 (ns azjure.modes
   (:require [azjure.cipher.blockcipher :refer :all]
-            [azjure.padders :refer [bytes-per-block]]
-            [org.azjure.libbyte :refer [word-bytes]])
+            [azjure.padders :refer [bytes-per-block]])
   (:import (clojure.lang BigInt)))
 
 (defmulti encrypt-blocks
@@ -46,7 +45,7 @@
        (mapv bit-xor bv)))
 
 (defn- process-blocks-ecb [m bv encrypting]
-  (->> (partition (bytes-per-block (:type m) bv))
+  (->> (partition (bytes-per-block (:type m)) bv)
        (mapv (partial (if encrypting encrypt-block decrypt-block) m))
        (reduce into)))
 
@@ -106,22 +105,22 @@
 (defmethod val->bytes BigInteger [^BigInteger v]
   (loop [curr v
          acc []]
-    (cond (and (= 0 curr) (empty? acc)) [0]
-          (= 0 curr) (vec (reverse acc))
+    (cond (and (zero? curr) (empty? acc)) [0]
+          (zero? curr) (vec (reverse acc))
           :else (recur (.shiftRight curr 8) (conj acc (last-byte curr))))))
 
 (defmethod val->bytes BigInt [^BigInt v]
   (loop [curr (.toBigInteger v)
          acc []]
-    (cond (and (= 0 curr) (empty? acc)) [0]
-          (= 0 curr) (vec (reverse acc))
+    (cond (and (zero? curr) (empty? acc)) [0]
+          (zero? curr) (vec (reverse acc))
           :else (recur (.shiftRight curr 8) (conj acc (last-byte curr))))))
 
 (defmethod val->bytes Long [v]
   (loop [curr v
          acc []]
-    (cond (and (= 0 curr) (empty? acc)) [0]
-          (= 0 curr) (vec (reverse acc))
+    (cond (and (zero? curr) (empty? acc)) [0]
+          (zero? curr) (vec (reverse acc))
           :else (recur (unsigned-bit-shift-right curr 8) (conj acc (last-byte curr))))))
 
 (defmulti xor (fn [x _] (class x)))

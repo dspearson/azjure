@@ -1,6 +1,7 @@
 ;;; ## CAST5 Block Cipher Tests
 ;
-;(ns org.azjure.cipher.testcast5
+
+(ns org.azjure.cipher.testcast5)
 ;  "Test suite for the CAST5 block cipher"
 ;  {:author "Jason Ozias"}
 ;  (:require [clojure.test :refer :all]

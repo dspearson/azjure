@@ -1,17 +1,25 @@
 (ns azjure.core
+  "Encrypt/Decrypt API
+
+  See https://github.com/CraZySacX/azjure for usage"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]
             [azjure.padders :refer :all]))
 
-(defn encrypt [i m]
+(defn encrypt
+  "Encrypt the given input i based on the configuration supplied in the map m"
+  [i m]
   (let [m (initialize m)]
     (->> (encryption-input-decoder m i)
          (pad m)
          (encrypt-blocks m)
          (encryption-output-encoder m))))
 
-(defn decrypt [i m]
+(defn decrypt
+  "Encrypt the given input i based on the configuration supplied in the map m"
+  [i m]
   (let [m (initialize m)]
     (->> (decryption-input-decoder m i)
          (decrypt-blocks m)

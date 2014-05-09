@@ -1,5 +1,6 @@
 (ns azjure.encoders
-  (:require [org.azjure.libbyte :refer [word-bytes]]))
+  (:require [clojure.string :as str]
+            [org.azjure.libbyte :refer [word-bytes]]))
 
 (def maskv [63 4032 258048 16515072])
 (def b64-alphabet
@@ -50,7 +51,7 @@
 (defn ^{:added "0.2.0"} bv->str
   "Convert a vector of bytes to a string"
   [bv]
-  (apply str (map char bv)))
+  (str/join (map char bv)))
 
 (defn ^{:added "0.2.0"} str->bv
   "Convert a string to a vector of bytes"
@@ -94,7 +95,7 @@
   (map bit-shift-left v (range 18 (dec (* 6 (- 4 (count v)))) -6)))
 
 (defn- base64x->bv [s alphabet]
-  (let [v (map #(.indexOf alphabet (.toString %)) s)]
+  (let [v (map #(.indexOf alphabet (str %)) s)]
     (->> (partition 4 v)
          (map #(remove (fn [x] (= -1 x)) %))
          (map decode-shift)
