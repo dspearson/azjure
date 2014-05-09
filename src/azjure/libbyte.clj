@@ -1,7 +1,7 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.libbyte
-  (:import (clojure.lang BigInt))
-  (:require [clojure.math.numeric-tower :refer [expt]]))
+(ns azjure.libbyte
+  {:author "Jason Ozias"}
+  (:require [clojure.math.numeric-tower :refer [expt]])
+  (:import (clojure.lang BigInt)))
 
 (def ^{:doc "32-bit mask"}
   mask32 0xFFFFFFFF)

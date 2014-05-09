@@ -1,5 +1,5 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.modes
+(ns azjure.modes
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.padders :refer [bytes-per-block]])
   (:import (clojure.lang BigInt)))

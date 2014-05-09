@@ -1,5 +1,5 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.cipher.blockcipher)
+(ns azjure.cipher.blockcipher
+  {:author "Jason Ozias"})
 
 (defmulti blocksize-bits
           "Evaluates to the block size in bits supported by the block cipher.

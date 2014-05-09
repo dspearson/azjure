@@ -1,5 +1,5 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.encoders
+(ns azjure.encoders
+  {:author "Jason Ozias"}
   (:require [azjure.libbyte :refer [word-bytes]]
             [clojure.string :as str]))
 

@@ -25,8 +25,8 @@
                                   "slamhound" "test/,"
                                   "eastwood" "{:namespaces [:source-paths]},"
                                   "kibit,"
-                                  "bikeshed" "-v,"
                                   "check,"
+                                  "bikeshed" "-v,"
                                   "midje"]
                      "most"      ["do" "clean," "doc," "chk," "package"]
                      "dep"       ["do" "deploy," "deploy" "clojars"]

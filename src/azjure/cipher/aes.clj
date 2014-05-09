@@ -1,9 +1,9 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.cipher.aes
+(ns azjure.cipher.aes
   "AES Cipher
 
   Defined to meet the spec at
   http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer [bytes-word word-bytes]]))

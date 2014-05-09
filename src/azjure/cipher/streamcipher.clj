@@ -1,5 +1,5 @@
-(ns ^{:author "Jason Ozias"}
-    azjure.cipher.streamcipher)
+(ns azjure.cipher.streamcipher
+  {:author "Jason Ozias"})
 
 (defmulti iv-size-bits
           "Evaluates to the IV size in bits supported by the stream cipher in
