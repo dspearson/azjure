@@ -13,7 +13,7 @@
                      [org.clojure/tools.namespace "0.2.4"]
                      [org.ozias.cljlibs/scm "0.1.3"]]
                    :plugins
-                    [[codox "0.7.5"]
+                    [[codox "0.8.0"]
                      [lein-midje "3.1.3"]
                      [org.ozias.plugins/lein-git-version "1.1.3"]]
                    :aliases
@@ -44,7 +44,7 @@
   :codox {:output-dir                "api"
           :exclude                   [azjure.version]
           :sources                   ["src" "test"]
-          :src-dir-uri               "http://github.com/CraZySacX/azjure/blob/master/"
+          :src-dir-uri               "http://github.com/CraZySacX/azjure/blob/api-refactor/"
           :src-linenum-anchor-prefix "L"}
   :manifest {"Implementation-Version" "0.2.0-SNAPSHOT"}
   :git-version {:file {:assoc-in-keys [[:manifest "Implementation-Version"]]}})

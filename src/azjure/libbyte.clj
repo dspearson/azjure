@@ -3,8 +3,92 @@
   (:require [clojure.math.numeric-tower :refer [expt]])
   (:import (clojure.lang BigInt)))
 
-(def ^{:doc "32-bit mask"}
-  mask32 0xFFFFFFFF)
+(def ^{:doc "32-bit mask"} mask32 0xFFFFFFFF)
+
+(defn every-byte?
+  "Evaluates to true if every value in a sequence is between 0 and 255
+  inclusive"
+  [s]
+  {:added "0.2.0"}
+  (every? true? (map #(and (>= % 0) (<= % 255)) s)))
+
+(defmulti last-byte
+          "Get the last byte from a value"
+          {:arglists '([x])
+           :added    "0.2.0"}
+          class)
+
+(defmethod last-byte BigInt [^BigInt x]
+  (.longValue (.and (.toBigInteger x) (.toBigInteger (bigint 0xff)))))
+
+(defmethod last-byte BigInteger [^BigInteger x]
+  (.longValue (.and x (.toBigInteger (bigint 0xff)))))
+
+(defmethod last-byte Long [x]
+  (bit-and 0xff x))
+
+(defn bit-shift-right-big
+  "bitwise shift a BigInteger x right y bits"
+  {:added "0.2.0"}
+  [^BigInteger x y]
+  (.shiftRight x y))
+
+(defn bit-shift-left-big
+  "bitwise shift a BigInteger x left y bits"
+  {:added "0.2.0"}
+  [^BigInteger x y]
+  (.shiftLeft x y))
+
+(defn or-big
+  "bitwise or BigInteger x and BigInteger y"
+  {:added "0.2.0"}
+  [^BigInteger x ^BigInteger y]
+  (.or x y))
+
+(defn bytes->val
+  "Convert a vector of bytes (0-255) to a value"
+  {:added "0.2.0"}
+  [v]
+  {:pre [(every-byte? v)]}
+  (let [l (count v)]
+    (reduce or-big
+            (map #(bit-shift-left-big (.toBigInteger (bigint (nth v %1))) %2)
+                 (range l)
+                 (range (* 8 (dec l)) -1 -8)))))
+
+(defmulti val->bytes
+          "Convert a value to a vector of bytes (0-255)"
+          {:arglists '([x])
+           :added    "0.2.0"}
+          class)
+
+(defn- val->bytesfn
+  "Shift x right 8-bits and accumulate the last byte value in a vector."
+  {:added "0.2.0"}
+  [x sfn]
+  (loop [curr x
+         acc []]
+    (cond (and (zero? curr) (empty? acc)) [0]
+          (zero? curr) (vec (reverse acc))
+          :else (recur (sfn curr 8) (conj acc (last-byte curr))))))
+
+(defmethod val->bytes BigInteger [^BigInteger x]
+  (val->bytesfn x bit-shift-right-big))
+
+(defmethod val->bytes BigInt [^BigInt x]
+  (val->bytesfn (.toBigInteger x) bit-shift-right-big))
+
+(defmethod val->bytes Long [x]
+  (val->bytesfn x unsigned-bit-shift-right))
+
+(defmulti xor
+          "bitwise xor for different classes"
+          {:arglists '([x y])
+           :added    "0.2.0"}
+          (fn [x _] (class x)))
+
+(defmethod xor Long [x y] (bit-xor x y))
+(defmethod xor BigInteger [^BigInteger x y] (.xor x (.toBigInteger (bigint y))))
 
 (defn indexed
   "Returns a lazy sequence of [index, item] pairs, where items come
@@ -38,11 +122,6 @@
   (let [shift (* 8 (dec num))
         sftfn (if (zero? shift) word (bit-shift-right word shift))]
     (bit-and sftfn 0xFF)))
-
-;; ### last-byte
-;; Evaluates to the least significant byte of the given word
-(defn last-byte [word]
-  (bit-and 0xff word))
 
 ;; ### bytes-word
 ;; Takes a vector of 4 bytes and creates

@@ -10,6 +10,7 @@
 
 (defn encrypt
   "Encrypt the given input i based on the configuration supplied in the map m"
+  {:added "0.2.0"}
   [i m]
   (let [m (initialize m)]
     (->> (encryption-input-decoder m i)
@@ -19,6 +20,7 @@
 
 (defn decrypt
   "Encrypt the given input i based on the configuration supplied in the map m"
+  {:added "0.2.0"}
   [i m]
   (let [m (initialize m)]
     (->> (decryption-input-decoder m i)

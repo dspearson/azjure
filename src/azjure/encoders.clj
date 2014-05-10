@@ -1,80 +1,89 @@
 (ns azjure.encoders
   {:author "Jason Ozias"}
-  (:require [azjure.libbyte :refer [word-bytes]]
+  (:require [azjure.libbyte :refer :all]
             [clojure.string :as str]))
 
-(def maskv [63 4032 258048 16515072])
-(def b64-alphabet
+(def ^{:private true :doc "mask values for base64 encoding"} maskv
+  [63 4032 258048 16515072])
+(def ^{:private true :doc "The base64 alphabet string"} b64-alphabet
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
-(def b64url-alphabet
+(def ^{:private true :doc "The base64url alphabet string"} b64url-alphabet
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
 
-(defn ^{:added "0.2.0"} l->hex
-  "Convert a Long (0-255) to a 2-digit hex string.
+(defn x->hex
+  "Convert a byte value x (0-255) to a 2-digit hex string.
 
-  Note that in Clojure numbers are Longs by default and must be converted via
-  .intValue to an Integer to convert to a hex string
+  Values between 0-9 are padded with a 0 to 2 characters.
 
-  (l->hex 5) => \"05\"
-  (l->hex 204) => \"cc\""
-  [^Long l]
-  (let [val (Integer/toHexString (.intValue l))]
+  (x->hex 5) => \"05\"
+  (x->hex 204) => \"cc\""
+  {:added "0.2.0"}
+  [^Long x]
+  (let [val (Integer/toHexString (.intValue x))]
     (if (= 1 (count val))
       (str "0" val)
       val)))
 
-(defn ^{:added "0.2.0"} hex->l
-  "Convert a hex string into a Long"
-  [hex]
-  (Long/parseLong hex 16))
-
-(defn ^{:added "0.2.0"} every-byte?
-  "Evaluates to true if every value in a sequence is between 0 and 255
-  inclusive"
+(defn hex->x
+  "Convert a 2 character hex string into a byte value (0-255)"
+  {:added "0.2.0"}
   [s]
-  (every? true? (map #(and (>= % 0) (<= % 255)) s)))
+  {:pre [(= 2 (count s))]}
+  (Long/parseLong s 16))
 
-(defn ^{:added "0.2.0"} bv->hex
+(defn v->hex
   "Convert a vector of bytes (0-255) into a hex string."
+  {:added "0.2.0"}
   [v]
-  (if (every-byte? v)
-    (->> v (map l->hex) (apply str))))
+  {:pre [(every-byte? v)]}
+  (->> v (map x->hex) (apply str)))
 
-(defn ^{:added "0.2.0"} hex->bv
-  "Convert a string of hex values into a vector of byte values (0-255)"
-  [hex]
-  (->> hex
+(defn hex->v
+  "Convert a string of hex values into a vector of bytes (0-255)"
+  {:added "0.2.0"}
+  [s]
+  (->> s
        (partition-all 2)
        (map (partial apply str))
-       (map hex->l)
+       (map hex->x)
        vec))
 
-(defn ^{:added "0.2.0"} bv->str
-  "Convert a vector of bytes to a string"
-  [bv]
-  (str/join (map char bv)))
+(defn v->str
+  "Convert a vector of bytes (0-255) to a string"
+  {:added "0.2.0"}
+  [v]
+  {:pre [(every-byte? v)]}
+  (str/join (map char v)))
 
-(defn ^{:added "0.2.0"} str->bv
-  "Convert a string to a vector of bytes"
+(defn str->v
+  "Convert a string to a vector of bytes (0-255)"
+  {:added "0.2.0"}
   [^String str]
   (vec (.getBytes str)))
 
-(defn- mask6 [l idx]
-  (bit-shift-right (bit-and l (nth maskv idx)) (* idx 6)))
+(defn- nth6bits
+  "Get the value of the nth 6-bits from x.  This is used during base64 encoding
+  to extract 4 values from 3 bytes (24-bits)."
+  {:added "0.2.0"}
+  [x n]
+  {:pre [(< x 16777216)
+         (>= x 0)]}
+  (bit-shift-right (bit-and x (nth maskv n)) (* n 6)))
 
-(defn- b64-encode [sfn l alphabet]
+(defn- b64-encode
+  "For a given shift function, length, and alphabet, encode the given vector of
+  bytes"
+  {:added "0.2.0"}
+  [sfn l alphabet]
   (fn [v]
-    (->> (mapv mask6 (repeat (sfn v)) (range l))
+    (->> (mapv nth6bits (repeat (sfn v)) (range l))
          (reverse)
          (mapv #(nth alphabet %)))))
 
-(defn- bytes->6bits [v l]
-  (let [upper (* 8 (dec l))]
-    (reduce bit-or
-            (map #(bit-shift-left (nth v %1) %2)
-                 (range l) (range upper -1 -8)))))
-
-(defn- b64-encode-bytes [alphabet]
+(defn- b64-encode-bytes
+  "For the given alphabet, encode up to 3 bytes in a vector in base64"
+  {:added "0.2.0"}
+  [alphabet]
   (fn [v]
     {:pre [(< (count v) 4)
            (pos? (count v))]}
@@ -83,19 +92,31 @@
                     1 #(bit-shift-left % 4)
                     2 #(bit-shift-left % 2)
                     3 identity)]
-      (into ((b64-encode shiftfn (inc l) alphabet) (bytes->6bits v l))
+      (into ((b64-encode shiftfn (inc l) alphabet) (bytes->val v))
             (repeat (- 3 l) \=)))))
 
-(defn- bv->base64x [bv alphabet]
-  (->> (partition-all 3 bv)
+(defn- v->base64x
+  "Convert a vector of bytes (0-255) into a base64x encoded string.  The second argument
+  is the base64 alphabet to use."
+  {:added "0.2.0"}
+  [v alphabet]
+  {:pre [(every-byte? v)]}
+  (->> (partition-all 3 v)
        (mapv (b64-encode-bytes alphabet))
        (reduce into)
        (apply str)))
 
-(defn- decode-shift [v]
-  (map bit-shift-left v (range 18 (dec (* 6 (- 4 (count v)))) -6)))
+(defn- decode-shift
+  "Bit shifting used during the decoding of a base64x encoded string"
+  {:added "0.2.0"}
+  [x]
+  (map bit-shift-left x (range 18 (dec (* 6 (- 4 (count x)))) -6)))
 
-(defn- base64x->bv [s ^String alphabet]
+(defn- base64x->v
+  "Convert a base64x string into a vector of bytes.  The second argument is the
+  base64 alphabet to use."
+  {:added "0.2.0"}
+  [s ^String alphabet]
   (let [v (map #(.indexOf alphabet (str %)) s)]
     (->> (partition 4 v)
          (map #(remove (fn [x] (= -1 x)) %))
@@ -106,50 +127,66 @@
          (map vec)
          (reduce into))))
 
-(defn ^{:added "0.2.0"} bv->base64
-  "Convert a vector of bytes to a Base64 string"
-  [bv]
-  (bv->base64x bv b64-alphabet))
+(defn v->base64
+  "Convert a vector of bytes (0-255) to a Base64 string"
+  {:added "0.2.0"}
+  [v]
+  (v->base64x v b64-alphabet))
 
-(defn ^{:added "0.2.0"} base64->bv
-  "Convert a Base64 string to a vector of bytes"
+(defn base64->v
+  "Convert a Base64 string to a vector of bytes (0-255)"
+  {:added "0.2.0"}
   [s]
-  (base64x->bv s b64-alphabet))
+  (base64x->v s b64-alphabet))
 
-(defn ^{:added "0.2.0"} bv->base64url
-  "Convert a vector of bytes to a Base64 url safe string"
-  [bv]
-  (bv->base64x bv b64url-alphabet))
+(defn v->base64url
+  "Convert a vector of bytes (0-255) to a Base64 url safe string"
+  {:added "0.2.0"}
+  [v]
+  (v->base64x v b64url-alphabet))
 
-(defn ^{:added "0.2.0"} base64url->bv
-  "Convert a Base64 url safe string to a vector of bytes"
+(defn base64url->v
+  "Convert a Base64 url safe string to a vector of bytes (0-255)"
+  {:added "0.2.0"}
   [s]
-  (base64x->bv s b64url-alphabet))
+  (base64x->v s b64url-alphabet))
 
-(defmulti encryption-output-encoder :eoe)
-(defmethod encryption-output-encoder :str [_ bv] (bv->str bv))
-(defmethod encryption-output-encoder :hex [_ bv] (bv->hex bv))
-(defmethod encryption-output-encoder :base64 [_ bv] (bv->base64 bv))
-(defmethod encryption-output-encoder :base64url [_ bv] (bv->base64url bv))
+(defmulti encryption-output-encoder
+          "Encryption output encoder"
+          {:added "0.2.0"}
+          :eoe)
+(defmethod encryption-output-encoder :str [_ bv] (v->str bv))
+(defmethod encryption-output-encoder :hex [_ bv] (v->hex bv))
+(defmethod encryption-output-encoder :base64 [_ bv] (v->base64 bv))
+(defmethod encryption-output-encoder :base64url [_ bv] (v->base64url bv))
 (defmethod encryption-output-encoder :default [_ bv] bv)
 
-(defmulti decryption-output-encoder :doe)
-(defmethod decryption-output-encoder :str [_ bv] (bv->str bv))
-(defmethod decryption-output-encoder :hex [_ bv] (bv->hex bv))
-(defmethod decryption-output-encoder :base64 [_ bv] (bv->base64 bv))
-(defmethod decryption-output-encoder :base64url [_ bv] (bv->base64url bv))
+(defmulti decryption-output-encoder
+          "Decryption output encoder"
+          {:added "0.2.0"}
+          :doe)
+(defmethod decryption-output-encoder :str [_ bv] (v->str bv))
+(defmethod decryption-output-encoder :hex [_ bv] (v->hex bv))
+(defmethod decryption-output-encoder :base64 [_ bv] (v->base64 bv))
+(defmethod decryption-output-encoder :base64url [_ bv] (v->base64url bv))
 (defmethod decryption-output-encoder :default [_ bv] bv)
 
-(defmulti encryption-input-decoder :eid)
-(defmethod encryption-input-decoder :str [_ s] (str->bv s))
-(defmethod encryption-input-decoder :hex [_ s] (hex->bv s))
-(defmethod encryption-input-decoder :base64 [_ s] (base64->bv s))
-(defmethod encryption-input-decoder :base64url [_ s] (base64url->bv s))
+(defmulti encryption-input-decoder
+          "Encryption input decoder"
+          {:added "0.2.0"}
+          :eid)
+(defmethod encryption-input-decoder :str [_ s] (str->v s))
+(defmethod encryption-input-decoder :hex [_ s] (hex->v s))
+(defmethod encryption-input-decoder :base64 [_ s] (base64->v s))
+(defmethod encryption-input-decoder :base64url [_ s] (base64url->v s))
 (defmethod encryption-input-decoder :default [_ bv] bv)
 
-(defmulti decryption-input-decoder :did)
-(defmethod decryption-input-decoder :str [_ s] (str->bv s))
-(defmethod decryption-input-decoder :hex [_ s] (hex->bv s))
-(defmethod encryption-input-decoder :base64 [_ s] (base64->bv s))
-(defmethod encryption-input-decoder :base64url [_ s] (base64url->bv s))
+(defmulti decryption-input-decoder
+          "Decryption input decoder"
+          {:added "0.2.0"}
+          :did)
+(defmethod decryption-input-decoder :str [_ s] (str->v s))
+(defmethod decryption-input-decoder :hex [_ s] (hex->v s))
+(defmethod encryption-input-decoder :base64 [_ s] (base64->v s))
+(defmethod encryption-input-decoder :base64url [_ s] (base64url->v s))
 (defmethod decryption-input-decoder :default [_ bv] bv)

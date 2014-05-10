@@ -4,6 +4,7 @@
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
             (azjure [core :refer :all]
                     [encoders :refer :all]
+                    [libbyte :refer :all]
                     [modes :refer :all]
                     [padders :refer :all])
             (azjure.cipher [aes :refer :all])))

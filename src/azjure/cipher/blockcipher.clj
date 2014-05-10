@@ -27,3 +27,12 @@
           {:arglists '([m block])
            :added    "0.2.0"}
           :type)
+
+(def ^{:doc      "Calculates the bytes per block for the given block cipher
+  configuration."
+       :arglists '([m])
+       :added    "0.2.0"}
+  bytes-per-block
+  (memoize
+    (fn [m]
+      (/ (blocksize-bits m) 8))))
