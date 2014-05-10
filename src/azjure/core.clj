@@ -13,20 +13,22 @@
   {:added "0.2.0"}
   [i m]
   (let [m (initialize m)]
-    (->> (encryption-input-decoder m i)
+    (->> (input-decoder m i)
          (pad m)
          (encrypt-blocks m)
-         (encryption-output-encoder m))))
+         (output-encoder m))))
 
 (defn decrypt
   "Encrypt the given input i based on the configuration supplied in the map m"
   {:added "0.2.0"}
   [i m]
   (let [m (initialize m)]
-    (->> (decryption-input-decoder m i)
-         (decrypt-blocks m)
-         (unpad m)
-         (decryption-output-encoder m))))
+    (output-encoder
+      m
+      (->> (input-decoder m i :encryption false)
+           (decrypt-blocks m)
+           (unpad m))
+      :encryption false)))
 
 (comment
   (do
@@ -61,6 +63,8 @@
                :pad  :x923
                :eid  :str
                :eoe  :base64
+               :did  :base64
+               :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
     (def aim5 {:type :aes
@@ -68,6 +72,8 @@
                :pad  :x923
                :eid  :str
                :eoe  :base64url
+               :did  :base64url
+               :doe  :str
                :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
                :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
     (def aim6 {:type :aes

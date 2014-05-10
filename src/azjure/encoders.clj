@@ -92,12 +92,13 @@
                     1 #(bit-shift-left % 4)
                     2 #(bit-shift-left % 2)
                     3 identity)]
-      (into ((b64-encode shiftfn (inc l) alphabet) (bytes->val v))
+      (into ((b64-encode shiftfn (inc l) alphabet)
+             (.longValue ^BigInteger (bytes->val v)))
             (repeat (- 3 l) \=)))))
 
 (defn- v->base64x
-  "Convert a vector of bytes (0-255) into a base64x encoded string.  The second argument
-  is the base64 alphabet to use."
+  "Convert a vector of bytes (0-255) into a base64x encoded string.  The second
+  argument is the base64 alphabet to use."
   {:added "0.2.0"}
   [v alphabet]
   {:pre [(every-byte? v)]}
@@ -151,42 +152,30 @@
   [s]
   (base64x->v s b64url-alphabet))
 
-(defmulti encryption-output-encoder
-          "Encryption output encoder"
-          {:added "0.2.0"}
-          :eoe)
-(defmethod encryption-output-encoder :str [_ bv] (v->str bv))
-(defmethod encryption-output-encoder :hex [_ bv] (v->hex bv))
-(defmethod encryption-output-encoder :base64 [_ bv] (v->base64 bv))
-(defmethod encryption-output-encoder :base64url [_ bv] (v->base64url bv))
-(defmethod encryption-output-encoder :default [_ bv] bv)
+(defn- encoder-dispatcher [m _ & {:keys [encryption] :or {encryption true}}]
+  (if encryption (:eoe m) (:doe m)))
 
-(defmulti decryption-output-encoder
-          "Decryption output encoder"
+(defmulti output-encoder
+          "Output encoding"
           {:added "0.2.0"}
-          :doe)
-(defmethod decryption-output-encoder :str [_ bv] (v->str bv))
-(defmethod decryption-output-encoder :hex [_ bv] (v->hex bv))
-(defmethod decryption-output-encoder :base64 [_ bv] (v->base64 bv))
-(defmethod decryption-output-encoder :base64url [_ bv] (v->base64url bv))
-(defmethod decryption-output-encoder :default [_ bv] bv)
+          encoder-dispatcher)
 
-(defmulti encryption-input-decoder
-          "Encryption input decoder"
-          {:added "0.2.0"}
-          :eid)
-(defmethod encryption-input-decoder :str [_ s] (str->v s))
-(defmethod encryption-input-decoder :hex [_ s] (hex->v s))
-(defmethod encryption-input-decoder :base64 [_ s] (base64->v s))
-(defmethod encryption-input-decoder :base64url [_ s] (base64url->v s))
-(defmethod encryption-input-decoder :default [_ bv] bv)
+(defmethod output-encoder :str [_ bv & _] (v->str bv))
+(defmethod output-encoder :hex [_ bv & _] (v->hex bv))
+(defmethod output-encoder :base64 [_ bv & _] (v->base64 bv))
+(defmethod output-encoder :base64url [_ bv & _] (v->base64url bv))
+(defmethod output-encoder :default [_ bv & _] bv)
 
-(defmulti decryption-input-decoder
-          "Decryption input decoder"
+(defn- decoder-dispatcher [m _ & {:keys [encryption] :or {encryption true}}]
+  (if encryption (:eid m) (:did m)))
+
+(defmulti input-decoder
+          "Input decoding"
           {:added "0.2.0"}
-          :did)
-(defmethod decryption-input-decoder :str [_ s] (str->v s))
-(defmethod decryption-input-decoder :hex [_ s] (hex->v s))
-(defmethod encryption-input-decoder :base64 [_ s] (base64->v s))
-(defmethod encryption-input-decoder :base64url [_ s] (base64url->v s))
-(defmethod decryption-input-decoder :default [_ bv] bv)
+          decoder-dispatcher)
+
+(defmethod input-decoder :str [_ s & _] (str->v s))
+(defmethod input-decoder :hex [_ s & _] (hex->v s))
+(defmethod input-decoder :base64 [_ s & _] (base64->v s))
+(defmethod input-decoder :base64url [_ s & _] (base64url->v s))
+(defmethod input-decoder :default [_ bv & _] bv)
