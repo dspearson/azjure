@@ -5,12 +5,18 @@
 
 (def ^{:doc "32-bit mask"} mask32 0xFFFFFFFF)
 
+(defn every-bit?
+  "Evaluates to true if every value in a sequence in a 0 or a 1"
+  [xs]
+  {:added "0.2.0"}
+  (every? true? (map #(or (zero? %)(= 1 %)) xs)))
+
 (defn every-byte?
   "Evaluates to true if every value in a sequence is between 0 and 255
   inclusive"
-  [s]
+  [xs]
   {:added "0.2.0"}
-  (every? true? (map #(and (>= % 0) (<= % 255)) s)))
+  (every? true? (map #(and (>= % 0) (<= % 255)) xs)))
 
 (defmulti last-byte
           "Get the last byte from a value"
@@ -104,67 +110,54 @@
   [pred coll]
   (for [[idx elt] (indexed coll) :when (pred elt)] idx))
 
-(defn byte->bits [byte]
-  (vec (reverse (mapv #(if % 1 0) (mapv (partial bit-test byte) (range 8))))))
+(defn byte->bits
+  "Convert a byte (0-255) into a vector of bits"
+  [x]
+  {:pre [(>= x 0) (<= x 255)]}
+  (vec (reverse (mapv #(if % 1 0) (mapv (partial bit-test x) (range 8))))))
 
-(defn bits->byte [bits]
-  (reduce bit-set 0 (positions #{1} bits)))
+(defn bits->byte
+  "Convert a vector of bits into a byte (0-255)"
+  [v]
+  {:pre [(= (count v) 8)
+         (every-bit? v)]}
+  (reduce bit-set 0 (positions #{1} (reverse v))))
 
-;; ### get-byte
-;; Get byte <em>num</em> out of the given word.  <em>num</em>
-;; should be 1-4 where 1 is the least significant byte and 4
-;; is the most significant byte.
-;;
-;;     (get-byte 0x11223344 4)
-;;
-;; evaluates to 0x11
-(defn get-byte [num word]
-  (let [shift (* 8 (dec num))
-        sftfn (if (zero? shift) word (bit-shift-right word shift))]
+(defn get-byte
+  "Get the nth byte out of the given word.  n is a value from 1 to 4 where 1
+  represents the least significant byte and 4 represents the most significant
+  byte
+
+  (get-byte 0x11223344 4) => 0x11"
+  [n x]
+  (let [shift (* 8 (dec n))
+        sftfn (if (zero? shift) x (bit-shift-right x shift))]
     (bit-and sftfn 0xFF)))
 
-;; ### bytes-word
-;; Takes a vector of 4 bytes and creates
-;; one 32-bit word composed of the 4 bytes.
-;;
-;;     (bytes-word [0x12 0xab 0x1f 0x3b])
-;;
-;; evaluates to
-;; > 0x12ab1f3b
-;;
-;; This is the inverse of word-bytes.
 (defn bytes-word
-  ([vec le]
-   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
-     (reduce bit-or (map #(bit-shift-left (nth vec %1) %2) (range 4) rng))))
-  ([vec]
-   (bytes-word vec false)))
+  "Take a vector of 4 bytes (0-255) and create a 32-bit word value. If le is
+  true, the vector is assumed to be in little endian format.
 
-(defn bytes-dword [vec]
+  (bytes-word [0x12 0xab 0x1f 0x3b]) => 0x12ab1f3b"
+  ([v le]
+   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
+     (reduce bit-or (map #(bit-shift-left (nth v %1) %2) (range 4) rng))))
+  ([v]
+   (bytes-word v false)))
+
+(defn bytes-dword
+  "Take a vector of 8 bytes (0-255) and create a 64-bit dword value."
+  [v]
   (apply bit-or
-         (map #(bit-shift-left (nth vec %1) %2)
+         (map #(bit-shift-left (nth v %1) %2)
               (range 8)
               (range 56 -1 -8))))
 
-;; ### word-bytes
-;; Takes a 32-bit word and creates a vector of
-;; the 4 bytes individually. If <em>le</em>
-;; (little endian) is true, the order of the vector
-;; will be LSB to MSB. Otherwise, the order of the
-;; vector will be MSB to LSB.
-;;
-;;     (word-bytes 0x12ab1f3b)
-;;
-;; evaluates to
-;; > [0x12 0xab 0x1f 0x3b]
-;;
-;;     (word-bytes 0x12ab1f3b true)
-;;
-;; evaluates to
-;; > [0x3b 0x1f 0xab 0x12]
-;;
-;; This is the inverse of byte-words.
 (defn word-bytes
+  "Converts a word value to a vector of 4 bytes (0-255).  If le is true, the
+  conversion is made to little endian format.
+
+  (word-bytes 0x12ab1f3b) => [0x12 0xab 0x1f 0x3b]"
   ([word le]
    (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
      (mapv #(last-byte (bit-shift-right word %)) rng)))
@@ -172,47 +165,38 @@
    (word-bytes word false)))
 
 (defn dword-bytes
+  "Converts a dword value to a vector of 8 bytes (0-255).  If le is true, the
+  conversion is made to little endian format."
   ([dword le]
    (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
      (mapv #(last-byte (bit-shift-right dword %)) rng)))
   ([dword]
    (dword-bytes dword false)))
 
-;; ### reverse-bytes
-;; Reverse the bytes in a word
-;;
-;;     (reverse-bytes 0x01234567)
-;;
-;; evaluates to
-;; > 0x67452301
-;;
-(defn reverse-bytes [word]
+(defn reverse-bytes
+  "Reverse the bytes in a word.
+
+  (reverse-bytes 0x01234567) => 0x67452301"
+  [word]
   (-> #(last-byte (bit-shift-right word %1))
       (mapv (range 0 32 8))
       (bytes-word)))
 
-(defn- inv-shift [shift bits]
+(defn- inv-shift
+  "Invert the shift"
+  [shift bits]
   (- bits shift))
 
-(def minv-shift (memoize inv-shift))
+(def ^{:doc "Invert the shift"} minv-shift (memoize inv-shift))
 
-(defn shift-dispatch [word _ bits]
+(defn- shift-dispatch
+  "Circular left shift dispatch method"
+  [word _ bits]
   (cond
     (or (instance? BigInteger word) (> bits 32)) :a
     :else :default))
 
-;; ### <<<
-;; Circular left shift
-;;
-;; Shift a 32-bit word left by <em>shift</em> bits, shifting
-;; the leftmost bits into the rightmost positions.
-;;
-;;     (<<< 0x12345678 8)
-;;
-;; evaluates to
-;;
-;; > 0x34567812
-(defmulti <<<-mm shift-dispatch)
+(defmulti <<<-mm "Circular shift left" shift-dispatch)
 
 (defmethod <<<-mm :a [word shift bits]
   (let [biw (if (instance? BigInteger word) word (BigInteger. (str word)))
@@ -234,46 +218,46 @@
         (bit-shift-right word (minv-shift sft bits))))))
 
 (defn <<<
+  "Bitwise circular shift left.  Shifts a 32-bit word left by x bits, shifting
+  the leftmost bits into the rightmost positions."
   ([word shift bits] (<<<-mm word shift bits))
   ([word shift] (<<<-mm word shift 32)))
 
-;; ### >>>
-;; Circular right shift
-;;
-;; Shift a 32-bit word right by <em>shift</em> bits, shifting
-;; the rightmost bits into the leftmost positions.
-;;
-;;     (>>> 0x12345678 8)
-;;
-;; evaluates to
-;;
-;; > 0x78123456
 (defn >>>
+  "Bitwise circular shift right.  Shifts a 32-bit word right by x bits, shifting
+  the rightmost bits into the leftmost positions.
+
+  (>>> 0x12345678 8) => 0x78123456"
   ([word shift bits]
    (<<< word (minv-shift shift bits)))
   ([word shift]
    (>>> word shift 32)))
 
-(defn- ^{:doc "Shift a BigInteger x right by n bits."} shift-right
+(defn- shift-right
+  "Shift a BigInteger x right by n bits."
   [^BigInteger x n]
   (.shiftRight x n))
 
-(defn- ^{:doc "Convert a BigInt to a vector of byte values."} bi->bv
+(defn- bi->bv
+  "Convert a BigInt to a vector of byte values."
   [^BigInt x]
   (let [x (.toBigInteger x)
         mask (BigInteger. "FF" 16)]
     (mapv #(.and ^BigInteger (shift-right x %) mask) (range 56 -1 -8))))
 
-(defn ^{:doc "Convert a value to a vector of byte values."} x->bv
+(defn x->bv
+  "Convert a value to a vector of byte values."
   [x]
   (if (instance? BigInt x)
     (bi->bv x)
     (mapv #(bit-and (bit-shift-right x %) 0xFF) (range 56 -1 -8))))
 
-(defn ^{:doc "32-bit left shift"}
-  bsl32 [x n]
+(defn bsl32
+  "32-bit left shift"
+  [x n]
   (bit-and (bit-shift-left x n) mask32))
 
-(defn ^{:doc "32-bit right shift"}
-  bsr32 [x n]
+(defn bsr32
+  "32-bit right shift"
+  [x n]
   (bit-and (bit-shift-right x n) mask32))

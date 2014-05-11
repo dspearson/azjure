@@ -152,7 +152,9 @@
   [s]
   (base64x->v s b64url-alphabet))
 
-(defn- encoder-dispatcher [m _ & {:keys [encryption] :or {encryption true}}]
+(defn- encoder-dispatcher
+  "Dispatcher for the output encoders"
+  [m _ & {:keys [encryption] :or {encryption true}}]
   (if encryption (:eoe m) (:doe m)))
 
 (defmulti output-encoder
@@ -166,7 +168,9 @@
 (defmethod output-encoder :base64url [_ bv & _] (v->base64url bv))
 (defmethod output-encoder :default [_ bv & _] bv)
 
-(defn- decoder-dispatcher [m _ & {:keys [encryption] :or {encryption true}}]
+(defn- decoder-dispatcher
+  "Dispatcher for the input decoders"
+  [m _ & {:keys [encryption] :or {encryption true}}]
   (if encryption (:eid m) (:did m)))
 
 (defmulti input-decoder
