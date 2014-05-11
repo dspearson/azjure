@@ -19,6 +19,7 @@
   (x->hex 204) => \"cc\""
   {:added "0.2.0"}
   [^Long x]
+  {:pre [(>= x 0) (<= x 255)]}
   (let [val (Integer/toHexString (.intValue x))]
     (if (= 1 (count val))
       (str "0" val)
@@ -28,14 +29,14 @@
   "Convert a 2 character hex string into a byte value (0-255)"
   {:added "0.2.0"}
   [s]
-  {:pre [(= 2 (count s))]}
+  {:pre [(re-matches #"[0-9a-zA-Z]{2}" s)]}
   (Long/parseLong s 16))
 
 (defn v->hex
   "Convert a vector of bytes (0-255) into a hex string."
   {:added "0.2.0"}
   [v]
-  {:pre [(every-byte? v)]}
+  {:pre [(vector? v) (every-byte? v)]}
   (->> v (map x->hex) (apply str)))
 
 (defn hex->v

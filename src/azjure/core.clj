@@ -6,7 +6,8 @@
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]
-            [azjure.padders :refer :all]))
+            [azjure.padders :refer :all])
+  (:import (java.security SecureRandom)))
 
 (defn encrypt
   "Encrypt the given input i based on the configuration supplied in the map m"
@@ -29,6 +30,15 @@
            (decrypt-blocks m)
            (unpad m))
       :encryption false)))
+
+(defn gen-key
+  "Generate a key of length s bits.
+
+  Evaluates to a vector of unsigned byte values."
+  [s]
+  (let [barr (byte-array (/ s 8))
+        _ (.nextBytes (SecureRandom.) barr)]
+    (mapv (partial + 128) (vec barr))))
 
 (comment
   (do
