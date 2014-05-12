@@ -29,7 +29,7 @@
   "Convert a 2 character hex string into a byte value (0-255)"
   {:added "0.2.0"}
   [s]
-  {:pre [(re-matches #"[0-9a-zA-Z]{2}" s)]}
+  {:pre [(string? s) (re-matches #"[0-9a-zA-Z]{2}" s)]}
   (Long/parseLong s 16))
 
 (defn v->hex
@@ -43,6 +43,7 @@
   "Convert a string of hex values into a vector of bytes (0-255)"
   {:added "0.2.0"}
   [s]
+  {:pre [(string? s)]}
   (->> s
        (partition-all 2)
        (map (partial apply str))
