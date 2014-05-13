@@ -32,11 +32,13 @@
       :encryption false)))
 
 (defn gen-key
-  "Generate a key of length s bits.
+  "Generate a key of length x bits.  x should be a multiple of 8.
 
   Evaluates to a vector of unsigned byte values."
-  [s]
-  (let [barr (byte-array (/ s 8))
+  {:added "0.2.0"}
+  [x]
+  {:pre [(pos? x) (zero? (mod x 8))]}
+  (let [barr (byte-array (/ x 8))
         _ (.nextBytes (SecureRandom.) barr)]
     (mapv (partial + 128) (vec barr))))
 

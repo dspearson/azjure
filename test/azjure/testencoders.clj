@@ -1,7 +1,15 @@
 (ns azjure.testencoders
   (:require [azjure.encoders :refer :all]
             [midje.config :as config]
-            [midje.sweet :refer :all]))
+            [midje.sweet :refer :all]
+            [midje.util :refer [expose-testables]]))
+
+(def ^{:private true :doc "The base64 alphabet string"} b64-alphabet
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+(def ^{:private true :doc "The base64url alphabet string"} b64url-alphabet
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
+
+(expose-testables azjure.encoders)
 
 (config/at-print-level
   :print-facts
@@ -34,7 +42,8 @@
   (facts
     "about hex->x"
     (fact "non-string" (hex->x nil) => (throws AssertionError))
-    (fact "string too short" (hex->x "0") => (throws AssertionError))
+    (fact "string too short" (hex->x "") => (throws AssertionError))
+    (fact "0" (hex->x "0") => 0)
     (fact "00" (hex->x "00") => 0)
     (fact "0f" (hex->x "0f") => 15)
     (fact "aa" (hex->x "aa") => 170)
@@ -52,5 +61,78 @@
     (fact "[1 0 0 0]" (v->hex [1 0 0 0]) => "01000000")
     (fact "[16 22 45 8]" (v->hex [16 22 45 8]) => "10162d08"))
   (facts
-    "about hex->v")
+    "about hex->v"
+    (fact "non-string" (hex->v nil) => (throws AssertionError))
+    (fact "0" (hex->v "0") => [0])
+    (fact "100" (hex->v "100") => [1 0])
+    (fact "1ff" (hex->v "1ff") => [1 255])
+    (fact "01ff" (hex->v "01ff") => [1 255])
+    (fact "123456789abcdef"
+          (hex->v "123456789abcdef") => [1 35 69 103 137 171 205 239])
+    (fact "0123456789abcdef"
+          (hex->v "0123456789abcdef") => [1 35 69 103 137 171 205 239]))
+  (facts
+    "about v->str"
+    (fact "non-vector" (v->str nil) => (throws AssertionError))
+    (fact "invalid byte (-1)" (v->str [-1]) => (throws AssertionError))
+    (fact "invalid byte (256)" (v->str [256]) => (throws AssertionError))
+    (fact "[74 97 115 111 110]" (v->str [74 97 115 111 110]) => "Jason"))
+  (facts
+    "about str->v"
+    (fact "non-string" (str->v nil) => (throws AssertionError))
+    (fact "Jason" (str->v "Jason") => [74 97 115 111 110]))
+  (facts
+    "about nth6bits"
+    (fact "invalid x value (-1)" (nth6bits -1 0) => (throws AssertionError))
+    (fact "invalid x value (2^24)"
+          (nth6bits 16777216 0) => (throws AssertionError))
+    (fact "invalid n value (-1)" (nth6bits 0 -1) => (throws AssertionError))
+    (fact "invalid n value (4)" (nth6bits 0 4) => (throws AssertionError))
+    (fact "2^24 - 1 0th" (nth6bits 16777215 0) => 63)
+    (fact "2^24 - 1 1st" (nth6bits 16777215 1) => 63)
+    (fact "2^24 - 1 2nd" (nth6bits 16777215 2) => 63)
+    (fact "2^24 - 1 3rd" (nth6bits 16777215 3) => 63)
+    (fact "14712327 0th" (nth6bits 14712327 0) => 7)
+    (fact "14712327 1st" (nth6bits 14712327 1) => 56)
+    (fact "14712327 2nd" (nth6bits 14712327 2) => 7)
+    (fact "14712327 3rd" (nth6bits 14712327 3) => 56))
+  (facts
+    "about v->base64x"
+    (fact "alphabet not string"
+          (v->base64x [] nil) => (throws AssertionError))
+    (fact "alphabet too short"
+          (v->base64x [] "abc123") => (throws AssertionError))
+    (fact "v not vector"
+          (v->base64x nil b64-alphabet) => (throws AssertionError))
+    (fact "invalid byte in v (-1)"
+          (v->base64x [-1] b64-alphabet) => (throws AssertionError))
+    (fact "invalid byte in v (256)"
+          (v->base64x [256] b64-alphabet) => (throws AssertionError))
+    (fact "[74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]"
+          (v->base64x
+            [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+            b64-alphabet) => "SmFzb24gR3JhbnQgT3ppYXM=")
+    (fact "empty vector" (v->base64x [] b64-alphabet) => "")
+    (fact "f" (v->base64x [102] b64-alphabet) => "Zg==")
+    (fact "fo" (v->base64x [102 111] b64-alphabet) => "Zm8=")
+    (fact "foo" (v->base64x [102 111 111] b64-alphabet) => "Zm9v")
+    (fact "foob" (v->base64x [102 111 111 98] b64-alphabet) => "Zm9vYg==")
+    (fact "fooba" (v->base64x [102 111 111 98 97] b64-alphabet) => "Zm9vYmE=")
+    (fact "foobar"
+          (v->base64x [102 111 111 98 97 114] b64-alphabet) => "Zm9vYmFy"))
+  (facts
+    "about nth5bits"
+    (fact "invalid x value (-1)" (nth6bits -1 0) => (throws AssertionError))
+    (fact "invalid x value (2^40)"
+          (nth6bits 1099511627776 0) => (throws AssertionError))
+    (fact "invalid n value (-1)" (nth6bits 0 -1) => (throws AssertionError))
+    (fact "invalid n value (8)" (nth6bits 0 8) => (throws AssertionError))
+    (fact "567489872400 0th" (nth5bits 567489872400 0) => 16)
+    (fact "567489872400 1st" (nth5bits 567489872400 1) => 16)
+    (fact "567489872400 2nd" (nth5bits 567489872400 2) => 16)
+    (fact "567489872400 3rd" (nth5bits 567489872400 3) => 16)
+    (fact "567489872400 4th" (nth5bits 567489872400 4) => 16)
+    (fact "567489872400 5th" (nth5bits 567489872400 5) => 16)
+    (fact "567489872400 6th" (nth5bits 567489872400 6) => 16)
+    (fact "567489872400 7th" (nth5bits 567489872400 7) => 16))
   )
