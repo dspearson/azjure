@@ -149,15 +149,18 @@
   base64 alphabet to use."
   {:added "0.2.0"}
   [s ^String alphabet]
-  (->> (map #(.indexOf alphabet (str %)) s)
-       (partition 4)
-       (map #(remove (fn [x] (= -1 x)) %))
-       (map b64-decode-shift)
-       (map (partial apply bit-xor))
-       (mapv word-bytes)
-       (map rest)
-       (map vec)
-       (reduce into)))
+  {:pre [(string? s)]}
+  (if (empty? s)
+    []
+    (->> (map #(.indexOf alphabet (str %)) s)
+         (partition 4)
+         (map #(remove (fn [x] (= -1 x)) %))
+         (map b64-decode-shift)
+         (map (partial apply bit-xor))
+         (mapv word-bytes)
+         (map rest)
+         (map vec)
+         (reduce into))))
 
 (defn v->base64
   "Convert a vector of bytes (0-255) to a Base64 string"
