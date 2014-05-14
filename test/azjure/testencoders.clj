@@ -14,7 +14,7 @@
 (config/at-print-level
   :print-facts
   (facts
-    "about x->hex"
+    "(x->hex x)\n========================================"
     (fact "x < 0" (x->hex -1) => (throws AssertionError))
     (fact "0 >= x >= 255"
           (map x->hex (range 256)) =>
@@ -40,7 +40,7 @@
             "f7" "f8" "f9" "fa" "fb" "fc" "fd" "fe" "ff"))
     (fact "x > 255" (x->hex 256) => (throws AssertionError)))
   (facts
-    "about hex->x"
+    "(hex->x s)\n========================================"
     (fact "non-string" (hex->x nil) => (throws AssertionError))
     (fact "string too short" (hex->x "") => (throws AssertionError))
     (fact "0" (hex->x "0") => 0)
@@ -48,9 +48,12 @@
     (fact "0f" (hex->x "0f") => 15)
     (fact "aa" (hex->x "aa") => 170)
     (fact "FF" (hex->x "FF") => 255)
-    (fact "string too long" (hex->x "000") => (throws AssertionError)))
+    (fact "string too long" (hex->x "000") => (throws AssertionError))))
+
+(config/at-print-level
+  :print-facts
   (facts
-    "about v->hex"
+    "(v->hex v)\n========================================"
     (fact "non-vector" (v->hex nil) => (throws AssertionError))
     (fact "invalid byte value (-1)"
           (v->hex [-1 0 1]) => (throws AssertionError))
@@ -61,7 +64,7 @@
     (fact "[1 0 0 0]" (v->hex [1 0 0 0]) => "01000000")
     (fact "[16 22 45 8]" (v->hex [16 22 45 8]) => "10162d08"))
   (facts
-    "about hex->v"
+    "(hex->v s)\n========================================"
     (fact "non-string" (hex->v nil) => (throws AssertionError))
     (fact "0" (hex->v "0") => [0])
     (fact "100" (hex->v "100") => [1 0])
@@ -70,19 +73,169 @@
     (fact "123456789abcdef"
           (hex->v "123456789abcdef") => [1 35 69 103 137 171 205 239])
     (fact "0123456789abcdef"
-          (hex->v "0123456789abcdef") => [1 35 69 103 137 171 205 239]))
+          (hex->v "0123456789abcdef") => [1 35 69 103 137 171 205 239])))
+
+(config/at-print-level
+  :print-facts
   (facts
-    "about v->str"
+    "(v->str s)\n========================================"
     (fact "non-vector" (v->str nil) => (throws AssertionError))
     (fact "invalid byte (-1)" (v->str [-1]) => (throws AssertionError))
     (fact "invalid byte (256)" (v->str [256]) => (throws AssertionError))
     (fact "[74 97 115 111 110]" (v->str [74 97 115 111 110]) => "Jason"))
   (facts
-    "about str->v"
+    "(str->v s)\n========================================"
     (fact "non-string" (str->v nil) => (throws AssertionError))
-    (fact "Jason" (str->v "Jason") => [74 97 115 111 110]))
+    (fact "Jason" (str->v "Jason") => [74 97 115 111 110])))
+
+(config/at-print-level
+  :print-facts
   (facts
-    "about nth6bits"
+    "(v->base64 v)\n========================================"
+    (fact "non-vector" (v->base64 nil) => (throws AssertionError))
+    (fact "empty string" (v->base64 []) => "")
+    (fact "f" (v->base64 [102]) => "Zg==")
+    (fact "fo" (v->base64 [102 111]) => "Zm8=")
+    (fact "foo" (v->base64 [102 111 111]) => "Zm9v")
+    (fact "foob" (v->base64 [102 111 111 98]) => "Zm9vYg==")
+    (fact "fooba" (v->base64 [102 111 111 98 97]) => "Zm9vYmE=")
+    (fact "foobar" (v->base64 [102 111 111 98 97 114]) => "Zm9vYmFy")
+    (fact "Jason Grant Ozias"
+          (v->base64 (vec (.getBytes "Jason Grant Ozias"))) =>
+          "SmFzb24gR3JhbnQgT3ppYXM="))
+  (facts
+    "(base64->v s)\n========================================"
+    (fact "non-string" (base64->v nil) => (throws AssertionError))
+    (fact "Zg==" (base64->v "Zg==") => [102])
+    (fact "Zm8=" (base64->v "Zm8=") => [102 111])
+    (fact "Zm9v" (base64->v "Zm9v") => [102 111 111])
+    (fact "Zm9vYg==" (base64->v "Zm9vYg==") => [102 111 111 98])
+    (fact "Zm9vYmE=" (base64->v "Zm9vYmE=") => [102 111 111 98 97])
+    (fact "Zm9vYmFy" (base64->v "Zm9vYmFy") => [102 111 111 98 97 114])
+    (fact "SmFzb24gR3JhbnQgT3ppYXM=" (base64->v "SmFzb24gR3JhbnQgT3ppYXM=") =>
+          [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115])))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(v->base64url v)\n========================================"
+    (fact "non-vector" (v->base64url nil) => (throws AssertionError))
+    (fact "empty string" (v->base64url []) => "")
+    (fact "f" (v->base64url [102]) => "Zg==")
+    (fact "fo" (v->base64url [102 111]) => "Zm8=")
+    (fact "foo" (v->base64url [102 111 111]) => "Zm9v")
+    (fact "foob" (v->base64url [102 111 111 98]) => "Zm9vYg==")
+    (fact "fooba" (v->base64url [102 111 111 98 97]) => "Zm9vYmE=")
+    (fact "foobar" (v->base64url [102 111 111 98 97 114]) => "Zm9vYmFy")
+    (fact "[251 240]" (v->base64url [251 240 1]) => "-_AB")
+    (fact "Jason Grant Ozias"
+          (v->base64url (vec (.getBytes "Jason Grant Ozias"))) =>
+          "SmFzb24gR3JhbnQgT3ppYXM="))
+  (facts
+    "(base64url->v s)\n========================================"
+    (fact "non-string" (base64url->v nil) => (throws AssertionError))
+    (fact "Zg==" (base64url->v "Zg==") => [102])
+    (fact "Zm8=" (base64url->v "Zm8=") => [102 111])
+    (fact "Zm9v" (base64url->v "Zm9v") => [102 111 111])
+    (fact "Zm9vYg==" (base64url->v "Zm9vYg==") => [102 111 111 98])
+    (fact "Zm9vYmE=" (base64url->v "Zm9vYmE=") => [102 111 111 98 97])
+    (fact "Zm9vYmFy" (base64url->v "Zm9vYmFy") => [102 111 111 98 97 114])
+    (fact "-_AB" (base64url->v "-_AB") => [251 240 1])
+    (fact "SmFzb24gR3JhbnQgT3ppYXM="
+          (base64url->v "SmFzb24gR3JhbnQgT3ppYXM=") =>
+          [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115])))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(v->base32 v)\n========================================"
+    (fact "non-vector" (v->base32 nil) => (throws AssertionError))
+    (fact "empty string" (v->base32 []) => "")
+    (fact "f" (v->base32 [102]) => "MY======")
+    (fact "fo" (v->base32 [102 111]) => "MZXQ====")
+    (fact "foo" (v->base32 [102 111 111]) => "MZXW6===")
+    (fact "foob" (v->base32 [102 111 111 98]) => "MZXW6YQ=")
+    (fact "fooba" (v->base32 [102 111 111 98 97]) => "MZXW6YTB")
+    (fact "foobar" (v->base32 [102 111 111 98 97 114]) => "MZXW6YTBOI======")
+    (fact "Jason Grant Ozias"
+          (v->base32 (vec (.getBytes "Jason Grant Ozias"))) =>
+          "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="))
+  (facts
+    "(base32->v s)\n========================================"
+    (fact "non-string" (base32->v nil) => (throws AssertionError))
+    (fact "MY======" (base32->v "MY======") => [102])
+    (fact "MZXQ====" (base32->v "MZXQ====") => [102 111])
+    (fact "MZXW6===" (base32->v "MZXW6===") => [102 111 111])
+    (fact "MZXW6YQ=" (base32->v "MZXW6YQ=") => [102 111 111 98])
+    (fact "MZXW6YTB" (base32->v "MZXW6YTB") => [102 111 111 98 97])
+    (fact "MZXW6YTBOI======"
+          (base32->v "MZXW6YTBOI======") => [102 111 111 98 97 114])
+    (fact "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="
+          (base32->v "JJQXG33OEBDXEYLOOQQE66TJMFZQ====") =>
+          [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115])))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(v->base32hex v)\n========================================"
+    (fact "non-vector" (v->base32hex nil) => (throws AssertionError))
+    (fact "empty string" (v->base32hex []) => "")
+    (fact "f" (v->base32hex [102]) => "CO======")
+    (fact "fo" (v->base32hex [102 111]) => "CPNG====")
+    (fact "foo" (v->base32hex [102 111 111]) => "CPNMU===")
+    (fact "foob" (v->base32hex [102 111 111 98]) => "CPNMUOG=")
+    (fact "fooba" (v->base32hex [102 111 111 98 97]) => "CPNMUOJ1")
+    (fact "foobar" (v->base32hex [102 111 111 98 97 114]) => "CPNMUOJ1E8======")
+    (fact "Jason Grant Ozias"
+          (v->base32hex (vec (.getBytes "Jason Grant Ozias"))) =>
+          "99GN6RRE413N4OBEEGG4UUJ9C5PG===="))
+  (facts
+    "(base32hex->v s)\n========================================"
+    (fact "non-string" (base32hex->v nil) => (throws AssertionError))
+    (fact "CO======" (base32hex->v "CO======") => [102])
+    (fact "CPNG====" (base32hex->v "CPNG====") => [102 111])
+    (fact "CPNMU===" (base32hex->v "CPNMU===") => [102 111 111])
+    (fact "CPNMUOG=" (base32hex->v "CPNMUOG=") => [102 111 111 98])
+    (fact "CPNMUOJ1" (base32hex->v "CPNMUOJ1") => [102 111 111 98 97])
+    (fact "CPNMUOJ1E8======"
+          (base32hex->v "CPNMUOJ1E8======") => [102 111 111 98 97 114])
+    (fact "99GN6RRE413N4OBEEGG4UUJ9C5PG===="
+          (base32hex->v "99GN6RRE413N4OBEEGG4UUJ9C5PG====") =>
+          [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115])))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(v->base16 v)\n========================================"
+    (fact "non-vector" (v->base16 nil) => (throws AssertionError))
+    (fact "empty string" (v->base16 []) => "")
+    (fact "f" (v->base16 [102]) => "66")
+    (fact "fo" (v->base16 [102 111]) => "666F")
+    (fact "foo" (v->base16 [102 111 111]) => "666F6F")
+    (fact "foob" (v->base16 [102 111 111 98]) => "666F6F62")
+    (fact "fooba" (v->base16 [102 111 111 98 97]) => "666F6F6261")
+    (fact "foobar" (v->base16 [102 111 111 98 97 114]) => "666F6F626172")
+    (fact "Jason Grant Ozias"
+          (v->base16 (vec (.getBytes "Jason Grant Ozias"))) =>
+          "4A61736F6E204772616E74204F7A696173"))
+  (facts
+    "(base16->v s)\n========================================"
+    (fact "non-string" (base16->v nil) => (throws AssertionError))
+    (fact "66" (base16->v "66") => [102])
+    (fact "666F" (base16->v "666F") => [102 111])
+    (fact "666F6F" (base16->v "666F6F") => [102 111 111])
+    (fact "666F6F62" (base16->v "666F6F62") => [102 111 111 98])
+    (fact "666F6F6261" (base16->v "666F6F6261") => [102 111 111 98 97])
+    (fact "666F6F626172"
+          (base16->v "666F6F626172") => [102 111 111 98 97 114])
+    (fact "4A61736F6E204772616E74204F7A696173"
+          (base16->v "4A61736F6E204772616E74204F7A696173") =>
+          [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115])))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(nth6bits x)\n========================================"
     (fact "invalid x value (-1)" (nth6bits -1 0) => (throws AssertionError))
     (fact "invalid x value (2^24)"
           (nth6bits 16777216 0) => (throws AssertionError))
@@ -95,9 +248,12 @@
     (fact "14712327 0th" (nth6bits 14712327 0) => 7)
     (fact "14712327 1st" (nth6bits 14712327 1) => 56)
     (fact "14712327 2nd" (nth6bits 14712327 2) => 7)
-    (fact "14712327 3rd" (nth6bits 14712327 3) => 56))
+    (fact "14712327 3rd" (nth6bits 14712327 3) => 56)))
+
+(config/at-print-level
+  :print-facts
   (facts
-    "about v->base64x"
+    "(v->base64x v a)\n========================================"
     (fact "alphabet not string"
           (v->base64x [] nil) => (throws AssertionError))
     (fact "alphabet too short"
@@ -119,9 +275,12 @@
     (fact "foob" (v->base64x [102 111 111 98] b64-alphabet) => "Zm9vYg==")
     (fact "fooba" (v->base64x [102 111 111 98 97] b64-alphabet) => "Zm9vYmE=")
     (fact "foobar"
-          (v->base64x [102 111 111 98 97 114] b64-alphabet) => "Zm9vYmFy"))
+          (v->base64x [102 111 111 98 97 114] b64-alphabet) => "Zm9vYmFy")))
+
+(config/at-print-level
+  :print-facts
   (facts
-    "about nth5bits"
+    "(nth5bits x)\n========================================"
     (fact "invalid x value (-1)" (nth6bits -1 0) => (throws AssertionError))
     (fact "invalid x value (2^40)"
           (nth6bits 1099511627776 0) => (throws AssertionError))
@@ -134,5 +293,4 @@
     (fact "567489872400 4th" (nth5bits 567489872400 4) => 16)
     (fact "567489872400 5th" (nth5bits 567489872400 5) => 16)
     (fact "567489872400 6th" (nth5bits 567489872400 6) => 16)
-    (fact "567489872400 7th" (nth5bits 567489872400 7) => 16))
-  )
+    (fact "567489872400 7th" (nth5bits 567489872400 7) => 16)))

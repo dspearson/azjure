@@ -141,8 +141,8 @@
   "Bit shifting used during the decoding of a base64x encoded string"
   {:added    "0.2.0"
    :testable true}
-  [x]
-  (map bit-shift-left x (range 18 (dec (* 6 (- 4 (count x)))) -6)))
+  [xs]
+  (map bit-shift-left xs (range 18 (dec (* 6 (- 4 (count xs)))) -6)))
 
 (defn- base64x->v
   "Convert a base64x string into a vector of bytes.  The second argument is the
@@ -160,18 +160,22 @@
          (mapv word-bytes)
          (map rest)
          (map vec)
-         (reduce into))))
+         (reduce into)
+         (take-while #(not (zero? %)))
+         (vec))))
 
 (defn v->base64
   "Convert a vector of bytes (0-255) to a Base64 string"
   {:added "0.2.0"}
   [v]
+  {:pre [(vector? v)]}
   (v->base64x v b64-alphabet))
 
 (defn base64->v
   "Convert a Base64 string to a vector of bytes (0-255)"
   {:added "0.2.0"}
   [s]
+  {:pre [(string? s)]}
   (base64x->v s b64-alphabet))
 
 (defn v->base64url
@@ -246,18 +250,6 @@
          (reduce into)
          (apply str))))
 
-(defn v->base32
-  "Convert a vector of bytes (0-255) to a Base32 string"
-  {:added "0.2.0"}
-  [v]
-  (v->base32x v b32-alphabet))
-
-(defn v->base32hex
-  "Convert a vector of bytes (0-255) to a Base32-Hex string"
-  {:added "0.2.0"}
-  [v]
-  (v->base32x v b32hex-alphabet))
-
 (defn- b32-decode-shift
   "Bit shifting used during the decoding of a base32x encoded string"
   {:added "0.2.0"}
@@ -278,26 +270,44 @@
        (take-while #(not (zero? %)))
        (vec)))
 
+(defn v->base32
+  "Convert a vector of bytes (0-255) to a Base32 string"
+  {:added "0.2.0"}
+  [v]
+  {:pre [(vector? v)]}
+  (v->base32x v b32-alphabet))
+
+(defn v->base32hex
+  "Convert a vector of bytes (0-255) to a Base32-Hex string"
+  {:added "0.2.0"}
+  [v]
+  {:pre [(vector? v)]}
+  (v->base32x v b32hex-alphabet))
+
 (defn base32->v
   "Convert a Base32 string to a vector of bytes (0-255)"
   {:added "0.2.0"}
   [s]
+  {:pre [(string? s)]}
   (base32x->v s b32-alphabet))
 
 (defn base32hex->v
   "Convert a Base32-Hex string to a vector of bytes (0-255)"
   {:added "0.2.0"}
   [s]
+  {:pre [(string? s)]}
   (base32x->v s b32hex-alphabet))
 
 (defn v->base16
   "Convert a vector of bytes (0-255) to a Base16 string."
   [v]
+  {:pre [(vector? v)]}
   (.toUpperCase ^String (v->hex v)))
 
 (defn base16->v
   "Convert a Base16 string to a vector of bytes (0-255)."
   [s]
+  {:pre [(string? s)]}
   (hex->v s))
 
 (defn- encoder-dispatcher
