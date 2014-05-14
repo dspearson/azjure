@@ -294,3 +294,117 @@
     (fact "567489872400 5th" (nth5bits 567489872400 5) => 16)
     (fact "567489872400 6th" (nth5bits 567489872400 6) => 16)
     (fact "567489872400 7th" (nth5bits 567489872400 7) => 16)))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(output-encoder m bv & keys)\n========================================"
+    (fact "v->str encryption"
+          (output-encoder {:eoe :str} [102 111 111 98 97 114])
+          => "foobar")
+    (fact "v->str decryption"
+          (output-encoder {:doe :str} [102 111 111 98 97 114] :encryption false)
+          => "foobar")
+    (fact "v->hex encryption"
+          (output-encoder {:eoe :hex} [102 111 111 98 97 114])
+          => "666f6f626172")
+    (fact "v->hex decryption"
+          (output-encoder {:doe :hex} [102 111 111 98 97 114] :encryption false)
+          => "666f6f626172")
+    (fact "v->base64 encryption"
+          (output-encoder {:eoe :base64} [102 111 111 98 97 114])
+          => "Zm9vYmFy")
+    (fact "v->base64 decryption"
+          (output-encoder {:doe :base64}
+                          [102 111 111 98 97 114]
+                          :encryption false)
+          => "Zm9vYmFy")
+    (fact "v->base64url encryption"
+          (output-encoder {:eoe :base64url} [102 111 111 98 97 114])
+          => "Zm9vYmFy")
+    (fact "v->base64url decryption"
+          (output-encoder {:doe :base64url}
+                          [102 111 111 98 97 114]
+                          :encryption false)
+          => "Zm9vYmFy")
+    (fact "v->base32 encryption"
+          (output-encoder {:eoe :base32} [102 111 111 98 97 114])
+          => "MZXW6YTBOI======")
+    (fact "v->base32 decryption"
+          (output-encoder {:doe :base32}
+                          [102 111 111 98 97 114]
+                          :encryption false)
+          => "MZXW6YTBOI======")
+    (fact "v->base32hex encryption"
+          (output-encoder {:eoe :base32hex} [102 111 111 98 97 114])
+          => "CPNMUOJ1E8======")
+    (fact "v->base32hex decryption"
+          (output-encoder {:doe :base32hex}
+                          [102 111 111 98 97 114]
+                          :encryption false)
+          => "CPNMUOJ1E8======")
+    (fact "v->base16 encryption"
+          (output-encoder {:eoe :base16} [102 111 111 98 97 114])
+          => "666F6F626172")
+    (fact "v->base16 decryption"
+          (output-encoder {:doe :base16}
+                          [102 111 111 98 97 114]
+                          :encryption false)
+          => "666F6F626172")))
+
+(config/at-print-level
+  :print-facts
+  (facts
+    "(input-decoder m bv & keys)\n========================================"
+    (fact "str->v encryption"
+          (input-decoder {:eid :str} "foobar")
+          => [102 111 111 98 97 114])
+    (fact "str->v decryption"
+          (input-decoder {:did :str} "foobar" :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "hex->v encryption"
+          (input-decoder {:eid :hex} "666f6f626172")
+          => [102 111 111 98 97 114])
+    (fact "hex->v decryption"
+          (input-decoder {:did :hex} "666f6f626172" :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "base64->v encryption"
+          (input-decoder {:eid :base64} "Zm9vYmFy")
+          => [102 111 111 98 97 114])
+    (fact "base64->v decryption"
+          (input-decoder {:did :base64}
+                          "Zm9vYmFy"
+                          :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "base64url->v encryption"
+          (input-decoder {:eid :base64url} "Zm9vYmFy")
+          => [102 111 111 98 97 114])
+    (fact "base64url->v decryption"
+          (input-decoder {:did :base64url}
+                         "Zm9vYmFy"
+                          :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "base32->v encryption"
+          (input-decoder {:eid :base32} "MZXW6YTBOI======")
+          => [102 111 111 98 97 114])
+    (fact "base32->v decryption"
+          (input-decoder {:did :base32}
+                         "MZXW6YTBOI======"
+                          :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "base32hex->v encryption"
+          (input-decoder {:eid :base32hex} "CPNMUOJ1E8======")
+          => [102 111 111 98 97 114])
+    (fact "base32hex->v decryption"
+          (input-decoder {:did :base32hex}
+                         "CPNMUOJ1E8======"
+                          :encryption false)
+          => [102 111 111 98 97 114])
+    (fact "base16->v encryption"
+          (input-decoder {:eid :base16} "666F6F626172")
+          => [102 111 111 98 97 114])
+    (fact "base16->v decryption"
+          (input-decoder {:did :base16}
+                         "666F6F626172"
+                          :encryption false)
+          => [102 111 111 98 97 114])))

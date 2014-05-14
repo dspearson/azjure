@@ -324,6 +324,9 @@
 (defmethod output-encoder :hex [_ bv & _] (v->hex bv))
 (defmethod output-encoder :base64 [_ bv & _] (v->base64 bv))
 (defmethod output-encoder :base64url [_ bv & _] (v->base64url bv))
+(defmethod output-encoder :base32 [_ bv & _] (v->base32 bv))
+(defmethod output-encoder :base32hex [_ bv & _] (v->base32hex bv))
+(defmethod output-encoder :base16 [_ bv & _] (v->base16 bv))
 (defmethod output-encoder :default [_ bv & _] bv)
 
 (defn- decoder-dispatcher
@@ -340,4 +343,7 @@
 (defmethod input-decoder :hex [_ s & _] (hex->v s))
 (defmethod input-decoder :base64 [_ s & _] (base64->v s))
 (defmethod input-decoder :base64url [_ s & _] (base64url->v s))
+(defmethod input-decoder :base32 [_ s & _] (base32->v s))
+(defmethod input-decoder :base32hex [_ s & _] (base32hex->v s))
+(defmethod input-decoder :base16 [_ s & _] (base16->v s))
 (defmethod input-decoder :default [_ bv & _] bv)
