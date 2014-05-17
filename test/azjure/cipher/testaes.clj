@@ -1,7 +1,6 @@
 (ns azjure.cipher.testaes
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
-            [midje.config :as config]
             [midje.sweet :refer :all]))
 
 (def ^{:private true :doc "Configuration Map"} cm (atom {}))
@@ -25,41 +24,39 @@
 (def ^{:private true :doc "AES Spec 256-bit Key Ciphertext"} aes-testct-256
   [142 162 183 202 81 103 69 191 234 252 73 144 75 73 96 137])
 
-(config/at-print-level
-  :print-facts
-  (with-state-changes
-    [(before :facts (swap! cm assoc :type :aes :key aes-testkey-128))]
-    (facts
-      "AES 128-bit Key\n========================================"
-      (with-state-changes
-        [(before :facts (swap! cm initialize))]
-        (fact
-          "AES Encryption"
-          (encrypt-block @cm aes-testpt) => aes-testct-128)
-        (fact
-          "AES Decryption"
-          (decrypt-block @cm aes-testct-128) => aes-testpt))))
-  (with-state-changes
-    [(before :facts (swap! cm assoc :key aes-testkey-192))]
-    (facts
-      "AES 192-bit Key\n========================================"
-      (with-state-changes
-        [(before :facts (swap! cm initialize))]
-        (fact
-          "AES Encryption"
-          (encrypt-block @cm aes-testpt) => aes-testct-192)
-        (fact
-          "AES Decryption"
-          (decrypt-block @cm aes-testct-192) => aes-testpt))))
-  (with-state-changes
-    [(before :facts (swap! cm assoc :key aes-testkey-256))]
-    (facts
-      "AES 256-bit Key\n========================================"
-      (with-state-changes
-        [(before :facts (swap! cm initialize))]
-        (fact
-          "AES Encryption"
-          (encrypt-block @cm aes-testpt) => aes-testct-256)
-        (fact
-          "AES Decryption"
-          (decrypt-block @cm aes-testct-256) => aes-testpt)))))
+(with-state-changes
+  [(before :facts (swap! cm assoc :type :aes :key aes-testkey-128))]
+  (facts
+    "AES 128-bit Key\n========================================"
+    (with-state-changes
+      [(before :facts (swap! cm initialize))]
+      (fact
+        "AES Encryption"
+        (encrypt-block @cm aes-testpt) => aes-testct-128)
+      (fact
+        "AES Decryption"
+        (decrypt-block @cm aes-testct-128) => aes-testpt))))
+(with-state-changes
+  [(before :facts (swap! cm assoc :key aes-testkey-192))]
+  (facts
+    "AES 192-bit Key\n========================================"
+    (with-state-changes
+      [(before :facts (swap! cm initialize))]
+      (fact
+        "AES Encryption"
+        (encrypt-block @cm aes-testpt) => aes-testct-192)
+      (fact
+        "AES Decryption"
+        (decrypt-block @cm aes-testct-192) => aes-testpt))))
+(with-state-changes
+  [(before :facts (swap! cm assoc :key aes-testkey-256))]
+  (facts
+    "AES 256-bit Key\n========================================"
+    (with-state-changes
+      [(before :facts (swap! cm initialize))]
+      (fact
+        "AES Encryption"
+        (encrypt-block @cm aes-testpt) => aes-testct-256)
+      (fact
+        "AES Decryption"
+        (decrypt-block @cm aes-testct-256) => aes-testpt))))
