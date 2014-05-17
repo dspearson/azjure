@@ -7,4 +7,5 @@
                     [libbyte :refer :all]
                     [modes :refer :all]
                     [padders :refer :all])
-            (azjure.cipher [aes :refer :all])))
+            (azjure.cipher [aes :refer :all]
+                           [blowfish :refer :all])))
