@@ -1,11 +1,9 @@
 (ns azjure.testmodes
-  (require (azjure [modes :refer :all]
-                   [padders :refer :all]
-                   [configmaps :refer :all])
-           (azjure.cipher [cipher :refer :all]
-                          [aes :refer :all])
-           (midje [config :as config]
-                  [sweet :refer :all])))
+  (:require [azjure.cipher.cipher :refer :all]
+            [azjure.modes :refer :all]
+            [azjure.padders :refer :all]
+            [midje.config :as config]
+            [midje.sweet :refer :all]))
 
 (def cm (atom {}))
 

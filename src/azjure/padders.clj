@@ -21,6 +21,7 @@
   "Calculate the remaining number of bytes to add to make a full block.
 
   (bytes-to-pad 15 16) => 1
+  (bytes-to-pad 16 16) => 0
   (bytes-to-pad 17 16) => 15"
   {:added "0.2.0"}
   [total-bytes bytes-per-block]
@@ -31,14 +32,16 @@
 
 (defmethod pad :iso7816 [m bv]
   (let [l (count bv)
-        rem (bytes-to-pad l (bytes-per-block m))
-        zeropad (reduce conj bv (take rem (cycle [0])))]
-    (assoc zeropad l 0x80)))
+        rem (bytes-to-pad l (bytes-per-block m))]
+    (if (zero? rem)
+      bv
+      (let [zeropad (reduce conj bv (take rem (cycle [0])))]
+        (assoc zeropad l 0x80)))))
 
 (defmethod unpad :iso7816 [_ bv]
   (->> (reverse bv)
        (drop-while zero?)
-       (rest)
+       (drop-while #(= 128 %))
        (reverse)
        (vec)))
 

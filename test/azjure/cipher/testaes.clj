@@ -1,12 +1,10 @@
 (ns azjure.cipher.testaes
-  (require (azjure.cipher [cipher :refer :all]
-                          [blockcipher :refer :all]
-                          [aes :refer :all])
-           (midje [config :as config]
-                  [sweet :refer :all])))
+  (:require [azjure.cipher.blockcipher :refer :all]
+            [azjure.cipher.cipher :refer :all]
+            [midje.config :as config]
+            [midje.sweet :refer :all]))
 
-(def ^{:private true :doc "Configuration Map"} cm
-  (atom {}))
+(def ^{:private true :doc "Configuration Map"} cm (atom {}))
 
 (def ^{:private true :doc "AES Spec 128-bit Plaintext"} aes-testpt
   [0 17 34 51 68 85 102 119 136 153 170 187 204 221 238 255])
