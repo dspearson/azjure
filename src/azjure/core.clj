@@ -34,7 +34,7 @@
 (defn gen-key
   "Generate a key of length x bits.  x should be a multiple of 8.
 
-  Evaluates to a vector of unsigned byte values."
+  Evaluates to a vector of unsigned (0 - 255) byte values."
   {:added "0.2.0"}
   [x]
   {:pre [(pos? x) (zero? (mod x 8))]}

@@ -90,8 +90,7 @@
 (defn- nth6bits
   "Get the value of the nth 6-bits from x.  This is used during base64 encoding
   to extract 4 values from 3 bytes (24-bits)."
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [x n]
   {:pre [(>= x 0) (<= x 16777215)
          (>= n 0) (<= n 3)]}
@@ -100,8 +99,7 @@
 (defn- b64-encode
   "For a given shift function, length, and alphabet, encode the given vector of
   bytes"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [sfn l alphabet]
   (fn [v]
     (->> (mapv nth6bits (repeat (sfn v)) (range l))
@@ -110,8 +108,7 @@
 
 (defn- b64-encode-bytes
   "For the given alphabet, encode up to 3 bytes in a vector in base64"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [alphabet]
   (fn [v]
     {:pre [(>= (count v) 0) (<= (count v) 3)]}
@@ -127,8 +124,7 @@
 (defn- v->base64x
   "Convert a vector of bytes (0-255) into a base64x encoded string.  The second
   argument is the base64 alphabet to use."
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [v alphabet]
   {:pre [(vector? v) (every-byte? v)
          (string? alphabet) (= 64 (count alphabet))]}
@@ -141,16 +137,14 @@
 
 (defn- b64-decode-shift
   "Bit shifting used during the decoding of a base64x encoded string"
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [xs]
   (map bit-shift-left xs (range 18 (dec (* 6 (- 4 (count xs)))) -6)))
 
 (defn- base64x->v
   "Convert a base64x string into a vector of bytes.  The second argument is the
   base64 alphabet to use."
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [s ^String alphabet]
   {:pre [(string? s)]}
   (if (empty? s)
@@ -196,8 +190,7 @@
 (defn- nth5bits
   "Get the value of the nth 5-bits from x.  This is used during base32 encoding
   to extract 8 values from 5 bytes (40-bits)."
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [x n]
   {:pre [(>= x 0) (<= x 1099511627775)
          (>= n 0) (<= n 8)]}
@@ -206,8 +199,7 @@
 (defn- b32-encode
   "For a given shift function, length, and alphabet, encode the given vector of
   bytes"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [l alphabet]
   (fn [v]
     (->> (mapv nth5bits (repeat v) (range l))
@@ -217,15 +209,13 @@
 (defn- pad-count
   "Generate the pad count for Base32 encoding based on the length of the last
   set of bytes."
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [l]
   (/ (- 40 (.intValue ^Double (* (Math/ceil (/ (* 8 l) 5.0)) 5))) 5))
 
 (defn- b32-encode-bytes
   "For the given alphabet, encode up to 5 bytes in a vector in base32"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [alphabet]
   (fn [v]
     {:pre [(>= (count v) 0) (<= (count v) 5)]}
@@ -243,8 +233,7 @@
 (defn- v->base32x
   "Convert a vector of bytes (0-255) into a base32x encoded string.  The second
   argument is the base32 alphabet to use."
-  {:added    "0.2.0"
-   :testable true}
+  {:added    "0.2.0"}
   [v alphabet]
   {:pre [(vector? v) (every-byte? v)
          (string? alphabet) (= 32 (count alphabet))]}
@@ -257,15 +246,13 @@
 
 (defn- b32-decode-shift
   "Bit shifting used during the decoding of a base32x encoded string"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [x]
   (map bit-shift-left x (range 35 (dec (* 5 (- 8 (count x)))) -5)))
 
 (defn- base32x->v
   "Convert a Base32 string to a vector of bytes (0-255)"
-  {:added "0.2.0"
-   :testable true}
+  {:added "0.2.0"}
   [s alphabet]
   (->> (map #(.indexOf ^String alphabet (str %)) s)
        (partition 8)
