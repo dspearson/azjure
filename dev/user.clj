@@ -8,4 +8,5 @@
                     [modes :refer :all]
                     [padders :refer :all])
             (azjure.cipher [aes :refer :all]
-                           [blowfish :refer :all])))
+                           [blowfish :refer :all])
+            [midje.repl :refer :all]))
