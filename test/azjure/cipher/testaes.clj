@@ -1,11 +1,5 @@
 (ns azjure.cipher.testaes
-  (:require [azjure.cipher.blockcipher :refer :all]
-            [azjure.cipher.cipher :refer :all]
-            [azjure.libtest :refer :all]
-            [azjure.core :refer :all]
-
-            [azjure.plaintext :refer [pt]]
-            [midje.sweet :refer :all]))
+  (:require [azjure.libtest :refer :all]))
 
 (def ^{:private true :doc "Configuration Map"} cm
   (atom {:type :aes
@@ -251,24 +245,7 @@
    [:ctr :x923 ct-128-aesctrx923]
    [:ctr :zero ct-128-aesctrzero]])
 
-(defn- aes-test-suite
-  "Check the each padding and mode combination"
-  [[mode pad ciphertext]]
-  (with-state-changes
-    [(before :facts (swap! cm assoc
-                           :mode mode
-                           :pad pad
-                           :key key-128-zeros
-                           :iv iv-128-zeros))]
-    (facts
-      (if-not (= pad :iso10126)
-        (fact (encrypt pt @cm) => ciphertext)
-        (fact (encrypt pt @cm) => (has-prefix ciphertext)))
-      (if-not (= pad :iso10126)
-        (fact (decrypt ciphertext @cm) => pt)
-        (fact (decrypt (encrypt pt @cm) @cm) => pt)))))
-
-(fact (blocksize-bits @cm) => 128)
-(fact (keysizes-bits @cm) => [128 192 256])
+(check-blocksize-bits cm 128)
+(check-keysizes-bits cm [128 192 256])
 (dorun (map (partial check-test-vectors cm) test-vectors))
 (dorun (map (partial check-test-suite cm) test-suites))

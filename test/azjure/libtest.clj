@@ -2,10 +2,16 @@
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.core :refer :all]
-            [azjure.plaintext :refer [pt]]
-            [azjure.keys :refer [key-128-zeros]]
             [azjure.ivs :refer [iv-128-zeros]]
+            [azjure.keys :refer [key-128-zeros]]
+            [azjure.plaintext :refer [pt]]
             [midje.sweet :refer :all]))
+
+(defn check-blocksize-bits [cm v]
+  (fact (blocksize-bits @cm) => v))
+
+(defn check-keysizes-bits [cm v]
+  (fact (keysizes-bits @cm) => v))
 
 (defn check-test-vectors
   "Check the spec test vectors"
