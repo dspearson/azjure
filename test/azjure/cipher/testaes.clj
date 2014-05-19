@@ -1,9 +1,9 @@
 (ns azjure.cipher.testaes
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
+            [azjure.libtest :refer :all]
             [azjure.core :refer :all]
-            [azjure.keys :refer [key-128-zeros]]
-            [azjure.ivs :refer [iv-128-zeros]]
+
             [azjure.plaintext :refer [pt]]
             [midje.sweet :refer :all]))
 
@@ -218,17 +218,6 @@
    [key-192-aes pt-128-aes ct-192-aes]
    [key-256-aes pt-128-aes ct-256-aes]])
 
-(defn- aes-test-vectors
-  "Check the test vectors as defined in the spec"
-  [[key plaintext ciphertext]]
-  (with-state-changes
-    [(before :facts (swap! cm assoc :key key))]
-    (facts
-      (with-state-changes
-        [(before :facts (swap! cm initialize))]
-        (fact (encrypt-block @cm plaintext) => ciphertext)
-        (fact (decrypt-block @cm ciphertext) => plaintext)))))
-
 (def ^{:private true :doc "Suite tests"}
   test-suites
   [[:ecb :iso10126 ct-128-aesecb-base]
@@ -281,5 +270,5 @@
 
 (fact (blocksize-bits @cm) => 128)
 (fact (keysizes-bits @cm) => [128 192 256])
-(dorun (map aes-test-vectors test-vectors))
-(dorun (map aes-test-suite test-suites))
+(dorun (map (partial check-test-vectors cm) test-vectors))
+(dorun (map (partial check-test-suite cm) test-suites))
