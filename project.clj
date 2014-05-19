@@ -43,7 +43,6 @@
         :url  "https://github.com/CraZySacX/azjure"}
   :codox {:output-dir                "api"
           :exclude                   [azjure.version]
-          :sources                   ["src" "test"]
           :src-dir-uri               "http://github.com/CraZySacX/azjure/blob/api-refactor/"
           :src-linenum-anchor-prefix "L"}
   :manifest {"Implementation-Version" "0.2.0-SNAPSHOT"}
