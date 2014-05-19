@@ -2,10 +2,13 @@
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.core :refer :all]
-            [azjure.ivs :refer [iv-128-zeros]]
-            [azjure.keys :refer [key-128-zeros]]
-            [azjure.plaintext :refer [pt]]
             [midje.sweet :refer :all]))
+
+(def ^{:doc "64-bit vector of 0's"} zeros-64-bits (vec (take 8 (repeat 0))))
+
+(def ^{:doc "128-bit vector of 0's"} zeros-128-bits (vec (take 16 (repeat 0))))
+
+(def ^{:doc "Test plaintext"} pt "The quick brown fox jumped over the lazy dog")
 
 (defn check-blocksize-bits [cm v]
   (fact (blocksize-bits @cm) => v))
@@ -26,13 +29,14 @@
 
 (defn check-test-suite
   "Check a mode pad combination"
-  [cm [mode pad ciphertext]]
+  [cm [mode pad ciphertext]
+   & {:keys [key iv] :or {key zeros-128-bits iv zeros-128-bits}}]
   (with-state-changes
     [(before :facts (swap! cm assoc
                            :mode mode
                            :pad pad
-                           :key key-128-zeros
-                           :iv iv-128-zeros))]
+                           :key key
+                           :iv iv))]
     (facts
       (if-not (= pad :iso10126)
         (fact (encrypt pt @cm) => ciphertext)

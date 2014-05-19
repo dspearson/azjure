@@ -2,11 +2,7 @@
   (:require [azjure.libtest :refer :all]))
 
 (def ^{:private true :doc "Configuration Map"} cm
-  (atom {:type :aes
-         :mode :ecb
-         :pad  :x923
-         :eid  :str
-         :doe  :str}))
+  (atom {:type :aes :eid :str :doe :str}))
 
 (def ^{:doc "128-bit AES test vector key as defined in Appendix C.1 in
   http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf"}

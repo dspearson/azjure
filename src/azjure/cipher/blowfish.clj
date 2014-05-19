@@ -6,7 +6,7 @@
 
 (def ^{:private true
        :doc     "Vector of valid key sizes in bits"}
-  key-sizes (vec (range 4 57)))
+  key-sizes (vec (range 32 449)))
 
 (def ^{:private true
        :doc     "Block size in bits"}
