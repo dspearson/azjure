@@ -6,3 +6,4 @@ api
 pom.xml
 pom.xml.asc
 version.clj
+azjure.version.html
