@@ -9,5 +9,6 @@
                     [padders :refer :all])
             (azjure.cipher [aes :refer :all]
                            [blowfish :refer :all]
+                           [cast5 :refer :all]
                            [twofish :refer :all])
             [midje.repl :refer :all]))
