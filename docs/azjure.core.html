@@ -3028,9 +3028,10 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.core" name="azjure.core"><h1 class="project-name">azjure.core</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Core Azjure API for encryption/decryption.</p>
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.core" name="azjure.core"><h1 class="project-name">azjure.core</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Core Azjure API for encryption/decryption.</p>
 
-<p>  See the <a href="https://github.com/CraZySacX/azjure">azjure</a> homepage for more detailed usage information.</p>
+<p>  See the <a href="https://crazysacx.github.io/azjure">azjure</a> homepage for more detailed usage information.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.core
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.cipher :refer :all]
@@ -3062,12 +3063,12 @@ use. See <a href="azjure.modes.html">azjure.modes</a> for supported values.</li>
 <a href="azjure.padders.html">azjure.padders</a> for supported values.</li>
 <li><strong>eid</strong> - A keyword that represents the encryption input decoder you wish to
 use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
-<li><strong>eoe</strong> - A keyword that represents the encryption output encoder you wish to
-use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
+<li><strong>eoe</strong> - A keyword that represents the encryption output encoder you wish
+to use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
 <li><strong>did</strong> - A keyword that represents the decryption input decoder you wish to
 use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
-<li><strong>doe</strong> - A keyword that represents the decryption output encoder you wish to
-use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
+<li><strong>doe</strong> - A keyword that represents the decryption output encoder you wish
+to use. See <a href="azjure.encoders.html">azjure.encoders</a> for supported values.</li>
 <li><strong>key</strong> - A vector of unsigned bytes (0-255) of the appropriate length that
 represents the key you wish to use with the cipher.</li>
 <li><strong>iv</strong> - A vector of unsigned bytes (0-255) of the appropriate length that
