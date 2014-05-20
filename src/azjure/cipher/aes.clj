@@ -332,13 +332,13 @@
 (defn- rotate-word
   "Rotate a word with the given left and right shift.
 
-  If lshift is larger, the word will be rotated left.
-  If rshift is larger, the word will be rotated right.
-
-  If either argument is 0, no shift will occur and the function will evaluate
+  * If *lshift* is larger, the word will be rotated left.
+  * If *rshift* is larger, the word will be rotated right.
+  * If either argument is 0, no shift will occur and the function will evaluate
   to the given word.
 
   Valid shift values are multiples of 8 from 0 to 32 inclusive."
+  {:added "0.2.0"}
   [word lshift rshift]
   (if (or (zero? lshift) (zero? rshift))
     word
@@ -346,7 +346,7 @@
             (bit-shift-right (bit-and word (mask rshift)) rshift))))
 
 (defn- mod-shiftfn
-  "Shift mode 4 for word length shifting"
+  "Shift mod 4 for word length shifting"
   [s]
   (mod s 4))
 
@@ -606,20 +606,27 @@
   1. Get the lower and upper bounds for the key schedule.
   2. Grab the key material out of the key schedule.
   3. If the current round is 0
-     a. Add the key material to the state.
-  4. If the current round is less than nr
-     a. Do S-box substitution on the state.
-     b. Shift the state rows.
-     c. Mix the state columns.
-     d. Add the key material to the state.
-  5. Else the current round is equal to nr
-     a. Do S-box substitution on the state.
-     b. Shift the state rows.
-     c. Add the key material to the state.
 
-   Evaluates to a function over teh given key an number of rounds.
+      > 1. Add the key material to the state.
+
+  4. If the current round is less than nr
+
+      > 1. Do S-box substitution on the state.
+      > 2. Shift the state rows.
+      > 3. Mix the state columns.
+      > 4. Add the key material to the state.
+
+  5. Else the current round is equal to nr
+
+      > 1. Do S-box substitution on the state.
+      > 2. Shift the state rows.
+      > 3. Add the key material to the state.
+
+   Evaluates to a function over the given key and number of rounds.
 
    The function takes the state and current round number."
+  {:added "0.2.0"
+   :doc-private true}
   [ks nr]
   (fn [state round]
     (let [next (inc round)
@@ -643,20 +650,26 @@
   1. Get the lower and upper bounds for the key schedule.
   2. Grab the key material out of the key schedule.
   3. If the current round is equal to nr:
-     a. Add the key material to the state.
+
+      > 1. Add the key material to the state.
+
   4. If the current is greater than 0:
-     a. Shift the state rows.
-     b. Do S-box substitution on the state.
-     c. Add the key material to the state.
-     d. Mix the state columns.
+
+      > 1. Shift the state rows.
+      > 2. Do S-box substitution on the state.
+      > 3. Add the key material to the state.
+      > 4. Mix the state columns.
+
   5. Else the current round is 0:
-     a. Shift the state rows.
-     b. Do S-box substitution on the state.
-     c. Add the key material to the state.
+      > 1. Shift the state rows.
+      > 2. Do S-box substitution on the state.
+      > 3. Add the key material to the state.
 
   Evaluates to a function over the given key and number of rounds.
 
   The function takes the state and current round number."
+  {:added "0.2.0"
+   :doc-private true}
   [ks nr]
   (fn [state round]
     (let [next (inc round)
@@ -678,11 +691,12 @@
   "Process a vector of 16 byte values (one 128-bit block) for encryption or
   decryption.
 
-  1. block: A vector of 16 byte values representing a block of 4 words.
-  2. key: A 4, 6, or 8 word vector representing a 128, 192, or 256 bit key.
-  3. enc: true if you are encrypting, false if you are decrypting.
+  1. *block*: A vector of 16 byte values representing a block of 4 words.
+  2. *key*: A 4, 6, or 8 word vector representing a 128, 192, or 256 bit key.
+  3. *enc*: true if you are encrypting, false if you are decrypting.
 
   Evaluates to a vector of bytes."
+  {:added "0.2.0"}
   [block {:keys [ks nk enc] :as m}]
   {:pre [(contains? m :ks)
          (contains? m :nk)
