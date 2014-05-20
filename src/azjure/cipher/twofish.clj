@@ -476,12 +476,13 @@
     (let [[f0 f1] (f [w2 w3] initmap round)]
       (reduce conj [w2 w3] [(bit-xor (<<< w0 1) f0) (>>> (bit-xor f1 w1) 1)]))))
 
-(defn- twofish-encryption
+(defn- cipher
   "Encrypt the given block with the given key.
 
   Evaluates to a vector of four 32-bit words that represent the ciphertext of
   the block."
-  {:added "0.2.0"}
+  {:added "0.2.0"
+   :doc-private true}
   [block {:keys [ks] :as initmap}]
   (mapv reverse-bytes
         (whiten
@@ -492,7 +493,7 @@
                ((juxt last first))
                (reduce into [])) ks 4)))
 
-(defn- twofish-decryption
+(defn- inverse-cipher
   "Decrypt the given block with the given key.
 
   Evaluates to a vector of four 32-bit words that represent the plaintext of
@@ -519,7 +520,7 @@
           (= 40 (count (:ks initmap)))
           (> (count (:sv initmap)) 1)
           (< (count (:sv initmap)) 5)]}
-   (let [encfn (if enc twofish-encryption twofish-decryption)]
+   (let [encfn (if enc cipher inverse-cipher)]
      (->> (encfn (mapv bytes-word (partition 4 block)) initmap)
           (mapv word-bytes)
           (reduce into)))))

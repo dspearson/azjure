@@ -644,7 +644,7 @@
             (shift-rows
               (sub-bytes state false) false) km))))))
 
-(defn- inv-cipher
+(defn- inverse-cipher
   "The AES decryption cipher
 
   1. Get the lower and upper bounds for the key schedule.
@@ -711,7 +711,7 @@
              (= 8 (:nk m)))
          (= 16 (count block))]}
   (let [nr (+ nk 6)
-        encfn (if enc cipher inv-cipher)
+        encfn (if enc cipher inverse-cipher)
         rv (if enc (range (inc nr)) (range nr -1 -1))
         block (mapv bytes-word (partition 4 block))]
     (->> (reduce (encfn ks nr) block rv)

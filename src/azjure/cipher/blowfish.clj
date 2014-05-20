@@ -230,7 +230,7 @@
         r (bit-xor (roundfn l ks) right)]
     [r l ks]))
 
-(defn- blowfish
+(defn- cipher
   "The Blowfish cipher.
 
   *[left right]* - A vector of two 32-bit words
@@ -273,7 +273,7 @@
   {:added "0.2.0"}
   [subkey]
   (fn [[_ _ ks :as all] idx]
-    (let [enc (blowfish all true)
+    (let [enc (cipher all true)
           nval (assoc (assoc (subkey ks) idx (first enc)) (inc idx) (last enc))]
       (conj enc (assoc ks subkey nval)))))
 
@@ -322,7 +322,7 @@
   {:added "0.2.0"}
   [block {:keys [enc] :as ks}]
   (let [block (mapv bytes-word (partition 4 block))]
-    (reduce into (mapv word-bytes (blowfish (conj block ks) enc)))))
+    (reduce into (mapv word-bytes (cipher (conj block ks) enc)))))
 
 (defmethod initialize :blowfish [m]
   (conj m (generate-subkeys (:key m))))
