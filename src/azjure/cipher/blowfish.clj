@@ -1,4 +1,8 @@
 (ns azjure.cipher.blowfish
+  "Blowfish Cipher
+
+  Implement to meet the spec at https://www.schneier.com/blowfish.html"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
@@ -229,9 +233,10 @@
 (defn- blowfish
   "The Blowfish cipher.
 
-  * [left right] - A vector of two 32-bit words
+  *[left right]* - A vector of two 32-bit words
   representing a 64-bit block.
-  * enc - True if encrypting, false if decrypting.
+
+  *enc* - True if encrypting, false if decrypting.
 
   This function applies the feistel-round above for 16 rounds.
   The result of the feistel rounds is then xor'd with either the
@@ -246,7 +251,8 @@
 
   Evaluates to a vector of two 32-bit words representing
   the encrypted or decrypted 64-bit block."
-  {:added "0.2.0"}
+  {:added "0.2.0"
+   :doc-private true}
   [[_ _ ks :as all] enc]
   (let [r (if enc (range 0 16) (range 17 1 -1))
         li (if enc 17 0)
@@ -305,10 +311,11 @@
 
 (defn- process-block
   "Process a block for encryption or decryption.
-  1. block<: A vector of two 32-bit words representing a block.
-  2. key: A vector of 4 to 56 bytes representing a
+
+  1. *block*: A vector of two 32-bit words representing a block.
+  2. *key*: A vector of 4 to 56 bytes representing a
   key of 32 to 448 bits in 8-bit intervals.
-  3. enc: true if you are encrypting the block, false
+  3. *enc*: true if you are encrypting the block, false
   if you are decrypting the block.
 
   Evaluates to a vector of two 32-bit words."

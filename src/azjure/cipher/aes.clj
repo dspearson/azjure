@@ -1,7 +1,7 @@
 (ns azjure.cipher.aes
   "AES Cipher
 
-  Defined to meet the spec at
+  Implemented to meet the spec at
   http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf"
   {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
