@@ -1,4 +1,4 @@
-(ns ^{:no-doc true} user
+(ns user
   (:require [clojure.repl :refer :all]
             [clojure.pprint :refer (pprint)]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
@@ -8,5 +8,6 @@
                     [modes :refer :all]
                     [padders :refer :all])
             (azjure.cipher [aes :refer :all]
-                           [blowfish :refer :all])
+                           [blowfish :refer :all]
+                           [twofish :refer :all])
             [midje.repl :refer :all]))
