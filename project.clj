@@ -6,14 +6,15 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/math.numeric-tower "0.0.4"]
                  [org.ozias.cljlibs/logging "0.1.5"]]
+  :test-paths ["spec"]
   :profiles
   {:dev {:source-paths ["dev"]
-         :dependencies [[org.clojars.jozias/midje "1.6.3"]
-                        [org.clojure/tools.namespace "0.2.4"]
-                        [org.ozias.cljlibs/scm "0.1.3"]]
+         :dependencies [[org.clojure/tools.namespace "0.2.4"]
+                        [org.ozias.cljlibs/scm "0.1.3"]
+                        [speclj "3.0.2"]]
          :plugins      [[lein-marginalia "0.7.1"]
-                        [lein-midje "3.1.3"]
-                        [org.ozias.plugins/lein-git-version "1.1.3"]]
+                        [org.ozias.plugins/lein-git-version "1.1.3"]
+                        [speclj "3.0.2"]]
          :aliases      {"package"   ["do" "clean," "install"]
                         "slamhound" ["run" "-m" "slam.hound"]
                         "doc"       ["marg" "-m" "-v" "0.2.0"]
@@ -39,5 +40,6 @@
      :creds :gpg}]]
   :scm {:name "git"
         :url  "https://github.com/CraZySacX/azjure"}
+
   :manifest {"Implementation-Version" "0.2.0-SNAPSHOT"}
   :git-version {:file {:assoc-in-keys [[:manifest "Implementation-Version"]]}})

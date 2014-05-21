@@ -1,8 +1,7 @@
 (ns azjure.libtest
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
-            [azjure.core :refer :all]
-            [midje.sweet :refer :all]))
+            [azjure.core :refer :all]))
 
 (def ^{:doc "64-bit vector of 0's"} zeros-64-bits (vec (take 8 (repeat 0))))
 

@@ -18,7 +18,7 @@
   block-size 128)
 
 (def ^{:private true
-       :doc "S-box used during key schedule and MDS creation.
+       :doc     "S-box used during key schedule and MDS creation.
 
   Using a byte value as an index into the sbox generates a byte value output"}
   q0 [0xA9 0x67 0xB3 0xE8 0x04 0xFD 0xA3 0x76
@@ -55,7 +55,7 @@
       0x6F 0x9D 0x36 0x42 0x4A 0x5E 0xC1 0xE0])
 
 (def ^{:private true
-       :doc "S-box used during key schedule and MDS creation.
+       :doc     "S-box used during key schedule and MDS creation.
 
   Using a byte value as an index into the sbox generates a byte value output"}
   q1 [0x75 0xF3 0xC6 0xF4 0xDB 0x7B 0xFB 0xC8
@@ -126,9 +126,9 @@
        :doc     "Vector of q constants (0 or 1) used to identify which q S-box
        to use above when substituting a value."}
   qvec3 [(bit-xor (nth qvec1 0) 1)
-            (bit-xor (nth qvec1 1) 1)
-            (bit-xor (nth qvec1 2) 1)
-            (bit-xor (nth qvec1 3) 1)])
+         (bit-xor (nth qvec1 1) 1)
+         (bit-xor (nth qvec1 2) 1)
+         (bit-xor (nth qvec1 3) 1)])
 
 (def ^{:private true
        :doc     "Vector of q constants (0 or 1) used to identify which q S-box
@@ -146,7 +146,7 @@
   (if (zero? qconst) q0 q1))
 
 (def ^{:private true
-       :doc "Memoization of getqfn"}
+       :doc     "Memoization of getqfn"}
   getq (memoize getqfn))
 
 (defn- ax
@@ -319,7 +319,7 @@
   (reduce mdsround [] (range 256)))
 
 (def ^{:private true
-       :doc "Memoization of mds"}
+       :doc     "Memoization of mds"}
   mds (memoize mdsfn))
 
 (defn- boddsfn
@@ -367,11 +367,11 @@
       (vec)))
 
 (def ^{:private true
-       :doc "Parital that will grab evens from a collection"}
+       :doc     "Parital that will grab evens from a collection"}
   evens (partial take-nth 2))
 
 (def ^{:private true
-       :doc "Comp that will grab odds from a collection"}
+       :doc     "Comp that will grab odds from a collection"}
   odds (comp evens rest))
 
 (defn- memofn
@@ -385,22 +385,22 @@
   ((juxt evens odds) (mapv reverse-bytes key)))
 
 (def ^{:private true
-       :doc "Memoization of memofn"}
+       :doc     "Memoization of memofn"}
   memo (memoize memofn))
 
 (defn- pad-key
   "Pad the given key to the next appropriate key size"
   {:added "0.2.0"}
   [key]
-   {:pre [(vector? key)
-          (> (count key) 15)
-          (< (count key) 33)]}
-   (let [len (count key)]
-     (if (or (= len 16) (= len 24) (= len 32))
-       key
-       (if (< len 24)
-         (into key (take (- 24 len) (cycle [0])))
-         (into key (take (- 32 len) (cycle [0])))))))
+  {:pre [(vector? key)
+         (> (count key) 15)
+         (< (count key) 33)]}
+  (let [len (count key)]
+    (if (or (= len 16) (= len 24) (= len 32))
+      key
+      (if (< len 24)
+        (into key (take (- 24 len) (cycle [0])))
+        (into key (take (- 32 len) (cycle [0])))))))
 
 (defn- expand-key
   "Expand the key into the subkey vector and the S-box values
@@ -481,7 +481,7 @@
 
   Evaluates to a vector of four 32-bit words that represent the ciphertext of
   the block."
-  {:added "0.2.0"
+  {:added       "0.2.0"
    :doc-private true}
   [block {:keys [ks] :as initmap}]
   (mapv reverse-bytes
@@ -511,7 +511,7 @@
 
 (defn- process-block
   "Process the given vector of bytes using the values given in the initmap."
-  ([block {:keys [enc] :as initmap}]
+  [block {:keys [enc] :as initmap}]
    {:pre [(contains? initmap :ks)
           (contains? initmap :sv)
           (contains? initmap :enc)
@@ -523,7 +523,7 @@
    (let [encfn (if enc cipher inverse-cipher)]
      (->> (encfn (mapv bytes-word (partition 4 block)) initmap)
           (mapv word-bytes)
-          (reduce into)))))
+          (reduce into))))
 
 (defmethod initialize :twofish [m]
   (conj m (expand-key (:key m))))
