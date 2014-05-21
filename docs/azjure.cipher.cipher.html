@@ -3050,9 +3050,11 @@ assumed.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.cipher
   {:author &quot;Jason Ozias&quot;})</pre></td></tr><tr><td class="docs"><h3>initialize</h3>
 
-<p>  Takes a configuration map as defined in <a href="azjure.core.html">azjure.core</a>.  Any
-  information needed during encryption/decryption (such as key schedules)
-  should be assoc'd into the configuration map during initialization.</p>
+<p>  Takes a configuration map as defined in <a href="azjure.core.html">azjure.core</a> as the argument.</p>
+
+<p>  Ciphers implementing this method should assoc any information needed during
+  encryption/decryption (such as key schedules) into the configuration map
+  during initialization.</p>
 
 <p>  This function should evaluate to the configuration map with any additional
   information assoc'd into it.</p>
@@ -3061,7 +3063,7 @@ assumed.</p>
            :added    &quot;0.2.0&quot;}
           :type)</pre></td></tr><tr><td class="docs"><h3>keysizes-bits</h3>
 
-<p>  The cipher implementing this multimethod should return a vector of values
+<p>  Ciphers implementing this multimethod should return a vector of values
   representing the key sizes (in bits) supported by the cipher.</p>
 
 <p>  For example, AES supports key sizes of 128, 192, and 256 bits.  This function
