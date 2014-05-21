@@ -3047,7 +3047,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Using a byte value as an index into the sbox generates a byte value output</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   q0 [0xA9 0x67 0xB3 0xE8 0x04 0xFD 0xA3 0x76
       0x9A 0x92 0x80 0x78 0xE4 0xDD 0xD1 0x38
       0x0D 0xC6 0x35 0x98 0x18 0xF7 0xEC 0x6C
@@ -3083,7 +3083,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Using a byte value as an index into the sbox generates a byte value output</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   q1 [0x75 0xF3 0xC6 0xF4 0xDB 0x7B 0xFB 0xC8
       0x4A 0xD3 0xE6 0x6B 0x45 0x7D 0xE8 0x4B
       0xD6 0x32 0xD8 0xFD 0x37 0x71 0xF1 0xE1
@@ -3146,9 +3146,9 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   qvec3 [(bit-xor (nth qvec1 0) 1)
-            (bit-xor (nth qvec1 1) 1)
-            (bit-xor (nth qvec1 2) 1)
-            (bit-xor (nth qvec1 3) 1)])</pre></td></tr><tr><td class="docs"><p>Vector of q constants (0 or 1) used to identify which q S-box
+         (bit-xor (nth qvec1 1) 1)
+         (bit-xor (nth qvec1 2) 1)
+         (bit-xor (nth qvec1 3) 1)])</pre></td></tr><tr><td class="docs"><p>Vector of q constants (0 or 1) used to identify which q S-box
        to use above when substituting a value.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
@@ -3161,7 +3161,7 @@ net.brehaut.ClojureTools = (function (SH) {
   [qconst]
   (if (zero? qconst) q0 q1))</pre></td></tr><tr><td class="docs"><p>Memoization of getqfn</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   getq (memoize getqfn))</pre></td></tr><tr><td class="docs"><p>Calculates αx for a byte</p>
 
 <p>  Evaluates to a byte</p>
@@ -3301,7 +3301,7 @@ net.brehaut.ClojureTools = (function (SH) {
   []
   (reduce mdsround [] (range 256)))</pre></td></tr><tr><td class="docs"><p>Memoization of mds</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   mds (memoize mdsfn))</pre></td></tr><tr><td class="docs"><p>Calculate a temp vector of words used during the even and odd subkey
   generation</p>
 
@@ -3338,10 +3338,10 @@ net.brehaut.ClojureTools = (function (SH) {
       (interleave (odd-subkeys mds memo))
       (vec)))</pre></td></tr><tr><td class="docs"><p>Parital that will grab evens from a collection</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   evens (partial take-nth 2))</pre></td></tr><tr><td class="docs"><p>Comp that will grab odds from a collection</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   odds (comp evens rest))</pre></td></tr><tr><td class="docs"><p>Split the key into evens (M<sub>e</sub>) and odds (M<sub>o</sub>) after the
   bytes have been reversed</p>
 
@@ -3352,20 +3352,20 @@ net.brehaut.ClojureTools = (function (SH) {
   [key]
   ((juxt evens odds) (mapv reverse-bytes key)))</pre></td></tr><tr><td class="docs"><p>Memoization of memofn</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
+       :doc     }
   memo (memoize memofn))</pre></td></tr><tr><td class="docs"><p>Pad the given key to the next appropriate key size</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- pad-key
   {:added &quot;0.2.0&quot;}
   [key]
-   {:pre [(vector? key)
-          (&gt; (count key) 15)
-          (&lt; (count key) 33)]}
-   (let [len (count key)]
-     (if (or (= len 16) (= len 24) (= len 32))
-       key
-       (if (&lt; len 24)
-         (into key (take (- 24 len) (cycle [0])))
-         (into key (take (- 32 len) (cycle [0])))))))</pre></td></tr><tr><td class="docs"><p>Expand the key into the subkey vector and the S-box values</p>
+  {:pre [(vector? key)
+         (&gt; (count key) 15)
+         (&lt; (count key) 33)]}
+  (let [len (count key)]
+    (if (or (= len 16) (= len 24) (= len 32))
+      key
+      (if (&lt; len 24)
+        (into key (take (- 24 len) (cycle [0])))
+        (into key (take (- 32 len) (cycle [0])))))))</pre></td></tr><tr><td class="docs"><p>Expand the key into the subkey vector and the S-box values</p>
 
 <p>  Evaluates to a map of two vectors. The <em>:ks</em> entry contains the key schedule.
   The <em>:sv</em> entry contains the S-box values.</p>
@@ -3436,7 +3436,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Evaluates to a vector of four 32-bit words that represent the ciphertext of
   the block.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- cipher
-  {:added &quot;0.2.0&quot;
+  {:added       &quot;0.2.0&quot;
    :doc-private true}
   [block {:keys [ks] :as initmap}]
   (mapv reverse-bytes
@@ -3462,7 +3462,7 @@ net.brehaut.ClojureTools = (function (SH) {
                        (reduce into []))
                   (range 15 -1 -1)) ks)))</pre></td></tr><tr><td class="docs"><p>Process the given vector of bytes using the values given in the initmap.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-block
-  ([block {:keys [enc] :as initmap}]
+  [block {:keys [enc] :as initmap}]
    {:pre [(contains? initmap :ks)
           (contains? initmap :sv)
           (contains? initmap :enc)
@@ -3474,7 +3474,7 @@ net.brehaut.ClojureTools = (function (SH) {
    (let [encfn (if enc cipher inverse-cipher)]
      (-&gt;&gt; (encfn (mapv bytes-word (partition 4 block)) initmap)
           (mapv word-bytes)
-          (reduce into)))))</pre></td></tr><tr><td class="docs">
+          (reduce into))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod initialize :twofish [m]
   (conj m (expand-key (:key m))))
 (defmethod keysizes-bits :twofish [_] key-sizes)
