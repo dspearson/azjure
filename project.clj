@@ -11,7 +11,7 @@
   {:dev {:source-paths ["dev"]
          :dependencies [[org.clojure/tools.namespace "0.2.4"]
                         [org.ozias.cljlibs/scm "0.1.3"]
-                        [speclj "3.0.2"]]
+                        [org.clojars.jozias/speclj "3.0.2"]]
          :plugins      [[lein-marginalia "0.7.1"]
                         [org.ozias.plugins/lein-git-version "1.1.3"]
                         [speclj "3.0.2"]]
