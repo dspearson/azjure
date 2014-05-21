@@ -3028,21 +3028,30 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.cast5" name="azjure.cipher.cast5"><h1 class="project-name">azjure.cipher.cast5</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>CAST5 Cipher</p>
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.cast5" name="azjure.cipher.cast5"><h1 class="project-name">azjure.cipher.cast5</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>CAST5 Cipher</h2>
 
-<p>  Implemented to meet the spec at [http://tools.ietf.org/html/rfc2144] [spec]</p>
+<p>  Implemented to meet the spec at <a href="http://tools.ietf.org/html/rfc2144">http://tools.ietf.org/html/rfc2144</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.cast5
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
-            [azjure.libmod :refer :all]))</pre></td></tr><tr><td class="docs"><p>Vector of valid key sizes in bits</p>
+            [azjure.libmod :refer :all]))</pre></td></tr><tr><td class="docs"><h4>key-sizes</h4>
+
+<p>  CAST5 supports keys of 40 to 128 bits inclusive in 8-bit steps.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
-  key-sizes (vec (range 40 129)))</pre></td></tr><tr><td class="docs"><p>Block size in bits</p>
+  key-sizes (vec (range 40 129 8)))</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
+
+<p>  CAST5 operates on 64-bit blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
-  block-size 64)</pre></td></tr><tr><td class="docs"><p>S-box 1</p>
+  block-size 64)</pre></td></tr><tr><td class="docs"><h4>s1</h4>
+
+<p>  Substitution box used in the round function.</p>
+
+<p>  Each S-box is a vector of 256 32-bit words for a total of 1KiB of data each</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s1
@@ -3082,7 +3091,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0xf881814c 0x474d6ad7 0x7c0c5e5c 0xd1231959 0x381b7298 0xf5d2f4db 0xab838653
    0x6e2f1e23 0x83719c9e 0xbd91e046 0x9a56456e 0xdc39200c 0x20c8c571 0x962bda1c
    0xe1e696ff 0xb141ab08 0x7cca89b9 0x1a69e783 0x02cc4843 0xa2f7c579 0x429ef47d
-   0x427b169c 0x5ac9f049 0xdd8f0f00 0x5c8165bf])</pre></td></tr><tr><td class="docs"><p>S-box 2</p>
+   0x427b169c 0x5ac9f049 0xdd8f0f00 0x5c8165bf])</pre></td></tr><tr><td class="docs"><h4>s2</h4>
+
+<p>  Substitution box used in the round function</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s2
@@ -3122,7 +3133,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0x0ae6d249 0xb284600c 0xd835731d 0xdcb1c647 0xac4c56ea 0x3ebd81b3 0x230eabb0
    0x6438bc87 0xf0b5b1fa 0x8f5ea2b3 0xfc184642 0x0a036b7a 0x4fb089bd 0x649da589
    0xa345415e 0x5c038323 0x3e5d3bb9 0x43d79572 0x7e6dd07c 0x06dfdf1e 0x6c6cc4ef
-   0x7160a539 0x73bfbe70 0x83877605 0x4523ecf1])</pre></td></tr><tr><td class="docs"><p>S-box 3</p>
+   0x7160a539 0x73bfbe70 0x83877605 0x4523ecf1])</pre></td></tr><tr><td class="docs"><h4>s3</h4>
+
+<p>  Substitution box used in the round function</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s3
@@ -3162,7 +3175,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0x60543a49 0x5727c148 0x2be98a1d 0x8ab41738 0x20e1be24 0xaf96da0f 0x68458425
    0x99833be5 0x600d457d 0x282f9350 0x8334b362 0xd91d1120 0x2b6d8da0 0x642b1e31
    0x9c305a00 0x52bce688 0x1b03588a 0xf7baefd5 0x4142ed9c 0xa4315c11 0x83323ec5
-   0xdfef4636 0xa133c501 0xe9d3531c 0xee353783])</pre></td></tr><tr><td class="docs"><p>S-box 4</p>
+   0xdfef4636 0xa133c501 0xe9d3531c 0xee353783])</pre></td></tr><tr><td class="docs"><h4>s4</h4>
+
+<p>  Substitution box used in the round function</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s4
@@ -3202,7 +3217,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0x9266beab 0xb5676e69 0x9bd3ddda 0xdf7e052f 0xdb25701c 0x1b5e51ee 0xf65324e6
    0x6afce36c 0x0316cc04 0x8644213e 0xb7dc59d0 0x7965291f 0xccd6fd43 0x41823979
    0x932bcdf6 0xb657c34d 0x4edfd282 0x7ae5290c 0x3cb9536b 0x851e20fe 0x9833557e
-   0x13ecf0b0 0xd3ffb372 0x3f85c5c1 0x0aef7ed2])</pre></td></tr><tr><td class="docs"><p>S-box 5</p>
+   0x13ecf0b0 0xd3ffb372 0x3f85c5c1 0x0aef7ed2])</pre></td></tr><tr><td class="docs"><h4>s5</h4>
+
+<p>  Substitution box used during key schedule generation</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s5
@@ -3242,7 +3259,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0x5346aba0 0x5ce96c28 0xe176eda3 0x6bac307f 0x376829d2 0x85360fa9 0x17e3fe2a
    0x24b79767 0xf5a96b20 0xd6cd2595 0x68ff1ebf 0x7555442c 0xf19f06be 0xf9e0659a
    0xeeb9491d 0x34010718 0xbb30cab8 0xe822fe15 0x88570983 0x750e6249 0xda627e55
-   0x5e76ffa8 0xb1534546 0x6d47de08 0xefe9e7d4])</pre></td></tr><tr><td class="docs"><p>S-box 6</p>
+   0x5e76ffa8 0xb1534546 0x6d47de08 0xefe9e7d4])</pre></td></tr><tr><td class="docs"><h4>s6</h4>
+
+<p>  Substitution box used during key schedule generation</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s6
@@ -3282,7 +3301,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0xb8e5a121 0xb81a928a 0x60ed5869 0x97c55b96 0xeaec991b 0x29935913 0x01fdb7f1
    0x088e8dfa 0x9ab6f6f5 0x3b4cbf9f 0x4a5de3ab 0xe6051d35 0xa0e1d855 0xd36b4cf1
    0xf544edeb 0xb0e93524 0xbebb8fbd 0xa2d762cf 0x49c92f54 0x38b5f331 0x7128a454
-   0x48392905 0xa65b1db8 0x851c97bd 0xd675cf2f])</pre></td></tr><tr><td class="docs"><p>S-box 7</p>
+   0x48392905 0xa65b1db8 0x851c97bd 0xd675cf2f])</pre></td></tr><tr><td class="docs"><h4>s7</h4>
+
+<p>  Substitution box used during key schedule generation</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s7
@@ -3322,7 +3343,9 @@ net.brehaut.ClojureTools = (function (SH) {
    0x1cb8d647 0x97fd61a9 0xea7759f4 0x2d57539d 0x569a58cf 0xe84e63ad 0x462e1b78
    0x6580f87e 0xf3817914 0x91da55f4 0x40a230f3 0xd1988f35 0xb6e318d2 0x3ffa50bc
    0x3d40f021 0xc3c0bdae 0x4958c24c 0x518f36b2 0x84b1d370 0x0fedce83 0x878ddada
-   0xf2a279c7 0x94e01be8 0x90716f4b 0x954b8aa3])</pre></td></tr><tr><td class="docs"><p>S-box 8</p>
+   0xf2a279c7 0x94e01be8 0x90716f4b 0x954b8aa3])</pre></td></tr><tr><td class="docs"><h4>s8</h4>
+
+<p>  Substitution box used during key schedule generation</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
   s8
@@ -3362,31 +3385,35 @@ net.brehaut.ClojureTools = (function (SH) {
    0x350d8384 0x5938fa0f 0x42399ef3 0x36997b07 0x0e84093d 0x4aa93e61 0x8360d87b
    0x1fa98b0c 0x1149382c 0xe97625a5 0x0614d1b7 0x0e25244b 0x0c768347 0x589e8d82
    0x0d2059d1 0xa466bb1e 0xf8da0a82 0x04f19130 0xba6e4ec0 0x99265164 0x1ee7230d
-   0x50b2ad80 0xeaee6801 0x8db2a283 0xea8bf59e])</pre></td></tr><tr><td class="docs"><p>get-bytes take a value from 1 to 4 with 4 representing the
-  most significant byte and 1 representing the least.</p>
+   0x50b2ad80 0xeaee6801 0x8db2a283 0xea8bf59e])</pre></td></tr><tr><td class="docs"><h3>flipfn</h3>
 
-<p>  The bytes in the CAST5 spec are indexed from 0 to 3, with
-  0 representing the most significant byte and 3 representinng
-  the least.</p>
+<p>  <code>get-bytes</code> take a value from 1 to 4 with 4 representing the most
+  significant byte and 1 representing the least.</p>
+
+<p>  The bytes in the CAST5 spec are indexed from 0 to 3, with 0 representing the
+  most significant byte and 3 representing the least.</p>
 
 <p>  This function flips the spec index into the get-bytes index.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- flipfn
   {:added &quot;0.2.0&quot;}
   [idx]
-  (- 4 idx))</pre></td></tr><tr><td class="docs"><p>Memoization of flip</p>
+  (- 4 idx))</pre></td></tr><tr><td class="docs"><h3>flip</h3>
+
+<p>  Memoization of flipfn</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
-  flip (memoize flipfn))</pre></td></tr><tr><td class="docs"><p>Takes a 32-bit word and a vector of indexes into each byte
-  of the word (0 to 3).</p>
+  flip (memoize flipfn))</pre></td></tr><tr><td class="docs"><h3>get-bytes</h3>
+
+<p>  Takes a 32-bit word and a vector of indexes into each byte of the word (0
+  to 3).</p>
 
 <pre><code>  (get-bytes 0x01020304 [1 3 0 2])
 </code></pre>
 
 <p>  evaluates to</p>
 
-<blockquote>
-  <p>[0x02 0x04 0x01 0x03]</p>
-</blockquote>
+<pre><code>  [0x02 0x04 0x01 0x03]
+</code></pre>
 
 <p>  Evaluates to a vector of 4 bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- get-bytes
@@ -3394,20 +3421,23 @@ net.brehaut.ClojureTools = (function (SH) {
   [kw order]
   (-&gt;&gt; order
        (mapv flip)
-       (mapv #(get-byte % kw))))</pre></td></tr><tr><td class="docs"><p>Represents the generation of one temp word from
-  [Section 2.4] [s2.4]</p>
+       (mapv #(get-byte % kw))))</pre></td></tr><tr><td class="docs"><h3>xor-line</h3>
+
+<p>  Represents the generation of one temp word from
+  <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
 
 <ul>
 <li><em>w1</em> - The base word.</li>
 <li><em>w2</em> - The seed word.  Individual bytes are pulled from this to
 use in the xor.</li>
-<li><em>[a b c d]</em> - The order to pull the bytes out of the seed word.</li>
+<li><em>order</em> - The order to pull the bytes out of the seed word.  This is a
+vector of 4 values from 0 to 3.</li>
 <li><em>w3</em> - The word to pull a byte from for the tail of the xor.</li>
 <li><em>fsbox</em> - The S-box to use for the tail substitution.</li>
-<li><p><em>idx</em> - The byte index to use in the tail word.</p>
-
-<p>Evaluates to a 32-bit word.</p></li>
+<li><em>idx</em> - The byte index to use in the tail word.</li>
 </ul>
+
+<p>Evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xor-line
   {:added &quot;0.2.0&quot;}
   [w1 w2 order w3 fsbox idx]
@@ -3419,19 +3449,20 @@ use in the xor.</li>
       (nth s6 (nth barr 1))
       (nth s7 (nth barr 2))
       (nth s8 (nth barr 3))
-      (nth fsbox lb))))</pre></td></tr><tr><td class="docs"><p>Generate 4 temporary 32-bit words for use in subkey generation.
-  Represents the generation of 4 temporary words from
-  [Section 2.4] [s2.4]</p>
+      (nth fsbox lb))))</pre></td></tr><tr><td class="docs"><h3>gen-words</h3>
+
+<p>  Generate 4 temporary 32-bit words for use in subkey generation. Represents
+  the generation of 4 temporary words from <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
 
 <ul>
-<li><em>words</em> - A vector of 4 32-bit words used in the generation
-of the 4 32-bit temporary words.</li>
-<li><p><em>[i0 i1 i2 i3 i4 i5]</em> - A vector of indexes (0-3) into the
-words vector to determine where the words are used in the temp word
-generation.  Note an index can appear more than once.</p>
-
-<p>Evaluates to a vector of 4 32-bit temporary words.</p></li>
+<li><em>words</em> - A vector of 4 32-bit words used in the generation of the 4
+32-bit temporary words.</li>
+<li><em>[i0 i1 i2 i3 i4 i5]</em> - A vector of indexes (0-3) into the words vector
+to determine where the words are used in the temp word generation.  Note an
+index can appear more than once.</li>
 </ul>
+
+<p>Evaluates to a vector of 4 32-bit temporary words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- gen-words
   {:added &quot;0.2.0&quot;}
   [words [i0 i1 i2 i3 i4 i5]]
@@ -3441,19 +3472,21 @@ generation.  Note an index can appear more than once.</p>
         ow1 (xor-line (nth words i2) ow0 [0 2 1 3] down s8 2)
         ow2 (xor-line (nth words i3) ow1 [3 2 1 0] down s5 1)
         ow3 (xor-line (nth words i4) ow2 [2 1 3 0] down s6 3)]
-    [ow0 ow1 ow2 ow3]))</pre></td></tr><tr><td class="docs"><p>Generate one subkey word (K<sub>1</sub>) as defined at
-  [Section 2.4] [s2.4]</p>
+    [ow0 ow1 ow2 ow3]))</pre></td></tr><tr><td class="docs"><h3>gen-subkey-word</h3>
+
+<p>  Generate one subkey word (K<sub>1</sub>) as defined at
+  <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
 
 <ul>
-<li><em>[a b c d e]</em> - A vector of indexes into the given words.
-a and b are pulled from w0, c and d are pulled from w1 and e is pulled
-from the tail bytes.</li>
+<li><em>[a b c d e]</em> - A vector of indexes into the given words. <code>a</code> and <code>b</code> are
+pulled from <code>w0</code>, <code>c</code> and <code>d</code> are pulled from <code>w1</code> and <code>e</code> is pulled from
+the tail bytes.</li>
 <li><em>w0</em> - The first word to pull bytes from</li>
 <li><em>w1</em> - The second word to pull bytes from</li>
-<li><p><em>tail</em> - The vector of bytes representing the tail bytes</p>
-
-<p>Evaluates to a 32-bit word.</p></li>
+<li><em>tail</em> - The vector of bytes representing the tail bytes</li>
 </ul>
+
+<p>Evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- gen-subkey-word
   {:added &quot;0.2.0&quot;}
   [[a b c d e] w0 w1 tail]
@@ -3462,35 +3495,35 @@ from the tail bytes.</li>
     (nth s6 (get-byte (flip b) w0))
     (nth s7 (get-byte (flip c) w1))
     (nth s8 (get-byte (flip d) w1))
-    (nth tail e)))</pre></td></tr><tr><td class="docs"><p>Generate a vector of 4 bytes that are used as the tail
-  byte in the xor for each K generation.</p>
+    (nth tail e)))</pre></td></tr><tr><td class="docs"><h3>gen-tails</h3>
+
+<p>  Generate a vector of 4 bytes that are used as the tail byte in the xor for
+  each K generation.</p>
 
 <ul>
-<li><em>[a b c d]</em> - The index into each word to pull
-the byte from</li>
-<li><p><em>[w0 w1 w2 w3]</em> - The 4 32-bit words used in
-the subkey generation.  A tail byte come from each one.</p>
-
-<p>Evaluates to a vector of 4 bytes.</p></li>
+<li><em>[a b c d]</em> - The index into each word to pull the byte from</li>
+<li><em>[w0 w1 w2 w3]</em> - The 4 32-bit words used in the subkey generation.  A
+tail byte come from each one.</li>
 </ul>
+
+<p>Evaluates to a vector of 4 bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- gen-tails
   {:added &quot;0.2.0&quot;}
   [[a b c d] [w0 w1 w2 w3]]
   [(nth s5 (get-byte (flip a) w0))
    (nth s6 (get-byte (flip b) w1))
    (nth s7 (get-byte (flip c) w2))
-   (nth s8 (get-byte (flip d) w3))])</pre></td></tr><tr><td class="docs"><p>Get the tail bytes based on the current round of subkey
-  generation.  There are 4 unique tail patterns (repeated twice)
-  used during subkey generation.</p>
+   (nth s8 (get-byte (flip d) w3))])</pre></td></tr><tr><td class="docs"><h3>get-tails</h3>
+
+<p>  Get the tail bytes based on the current round of subkey generation.  There
+  are 4 unique tail patterns (repeated twice) used during subkey generation.</p>
 
 <ul>
-<li><em>[w0 w1 w2 w3]</em> - The temporary words used in the
-creation of the subkeys</li>
-<li><p><em>round</em> - The current round of subkeys being generated
-(0-3).</p>
-
-<p>Evaluates to a vector of 4 bytes.</p></li>
+<li><em>[w0 w1 w2 w3]</em> - The temporary words used in the creation of the subkeys</li>
+<li><em>round</em> - The current round of subkeys being generated (0-3).</li>
 </ul>
+
+<p>Evaluates to a vector of 4 bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- get-tails
   {:added &quot;0.2.0&quot;}
   [[w0 w1 w2 w3 :as words] round]
@@ -3498,18 +3531,19 @@ creation of the subkeys</li>
     0 (gen-tails [2 2 1 0] words)
     1 (gen-tails [0 1 3 3] [w2 w3 w0 w1])
     2 (gen-tails [1 0 2 2] [w2 w3 w0 w1])
-    3 (gen-tails [3 3 0 1] words)))</pre></td></tr><tr><td class="docs"><p>Generates a vector of 4 32-bit words representing 4 subkeys.
-  Note that round 1 and 4 use the same subkey word generation
-  pattern.  Round 2 and 3 use the same pattern.</p>
+    3 (gen-tails [3 3 0 1] words)))</pre></td></tr><tr><td class="docs"><h3>generate-subkey</h3>
+
+<p>  Generates a vector of 4 32-bit words representing 4 subkeys. Note that
+  round 1 and 4 use the same subkey word generation pattern.  Round 2 and 3
+  use the same pattern.</p>
 
 <ul>
-<li><em>[w0 w1 w2 w3]</em> - The 4 32-bit temporary words used
-for subkey generation.</li>
-<li><p><em>round</em> - The current subkey generation round.  There
-are 2 sets of 4 unique rounds.</p>
-
-<p>Evaluates to a vector of 4 32-bit words.</p></li>
+<li><em>[w0 w1 w2 w3]</em> - The 4 32-bit temporary words used for subkey generation.</li>
+<li><em>round</em> - The current subkey generation round.  There are 2 sets of 4
+unique rounds.</li>
 </ul>
+
+<p>Evaluates to a vector of 4 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- generate-subkey
   [[w0 w1 w2 w3 :as words] round]
   (let [rnd (mod round 4)
@@ -3522,25 +3556,27 @@ are 2 sets of 4 unique rounds.</p>
       (or (= rnd 1) (= rnd 2)) [(gen-subkey-word [3 2 0 1 0] w0 w3 tails)
                                 (gen-subkey-word [1 0 2 3 1] w0 w3 tails)
                                 (gen-subkey-word [3 2 0 1 2] w1 w2 tails)
-                                (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))</pre></td></tr><tr><td class="docs"><p>Generate enough key material to support the creation of the subkeys.
-  Note that the cycle generates the pattern of indexes into the
-  vector of 4 words that is described in the algorithm at
-  [Section 2.4] [s2.4]</p>
+                                (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))</pre></td></tr><tr><td class="docs"><h3>expand-key</h3>
 
-<p>  Evaluates to a vector of 8 vectors containing 4 32-bit words each.
-  These serve as input material for the generate-subkey function.</p>
+<p>  Generate enough key material to support the creation of the subkeys. Note
+  that the cycle generates the pattern of indexes into the vector of 4 words
+  that is described in the algorithm at <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
+
+<p>  Evaluates to a vector of 8 vectors containing 4 32-bit words each. These
+  serve as input material for the generate-subkey function.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- expand-key
   {:added &quot;0.2.0&quot;}
   [key]
   (subvec 1 (-&gt;&gt; (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
                  (take 8)
-                 (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))</pre></td></tr><tr><td class="docs"><p>Generates 32 32-bit words that make up the key schedule defined at
-  [Section 2.4] [s2.4]</p>
+                 (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))</pre></td></tr><tr><td class="docs"><h3>generate-subkeysfn</h3>
 
-<p>  K<sub>1</sub> to K<sub>16</sub> serve as the
-  masking keys (K<sub>m</sub>) for each cipher round.  K<sub>17</sub> to
-  K<sub>32</sub> serve as the rotate keys (K<sub>r</sub>) for each cipher
-  round</p>
+<p>  Generates 32 32-bit words that make up the key schedule defined at
+  <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
+
+<p>  K<sub>1</sub> to K<sub>16</sub> serve as the masking keys (K<sub>m</sub>)
+  for each cipher round.  K<sub>17</sub> to K<sub>32</sub> serve as the
+  rotate keys (K<sub>r</sub>) for each cipher round.</p>
 
 <p>  Evalutates to a vector of 32 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- generate-subkeysfn
@@ -3548,10 +3584,14 @@ are 2 sets of 4 unique rounds.</p>
   [key]
   (-&gt;&gt; (range 8)
        (mapv generate-subkey (expand-key key))
-       (reduce into)))</pre></td></tr><tr><td class="docs"><p>Memoization of generate-subkeysfn.</p>
+       (reduce into)))</pre></td></tr><tr><td class="docs"><h3>generate-subkeys</h3>
+
+<p>  Memoization of generate-subkeysfn.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :doc     }
-  generate-subkeys (memoize generate-subkeysfn))</pre></td></tr><tr><td class="docs"><p>Generate the key schedule</p>
+  generate-subkeys (memoize generate-subkeysfn))</pre></td></tr><tr><td class="docs"><h3>key-schedule</h3>
+
+<p>  Generate the key schedule</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- key-schedule
   {:added &quot;0.2.0&quot;}
   [key]
@@ -3564,32 +3604,42 @@ are 2 sets of 4 unique rounds.</p>
        (generate-subkeys)
        ((juxt
           #(subvec % 0 16)
-          #(mapv (partial bit-and 0x1f) (subvec % 16 (count %)))))))</pre></td></tr><tr><td class="docs"><p>f1</p>
+          #(mapv (partial bit-and 0x1f) (subvec % 16 (count %)))))))</pre></td></tr><tr><td class="docs"><h3>f1</h3>
+
+<p>  f1</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- f1
   {:added &quot;0.2.0&quot;}
   [[ia ib ic id]]
   (-&gt; (nth s1 ia)
       (bit-xor (nth s2 ib))
       (-modw (nth s3 ic))
-      (+modw (nth s4 id))))</pre></td></tr><tr><td class="docs"><p>f2</p>
+      (+modw (nth s4 id))))</pre></td></tr><tr><td class="docs"><h3>f2</h3>
+
+<p>  f2</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- f2
   {:added &quot;0.2.0&quot;}
   [[ia ib ic id]]
   (-&gt; (nth s1 ia)
       (-modw (nth s2 ib))
       (+modw (nth s3 ic))
-      (bit-xor (nth s4 id))))</pre></td></tr><tr><td class="docs"><p>f3</p>
+      (bit-xor (nth s4 id))))</pre></td></tr><tr><td class="docs"><h3>f3</h3>
+
+<p>  f3</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- f3
   {:added &quot;0.2.0&quot;}
   [[ia ib ic id]]
   (-&gt; (nth s1 ia)
       (+modw (nth s2 ib))
       (bit-xor (nth s3 ic))
-      (-modw (nth s4 id))))</pre></td></tr><tr><td class="docs"><p>Circular rotate a word left <em>shift</em> bytes</p>
+      (-modw (nth s4 id))))</pre></td></tr><tr><td class="docs"><h3>rotate</h3>
+
+<p>  Circular rotate a word left <em>shift</em> bytes</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- rotate
   {:added &quot;0.2.0&quot;}
   [word shift]
-  (word-bytes (&lt;&lt;&lt; word shift)))</pre></td></tr><tr><td class="docs"><p>Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
+  (word-bytes (&lt;&lt;&lt; word shift)))</pre></td></tr><tr><td class="docs"><h3>roundfn</h3>
+
+<p>  Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
   Rounds 2, 5, 8, 11, and 14 use f function Type 2.
   Rounds 3, 6, 9, 12, and 15 use f function Type 3.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- roundfn
@@ -3605,24 +3655,28 @@ are 2 sets of 4 unique rounds.</p>
             (f2))
       2 (-&gt; (-modw kmi word)
             (rotate kri)
-            (f3)))))</pre></td></tr><tr><td class="docs"><p>CAST5 cipher</p>
+            (f3)))))</pre></td></tr><tr><td class="docs"><h3>cast5</h3>
+
+<p>  CAST5 cipher</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- cast5
   {:added &quot;0.2.0&quot;}
   [[km kr]]
   (fn [[li ri] round]
     [ri (-&gt;&gt; round
              (roundfn ri (nth km round) (nth kr round))
-             (bit-xor li))]))</pre></td></tr><tr><td class="docs"><p>Process a block for encryption or decryption.</p>
+             (bit-xor li))]))</pre></td></tr><tr><td class="docs"><h3>process-block</h3>
+
+<p>  Process a block for encryption or decryption.</p>
 
 <ol>
 <li><em>block</em>: A vector of two 32-bit words representing a block.</li>
 <li><em>key</em>: A vector of byte values (0-255) representing a
 key of 40 to 128 bits (only supports multiples of 8 bits).</li>
-<li><p><em>enc</em>: true if you are encrypting the block, false
-if you are decrypting the block.</p>
-
-<p>Evaluates to a vector of two 32-bit words.</p></li>
+<li><em>enc</em>: true if you are encrypting the block, false
+if you are decrypting the block.</li>
 </ol>
+
+<p>Evaluates to a vector of two 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-block
   {:added &quot;0.2.0&quot;}
   [block {:keys [km kr rc enc] :as initmap}]

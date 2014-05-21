@@ -151,6 +151,6 @@
 (describe
   "CAST5"
   (check-blocksize cm 64)
-  (check-keysizes cm (range 40 129))
+  (check-keysizes cm (range 40 129 8))
   (check-test-vectors cm test-vectors)
   (check-test-suites cm test-suites))

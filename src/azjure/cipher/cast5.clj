@@ -1,8 +1,8 @@
-; [spec]: http://tools.ietf.org/html/rfc2144
-; [s2.4]: http://tools.ietf.org/html/rfc2144#section-2.4
+;; [spec]: http://tools.ietf.org/html/rfc2144
+;; [s2.4]: http://tools.ietf.org/html/rfc2144#section-2.4
 
 (ns azjure.cipher.cast5
-  "CAST5 Cipher
+  "## CAST5 Cipher
 
   Implemented to meet the spec at [http://tools.ietf.org/html/rfc2144] [spec]"
   {:author "Jason Ozias"}
@@ -12,15 +12,20 @@
             [azjure.libmod :refer :all]))
 
 (def ^{:private true
-       :doc     "Vector of valid key sizes in bits"}
-  key-sizes (vec (range 40 129)))
+       :doc     "#### key-sizes
+  CAST5 supports keys of 40 to 128 bits inclusive in 8-bit steps."}
+  key-sizes (vec (range 40 129 8)))
 
 (def ^{:private true
-       :doc     "Block size in bits"}
+       :doc     "#### block-size
+  CAST5 operates on 64-bit blocks."}
   block-size 64)
 
 (def ^{:private true
-       :doc     "S-box 1"}
+       :doc     "#### s1
+  Substitution box used in the round function.
+
+  Each S-box is a vector of 256 32-bit words for a total of 1KiB of data each"}
   s1
   [0x30fb40d4 0x9fa0ff0b 0x6beccd2f 0x3f258c7a 0x1e213f2f 0x9c004dd3 0x6003e540
    0xcf9fc949 0xbfd4af27 0x88bbbdb5 0xe2034090 0x98d09675 0x6e63a0e0 0x15c361d2
@@ -61,7 +66,8 @@
    0x427b169c 0x5ac9f049 0xdd8f0f00 0x5c8165bf])
 
 (def ^{:private true
-       :doc     "S-box 2"}
+       :doc     "#### s2
+  Substitution box used in the round function"}
   s2
   [0x1f201094 0xef0ba75b 0x69e3cf7e 0x393f4380 0xfe61cf7a 0xeec5207a 0x55889c94
    0x72fc0651 0xada7ef79 0x4e1d7235 0xd55a63ce 0xde0436ba 0x99c430ef 0x5f0c0794
@@ -102,7 +108,8 @@
    0x7160a539 0x73bfbe70 0x83877605 0x4523ecf1])
 
 (def ^{:private true
-       :doc     "S-box 3"}
+       :doc     "#### s3
+  Substitution box used in the round function"}
   s3
   [0x8defc240 0x25fa5d9f 0xeb903dbf 0xe810c907 0x47607fff 0x369fe44b 0x8c1fc644
    0xaececa90 0xbeb1f9bf 0xeefbcaea 0xe8cf1950 0x51df07ae 0x920e8806 0xf0ad0548
@@ -143,7 +150,8 @@
    0xdfef4636 0xa133c501 0xe9d3531c 0xee353783])
 
 (def ^{:private true
-       :doc     "S-box 4"}
+       :doc     "#### s4
+  Substitution box used in the round function"}
   s4
   [0x9db30420 0x1fb6e9de 0xa7be7bef 0xd273a298 0x4a4f7bdb 0x64ad8c57 0x85510443
    0xfa020ed1 0x7e287aff 0xe60fb663 0x095f35a1 0x79ebf120 0xfd059d43 0x6497b7b1
@@ -184,7 +192,8 @@
    0x13ecf0b0 0xd3ffb372 0x3f85c5c1 0x0aef7ed2])
 
 (def ^{:private true
-       :doc     "S-box 5"}
+       :doc     "#### s5
+  Substitution box used during key schedule generation"}
   s5
   [0x7ec90c04 0x2c6e74b9 0x9b0e66df 0xa6337911 0xb86a7fff 0x1dd358f5 0x44dd9d44
    0x1731167f 0x08fbf1fa 0xe7f511cc 0xd2051b00 0x735aba00 0x2ab722d8 0x386381cb
@@ -225,7 +234,8 @@
    0x5e76ffa8 0xb1534546 0x6d47de08 0xefe9e7d4])
 
 (def ^{:private true
-       :doc     "S-box 6"}
+       :doc     "#### s6
+  Substitution box used during key schedule generation"}
   s6
   [0xf6fa8f9d 0x2cac6ce1 0x4ca34867 0xe2337f7c 0x95db08e7 0x016843b4 0xeced5cbc
    0x325553ac 0xbf9f0960 0xdfa1e2ed 0x83f0579d 0x63ed86b9 0x1ab6a6b8 0xde5ebe39
@@ -266,7 +276,8 @@
    0x48392905 0xa65b1db8 0x851c97bd 0xd675cf2f])
 
 (def ^{:private true
-       :doc     "S-box 7"}
+       :doc     "#### s7
+  Substitution box used during key schedule generation"}
   s7
   [0x85e04019 0x332bf567 0x662dbfff 0xcfc65693 0x2a8d7f6f 0xab9bc912 0xde6008a1
    0x2028da1f 0x0227bce7 0x4d642916 0x18fac300 0x50f18b82 0x2cb2cb11 0xb232e75c
@@ -307,7 +318,8 @@
    0xf2a279c7 0x94e01be8 0x90716f4b 0x954b8aa3])
 
 (def ^{:private true
-       :doc     "S-box 8"}
+       :doc     "#### s8
+  Substitution box used during key schedule generation"}
   s8
   [0xe216300d 0xbbddfffc 0xa7ebdabd 0x35648095 0x7789f8b7 0xe6c1121b 0x0e241600
    0x052ce8b5 0x11a9cfb0 0xe5952f11 0xece7990a 0x9386d174 0x2a42931c 0x76e38111
@@ -348,12 +360,12 @@
    0x50b2ad80 0xeaee6801 0x8db2a283 0xea8bf59e])
 
 (defn- flipfn
-  "get-bytes take a value from 1 to 4 with 4 representing the
-  most significant byte and 1 representing the least.
+  "### flipfn
+  `get-bytes` take a value from 1 to 4 with 4 representing the most
+  significant byte and 1 representing the least.
 
-  The bytes in the CAST5 spec are indexed from 0 to 3, with
-  0 representing the most significant byte and 3 representinng
-  the least.
+  The bytes in the CAST5 spec are indexed from 0 to 3, with 0 representing the
+  most significant byte and 3 representing the least.
 
   This function flips the spec index into the get-bytes index."
   {:added "0.2.0"}
@@ -361,18 +373,20 @@
   (- 4 idx))
 
 (def ^{:private true
-       :doc     "Memoization of flip"}
+       :doc     "### flip
+  Memoization of flipfn"}
   flip (memoize flipfn))
 
 (defn- get-bytes
-  "Takes a 32-bit word and a vector of indexes into each byte
-  of the word (0 to 3).
+  "### get-bytes
+  Takes a 32-bit word and a vector of indexes into each byte of the word (0
+  to 3).
 
       (get-bytes 0x01020304 [1 3 0 2])
 
   evaluates to
 
-  > [0x02 0x04 0x01 0x03]
+      [0x02 0x04 0x01 0x03]
 
   Evaluates to a vector of 4 bytes."
   {:added "0.2.0"}
@@ -382,18 +396,20 @@
        (mapv #(get-byte % kw))))
 
 (defn- xor-line
-  "Represents the generation of one temp word from
+  "### xor-line
+  Represents the generation of one temp word from
   [Section 2.4] [s2.4]
 
   * *w1* - The base word.
   * *w2* - The seed word.  Individual bytes are pulled from this to
   use in the xor.
-  * *[a b c d]* - The order to pull the bytes out of the seed word.
+  * *order* - The order to pull the bytes out of the seed word.  This is a
+  vector of 4 values from 0 to 3.
   * *w3* - The word to pull a byte from for the tail of the xor.
   * *fsbox* - The S-box to use for the tail substitution.
   * *idx* - The byte index to use in the tail word.
 
-  Evaluates to a 32-bit word."
+Evaluates to a 32-bit word."
   {:added "0.2.0"}
   [w1 w2 order w3 fsbox idx]
   (let [barr (get-bytes w2 order)
@@ -407,17 +423,17 @@
       (nth fsbox lb))))
 
 (defn- gen-words
-  "Generate 4 temporary 32-bit words for use in subkey generation.
-  Represents the generation of 4 temporary words from
-  [Section 2.4] [s2.4]
+  "### gen-words
+  Generate 4 temporary 32-bit words for use in subkey generation. Represents
+  the generation of 4 temporary words from [Section 2.4] [s2.4]
 
-  * *words* - A vector of 4 32-bit words used in the generation
-  of the 4 32-bit temporary words.
-  * *[i0 i1 i2 i3 i4 i5]* - A vector of indexes (0-3) into the
-  words vector to determine where the words are used in the temp word
-  generation.  Note an index can appear more than once.
+  * *words* - A vector of 4 32-bit words used in the generation of the 4
+  32-bit temporary words.
+  * *[i0 i1 i2 i3 i4 i5]* - A vector of indexes (0-3) into the words vector
+  to determine where the words are used in the temp word generation.  Note an
+  index can appear more than once.
 
-  Evaluates to a vector of 4 32-bit temporary words."
+Evaluates to a vector of 4 32-bit temporary words."
   {:added "0.2.0"}
   [words [i0 i1 i2 i3 i4 i5]]
   (let [seed (nth words i0)
@@ -429,17 +445,18 @@
     [ow0 ow1 ow2 ow3]))
 
 (defn- gen-subkey-word
-  "Generate one subkey word (K<sub>1</sub>) as defined at
+  "### gen-subkey-word
+  Generate one subkey word (K<sub>1</sub>) as defined at
   [Section 2.4] [s2.4]
 
-  * *[a b c d e]* - A vector of indexes into the given words.
-  a and b are pulled from w0, c and d are pulled from w1 and e is pulled
-  from the tail bytes.
+  * *[a b c d e]* - A vector of indexes into the given words. `a` and `b` are
+  pulled from `w0`, `c` and `d` are pulled from `w1` and `e` is pulled from
+  the tail bytes.
   * *w0* - The first word to pull bytes from
   * *w1* - The second word to pull bytes from
   * *tail* - The vector of bytes representing the tail bytes
 
-  Evaluates to a 32-bit word."
+Evaluates to a 32-bit word."
   {:added "0.2.0"}
   [[a b c d e] w0 w1 tail]
   (bit-xor
@@ -450,15 +467,15 @@
     (nth tail e)))
 
 (defn- gen-tails
-  "Generate a vector of 4 bytes that are used as the tail
-  byte in the xor for each K generation.
+  "### gen-tails
+  Generate a vector of 4 bytes that are used as the tail byte in the xor for
+  each K generation.
 
-  * *[a b c d]* - The index into each word to pull
-  the byte from
-  * *[w0 w1 w2 w3]* - The 4 32-bit words used in
-  the subkey generation.  A tail byte come from each one.
+  * *[a b c d]* - The index into each word to pull the byte from
+  * *[w0 w1 w2 w3]* - The 4 32-bit words used in the subkey generation.  A
+  tail byte come from each one.
 
-  Evaluates to a vector of 4 bytes."
+Evaluates to a vector of 4 bytes."
   {:added "0.2.0"}
   [[a b c d] [w0 w1 w2 w3]]
   [(nth s5 (get-byte (flip a) w0))
@@ -467,16 +484,14 @@
    (nth s8 (get-byte (flip d) w3))])
 
 (defn- get-tails
-  "Get the tail bytes based on the current round of subkey
-  generation.  There are 4 unique tail patterns (repeated twice)
-  used during subkey generation.
+  "### get-tails
+  Get the tail bytes based on the current round of subkey generation.  There
+  are 4 unique tail patterns (repeated twice) used during subkey generation.
 
-  * *[w0 w1 w2 w3]* - The temporary words used in the
-  creation of the subkeys
-  * *round* - The current round of subkeys being generated
-  (0-3).
+  * *[w0 w1 w2 w3]* - The temporary words used in the creation of the subkeys
+  * *round* - The current round of subkeys being generated (0-3).
 
-  Evaluates to a vector of 4 bytes."
+Evaluates to a vector of 4 bytes."
   {:added "0.2.0"}
   [[w0 w1 w2 w3 :as words] round]
   (condp = round
@@ -486,16 +501,16 @@
     3 (gen-tails [3 3 0 1] words)))
 
 (defn- generate-subkey
-  "Generates a vector of 4 32-bit words representing 4 subkeys.
-  Note that round 1 and 4 use the same subkey word generation
-  pattern.  Round 2 and 3 use the same pattern.
+  "### generate-subkey
+  Generates a vector of 4 32-bit words representing 4 subkeys. Note that
+  round 1 and 4 use the same subkey word generation pattern.  Round 2 and 3
+  use the same pattern.
 
-  * *[w0 w1 w2 w3]* - The 4 32-bit temporary words used
-  for subkey generation.
-  * *round* - The current subkey generation round.  There
-  are 2 sets of 4 unique rounds.
+  * *[w0 w1 w2 w3]* - The 4 32-bit temporary words used for subkey generation.
+  * *round* - The current subkey generation round.  There are 2 sets of 4
+  unique rounds.
 
-  Evaluates to a vector of 4 32-bit words."
+Evaluates to a vector of 4 32-bit words."
   [[w0 w1 w2 w3 :as words] round]
   (let [rnd (mod round 4)
         tails (get-tails words rnd)]
@@ -510,13 +525,13 @@
                                 (gen-subkey-word [1 0 2 3 3] w1 w2 tails)])))
 
 (defn- expand-key
-  "Generate enough key material to support the creation of the subkeys.
-  Note that the cycle generates the pattern of indexes into the
-  vector of 4 words that is described in the algorithm at
-  [Section 2.4] [s2.4]
+  "### expand-key
+  Generate enough key material to support the creation of the subkeys. Note
+  that the cycle generates the pattern of indexes into the vector of 4 words
+  that is described in the algorithm at [Section 2.4] [s2.4]
 
-  Evaluates to a vector of 8 vectors containing 4 32-bit words each.
-  These serve as input material for the generate-subkey function."
+  Evaluates to a vector of 8 vectors containing 4 32-bit words each. These
+  serve as input material for the generate-subkey function."
   {:added "0.2.0"}
   [key]
   (subvec 1 (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
@@ -524,13 +539,13 @@
                  (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))
 
 (defn- generate-subkeysfn
-  "Generates 32 32-bit words that make up the key schedule defined at
+  "### generate-subkeysfn
+  Generates 32 32-bit words that make up the key schedule defined at
   [Section 2.4] [s2.4]
 
-  K<sub>1</sub> to K<sub>16</sub> serve as the
-  masking keys (K<sub>m</sub>) for each cipher round.  K<sub>17</sub> to
-  K<sub>32</sub> serve as the rotate keys (K<sub>r</sub>) for each cipher
-  round
+  K<sub>1</sub> to K<sub>16</sub> serve as the masking keys (K<sub>m</sub>)
+  for each cipher round.  K<sub>17</sub> to K<sub>32</sub> serve as the
+  rotate keys (K<sub>r</sub>) for each cipher round.
 
   Evalutates to a vector of 32 32-bit words."
   {:added "0.2.0"}
@@ -540,11 +555,13 @@
        (reduce into)))
 
 (def ^{:private true
-       :doc     "Memoization of generate-subkeysfn."}
+       :doc     "### generate-subkeys
+  Memoization of generate-subkeysfn."}
   generate-subkeys (memoize generate-subkeysfn))
 
 (defn- key-schedule
-  "Generate the key schedule"
+  "### key-schedule
+  Generate the key schedule"
   {:added "0.2.0"}
   [key]
   {:pre [(vector? key) (and (> (count key) 4) (< (count key) 17))]}
@@ -559,7 +576,8 @@
           #(mapv (partial bit-and 0x1f) (subvec % 16 (count %)))))))
 
 (defn- f1
-  "f1"
+  "### f1
+  f1"
   {:added "0.2.0"}
   [[ia ib ic id]]
   (-> (nth s1 ia)
@@ -568,7 +586,8 @@
       (+modw (nth s4 id))))
 
 (defn- f2
-  "f2"
+  "### f2
+  f2"
   {:added "0.2.0"}
   [[ia ib ic id]]
   (-> (nth s1 ia)
@@ -577,7 +596,8 @@
       (bit-xor (nth s4 id))))
 
 (defn- f3
-  "f3"
+  "### f3
+  f3"
   {:added "0.2.0"}
   [[ia ib ic id]]
   (-> (nth s1 ia)
@@ -586,13 +606,15 @@
       (-modw (nth s4 id))))
 
 (defn- rotate
-  "Circular rotate a word left *shift* bytes"
+  "### rotate
+  Circular rotate a word left *shift* bytes"
   {:added "0.2.0"}
   [word shift]
   (word-bytes (<<< word shift)))
 
 (defn- roundfn
-  "Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
+  "### roundfn
+  Rounds 1, 4, 7, 10, 13, and 16 use f function Type 1.
   Rounds 2, 5, 8, 11, and 14 use f function Type 2.
   Rounds 3, 6, 9, 12, and 15 use f function Type 3."
   {:added "0.2.0"}
@@ -610,7 +632,8 @@
             (f3)))))
 
 (defn- cast5
-  "CAST5 cipher"
+  "### cast5
+  CAST5 cipher"
   {:added "0.2.0"}
   [[km kr]]
   (fn [[li ri] round]
@@ -619,15 +642,16 @@
              (bit-xor li))]))
 
 (defn- process-block
-  "Process a block for encryption or decryption.
+  "### process-block
+  Process a block for encryption or decryption.
 
-  1. *block*: A vector of two 32-bit words representing a block.
+  1. *block*: A vector of 8 bytes representing a 64-bit block.
   2. *key*: A vector of byte values (0-255) representing a
   key of 40 to 128 bits (only supports multiples of 8 bits).
   3. *enc*: true if you are encrypting the block, false
   if you are decrypting the block.
 
-  Evaluates to a vector of two 32-bit words."
+Evaluates to a vector of 8 bytes (representing a 64-bit block)."
   {:added "0.2.0"}
   [block {:keys [km kr rc enc] :as initmap}]
   {:pre [(contains? initmap :km) (contains? initmap :kr)
