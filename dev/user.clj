@@ -12,5 +12,7 @@
             [clojure.pprint :refer (pprint)]
             [clojure.repl :refer :all]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
+            [org.ozias.cljlibs.scm.core :refer :all]
+            [org.ozias.cljlibs.scm.git :refer :all]
             [speclj.core :refer :all]
             [speclj.run.standard]))
