@@ -38,6 +38,5 @@
      :creds :gpg}]]
   :scm {:name "git"
         :url  "https://github.com/CraZySacX/azjure"}
-
   :manifest {"Implementation-Version" "0.2.0-SNAPSHOT"}
   :git-version {:file {:assoc-in-keys [[:manifest "Implementation-Version"]]}})
