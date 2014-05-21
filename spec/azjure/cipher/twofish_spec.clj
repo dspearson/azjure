@@ -167,7 +167,6 @@
                [:ctr :x923 ct-128-tf-ctr-x923]
                [:ctr :zero ct-128-tf-ctr-zero]])
 
-
 (def ^{:private true
        :doc     ""}
   test-vectors [[[0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
@@ -193,7 +192,7 @@
                   0x9F 0x0C 0xFC 0xCA 0xE8 0x7C 0xFA 0x20]]])
 
 (def ^{:private true
-       :doc ""}
+       :doc "Configuration Map"}
   cm {:type :twofish :eid :str :doe :str})
 
 (describe

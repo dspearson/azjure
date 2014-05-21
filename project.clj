@@ -21,12 +21,11 @@
                         "chk"       ["do"
                                      "archaic" "upgrade,"
                                      "slamhound" "src/,"
-                                     "slamhound" "test/,"
                                      "eastwood" "{:namespaces [:source-paths]},"
                                      "kibit,"
                                      "check,"
                                      "bikeshed" "-v,"
-                                     "midje"]
+                                     "spec"]
                         "most"      ["do" "clean," "doc," "chk," "package"]
                         "dep"       ["do" "deploy," "deploy" "clojars"]
                         "all"       ["do" "most," "dep"]}}}

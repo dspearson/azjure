@@ -1,8 +1,6 @@
-(ns azjure.cipher.testaes
-  (:require [azjure.libtest :refer :all]))
-
-(def ^{:private true :doc "Configuration Map"} cm
-  (atom {:type :aes :eid :str :doe :str}))
+(ns azjure.cipher.aes-spec
+  (:require [azjure.libtest :refer :all]
+            [speclj.core :refer :all]))
 
 (def ^{:doc "128-bit AES test vector key as defined in Appendix C.1 in
   http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf"}
@@ -202,46 +200,52 @@
   (into ct-128-aesctr-base [0x77 0xE0 0xBF 0xEE 0x0C 0xD7 0xD9 0xEB
                             0xD3 0x4C 0xAD 0xDE 0x71 0xB2 0xFE 0x78]))
 
-(def ^{:private true :doc "Test vectors as defined in the spec."}
-  test-vectors
-  [[key-128-aes pt-128-aes ct-128-aes]
-   [key-192-aes pt-128-aes ct-192-aes]
-   [key-256-aes pt-128-aes ct-256-aes]])
+(def ^{:private true
+       :doc     "Test vectors as defined in the spec."}
+  test-vectors [[key-128-aes pt-128-aes ct-128-aes]
+                [key-192-aes pt-128-aes ct-192-aes]
+                [key-256-aes pt-128-aes ct-256-aes]])
 
-(def ^{:private true :doc "Suite tests"}
-  test-suites
-  [[:ecb :iso10126 ct-128-aesecb-base]
-   [:ecb :iso7816 ct-128-aesecbiso7816]
-   [:ecb :pkcs7 ct-128-aesecbpkcs7]
-   [:ecb :x923 ct-128-aesecbx923]
-   [:ecb :zero ct-128-aesecbzero]
-   [:cbc :iso10126 ct-128-aescbc-base]
-   [:cbc :iso7816 ct-128-aescbciso7816]
-   [:cbc :pkcs7 ct-128-aescbcpkcs7]
-   [:cbc :x923 ct-128-aescbcx923]
-   [:cbc :zero ct-128-aescbczero]
-   [:pcbc :iso10126 ct-128-aespcbc-base]
-   [:pcbc :iso7816 ct-128-aespcbciso7816]
-   [:pcbc :pkcs7 ct-128-aespcbcpkcs7]
-   [:pcbc :x923 ct-128-aespcbcx923]
-   [:pcbc :zero ct-128-aespcbczero]
-   [:cfb :iso10126 ct-128-aescfb-base]
-   [:cfb :iso7816 ct-128-aescfbiso7816]
-   [:cfb :pkcs7 ct-128-aescfbpkcs7]
-   [:cfb :x923 ct-128-aescfbx923]
-   [:cfb :zero ct-128-aescfbzero]
-   [:ofb :iso10126 ct-128-aesofb-base]
-   [:ofb :iso7816 ct-128-aesofbiso7816]
-   [:ofb :pkcs7 ct-128-aesofbpkcs7]
-   [:ofb :x923 ct-128-aesofbx923]
-   [:ofb :zero ct-128-aesofbzero]
-   [:ctr :iso10126 ct-128-aesctr-base]
-   [:ctr :iso7816 ct-128-aesctriso7816]
-   [:ctr :pkcs7 ct-128-aesctrpkcs7]
-   [:ctr :x923 ct-128-aesctrx923]
-   [:ctr :zero ct-128-aesctrzero]])
+(def ^{:private true
+       :doc     "Suite tests"}
+  test-suites [[:ecb :iso10126 ct-128-aesecb-base]
+               [:ecb :iso7816 ct-128-aesecbiso7816]
+               [:ecb :pkcs7 ct-128-aesecbpkcs7]
+               [:ecb :x923 ct-128-aesecbx923]
+               [:ecb :zero ct-128-aesecbzero]
+               [:cbc :iso10126 ct-128-aescbc-base]
+               [:cbc :iso7816 ct-128-aescbciso7816]
+               [:cbc :pkcs7 ct-128-aescbcpkcs7]
+               [:cbc :x923 ct-128-aescbcx923]
+               [:cbc :zero ct-128-aescbczero]
+               [:pcbc :iso10126 ct-128-aespcbc-base]
+               [:pcbc :iso7816 ct-128-aespcbciso7816]
+               [:pcbc :pkcs7 ct-128-aespcbcpkcs7]
+               [:pcbc :x923 ct-128-aespcbcx923]
+               [:pcbc :zero ct-128-aespcbczero]
+               [:cfb :iso10126 ct-128-aescfb-base]
+               [:cfb :iso7816 ct-128-aescfbiso7816]
+               [:cfb :pkcs7 ct-128-aescfbpkcs7]
+               [:cfb :x923 ct-128-aescfbx923]
+               [:cfb :zero ct-128-aescfbzero]
+               [:ofb :iso10126 ct-128-aesofb-base]
+               [:ofb :iso7816 ct-128-aesofbiso7816]
+               [:ofb :pkcs7 ct-128-aesofbpkcs7]
+               [:ofb :x923 ct-128-aesofbx923]
+               [:ofb :zero ct-128-aesofbzero]
+               [:ctr :iso10126 ct-128-aesctr-base]
+               [:ctr :iso7816 ct-128-aesctriso7816]
+               [:ctr :pkcs7 ct-128-aesctrpkcs7]
+               [:ctr :x923 ct-128-aesctrx923]
+               [:ctr :zero ct-128-aesctrzero]])
 
-(check-blocksize-bits cm 128)
-(check-keysizes-bits cm [128 192 256])
-(dorun (map (partial check-test-vectors cm) test-vectors))
-(dorun (map (partial check-test-suite cm) test-suites))
+(def ^{:private true
+       :doc     "Configuration Map"}
+  cm {:type :aes :eid :str :doe :str})
+
+(describe
+  "AES"
+  (check-blocksize cm 128)
+  (check-keysizes cm [128 192 256])
+  (check-test-vectors cm test-vectors)
+  (check-test-suites cm test-suites))
