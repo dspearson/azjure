@@ -5,7 +5,8 @@
 ;; [encoders]: azjure.encoders.html
 
 (ns azjure.core
-  "Core Azjure API for encryption/decryption.
+  "## Core
+  API entry point for encryption/decryption.
 
   See the [azjure] [azjure] homepage for more detailed usage information."
   {:author "Jason Ozias"}
@@ -16,7 +17,8 @@
   (:import (java.security SecureRandom)))
 
 (defn encrypt
-  "Encrypt the given input `x` based on the configuration supplied in the map
+  "### encrypt
+  Encrypt the given input `x` based on the configuration supplied in the map
   `m`.
 
   The map has the following format:
@@ -58,7 +60,8 @@
          (output-encoder m))))
 
 (defn decrypt
-  "Decrypt the given input `x` based on the configuration supplied in the map
+  "### decrypt
+  Decrypt the given input `x` based on the configuration supplied in the map
   `m`.  The map has the same format as described in the `encrypt`
   documentation."
   {:added "0.2.0"}
@@ -72,7 +75,8 @@
       :encryption false)))
 
 (defn gen-key
-  "Generate a key of length `x` bits.  `x` should be a positive multiple of 8.
+  "### gen-key
+  Generate a key of length `x` bits.  `x` should be a positive multiple of 8.
 
   Evaluates to a vector of unsigned (0 - 255) byte values."
   {:added "0.2.0"}

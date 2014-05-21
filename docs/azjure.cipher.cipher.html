@@ -3029,14 +3029,43 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.cipher" name="azjure.cipher.cipher"><h1 class="project-name">azjure.cipher.cipher</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>Cipher</h2>
+
+<p>  Cipher multimethod definitions.</p>
+
+<p>  All ciphers should define defmethods for these multimethods.</p>
+
+<p>  The currently supported cipher type keywords for use in the configuration map
+  are:</p>
+
+<ul>
+<li><code>:aes</code> - AES</li>
+<li><code>:bf</code> - Blowfish</li>
+<li><code>:cast5</code> - CAST5</li>
+<li><code>:tf</code> - Twofish</li>
+</ul>
+
+<p>Note that if no <code>:type</code> is supplied in the configuration map, <code>:aes</code> will be
+assumed.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.cipher
-  {:author &quot;Jason Ozias&quot;})</pre></td></tr><tr><td class="docs"><p>Takes an initmap and assocs any additional keys needed by the
-  cipher.  All ciphers should implement this method.</p>
+  {:author &quot;Jason Ozias&quot;})</pre></td></tr><tr><td class="docs"><h3>initialize</h3>
+
+<p>  Takes a configuration map as defined in <a href="azjure.core.html">azjure.core</a>.  Any
+  information needed during encryption/decryption (such as key schedules)
+  should be assoc'd into the configuration map during initialization.</p>
+
+<p>  This function should evaluate to the configuration map with any additional
+  information assoc'd into it.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti initialize
           {:arglists '([m])
            :added    &quot;0.2.0&quot;}
-          :type)</pre></td></tr><tr><td class="docs"><p>Evaluates to a vector of key sizes in bits supported by the cipher.
-   All ciphers should implement this method.</p>
+          :type)</pre></td></tr><tr><td class="docs"><h3>keysizes-bits</h3>
+
+<p>  The cipher implementing this multimethod should return a vector of values
+  representing the key sizes (in bits) supported by the cipher.</p>
+
+<p>  For example, AES supports key sizes of 128, 192, and 256 bits.  This function
+  would then evaluate to <code>[128 192 256]</code> if called for AES.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti keysizes-bits
           {:arglists '([])
            :added    &quot;0.2.0&quot;}
