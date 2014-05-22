@@ -127,7 +127,6 @@ a:after {
 	background-color: #000000;
 	padding-top: 70px;
 	padding-bottom: 70px;
-	text-align: center
 }
 
 #f h3 {
@@ -146,6 +145,10 @@ a:after {
 #f p {
 	font-size: 20px;
 	color: #dedeff;
+}
+
+#f div.col-lg-6 {
+    text-align: left;
 }
 
 #f img {
