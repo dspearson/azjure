@@ -12,7 +12,8 @@ author: bootply.com
 html,body {
 	height:100%;
     background:center no-repeat fixed url('/azjure/images/ipad-hires-carbon-fiber-wp12.png');
-    background-size:cover !important;
+    background-size:cover;
+    background-repeat:repeat-y;
 }
 
 .icon-bar {
