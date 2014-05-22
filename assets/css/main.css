@@ -131,7 +131,7 @@ a:after {
 }
 
 #f h3 {
-	color: white;
+	color: #dedeff;
 	font-size: 28px;
 	font-weight: 700;
 	letter-spacing: 1px;	
@@ -139,13 +139,13 @@ a:after {
 
 #f i {
 	font-size: 8px;
-	color: #fff;
+	color: #dedeff;
     padding: 3px;
 }
 
 #f p {
 	font-size: 20px;
-	color: #f2f2f2;
+	color: #dedeff;
 }
 
 #f img {
@@ -190,7 +190,7 @@ a:after {
 }
 
 .menu h1.logo a:hover {
-	color: #f85c37;
+	color: #00aaff;
 }
 
 .menu img.logo {
@@ -200,7 +200,7 @@ a:after {
 
 .menu a {
 	margin-left: 20px;
-	color: #808080;
+	color: #dedeff;
 	display: block;
 	font-size: 12px;
 	font-weight: 700;
@@ -233,7 +233,7 @@ a:after {
 	display: block;
 	position: absolute;
 	font-size: 14px;
-	color: #808080;
+	color: #dedeff;
 	width: 40px;
 	height: 40px;
 	line-height: 40px;
@@ -247,7 +247,7 @@ a:after {
 }
 
 .menu-close:hover {
-	color: #ffffff;
+	color: #00aaff;
 	-webkit-transition: all .1s ease-in-out;
 	   -moz-transition: all .1s ease-in-out;
 		-ms-transition: all .1s ease-in-out;
@@ -287,7 +287,7 @@ a:after {
 	display: block;
 	text-align: center;
 	font-size: 14px;
-	color: #ffffff;
+	color: #dedeff;
 	width: 40px;
 	height: 40px;
 	line-height: 40px;
@@ -301,7 +301,7 @@ a:after {
 }
 
 #menuToggle:hover {
-	color: #ffffff;
+	color: #00aaff;
 	background: rgba(0,0,0,0.2);
 	-webkit-transition: all .1s ease-in-out;
 	   -moz-transition: all .1s ease-in-out;
