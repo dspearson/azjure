@@ -11,7 +11,7 @@ author: bootply.com
 
 html,body {
 	height:100%;
-    background:center no-repeat fixed url('/images/carbon-fiber-1100-black-b.jpg');
+    background:center no-repeat fixed url('images/carbon-fiber-1100-black-b.jpg');
 }
 
 .icon-bar {
