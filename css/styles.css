@@ -26,7 +26,8 @@ html,body {
 }
 
 .navbar-trans li>a:hover,.navbar-trans li>a:focus,.navbar-trans li.active {
-	background-color:#38afef;
+    background-color:#494949;
+	/*background-color:#38afef;*/
 }
 
 .navbar-trans a{
