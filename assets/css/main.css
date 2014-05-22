@@ -103,6 +103,8 @@ a:after {
 	color: #dedeff;
 	font-size: 70px;
 	font-weight: 700;
+	display: inline;
+	margin-right: 20px;
 }
 
 #headerwrap h3 {
@@ -113,13 +115,13 @@ a:after {
     font-style: oblique;
 }
 
-#headerwrap .logo {
+#headerwrap i {
     color: #dedeff;
-	text-align: left;
-	margin-left: 20px;
-	margin-top: 15px;
 }
 
+.azjureheader {
+    margin-top: 50px;
+}
 
 /* Footer Wrap */
 
