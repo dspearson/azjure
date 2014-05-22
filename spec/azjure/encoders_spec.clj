@@ -27,7 +27,6 @@
             "dd" "de" "df" "e0" "e1" "e2" "e3" "e4" "e5" "e6" "e7" "e8" "e9"
             "ea" "eb" "ec" "ed" "ee" "ef" "f0" "f1" "f2" "f3" "f4" "f5" "f6"
             "f7" "f8" "f9" "fa" "fb" "fc" "fd" "fe" "ff"))
-
     (it "should throw an AssertionError on x < 0"
         (should-throw AssertionError (x->hex -1)))
     (it "should throw an AssertionError on x >255"
@@ -47,7 +46,6 @@
     (it "should equal 15" (should= 15 (hex->x "0f")))
     (it "should equal 170" (should= 170 (hex->x "aa")))
     (it "should equal 255" (should= 255 (hex->x "FF"))))
-
   (context
     "v->hex"
     (it "should throw an AssertionError on a non-vector"
@@ -64,7 +62,6 @@
         (should= "01000000" (v->hex [1 0 0 0])))
     (it "should generate '10162d08'"
         (should= "10162d08" (v->hex [16 22 45 8]))))
-
   (context
     "hex->v"
     (it "should throw an AssertionError on a non-string"
@@ -81,258 +78,326 @@
     (it "should be '[0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]'"
         (should= [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]
                  (hex->v "0123456789abcdef"))))
-  )
-;(facts
-;  "(v->str s)\n========================================"
-;  (fact "non-vector" (v->str nil) => (throws AssertionError))
-;  (fact "invalid byte (-1)" (v->str [-1]) => (throws AssertionError))
-;  (fact "invalid byte (256)" (v->str [256]) => (throws AssertionError))
-;  (fact "[74 97 115 111 110]" (v->str [74 97 115 111 110]) => "Jason"))
-;(facts
-;  "(str->v s)\n========================================"
-;  (fact "non-string" (str->v nil) => (throws AssertionError))
-;  (fact "Jason" (str->v "Jason") => [74 97 115 111 110]))
-;
-;(facts
-;  "(v->base64 v)\n========================================"
-;  (fact "non-vector" (v->base64 nil) => (throws AssertionError))
-;  (fact "empty string" (v->base64 []) => "")
-;  (fact "f" (v->base64 [102]) => "Zg==")
-;  (fact "fo" (v->base64 [102 111]) => "Zm8=")
-;  (fact "foo" (v->base64 [102 111 111]) => "Zm9v")
-;  (fact "foob" (v->base64 [102 111 111 98]) => "Zm9vYg==")
-;  (fact "fooba" (v->base64 [102 111 111 98 97]) => "Zm9vYmE=")
-;  (fact "foobar" (v->base64 [102 111 111 98 97 114]) => "Zm9vYmFy")
-;  (fact "Jason Grant Ozias"
-;        (v->base64 (vec (.getBytes "Jason Grant Ozias"))) =>
-;        "SmFzb24gR3JhbnQgT3ppYXM="))
-;(facts
-;  "(base64->v s)\n========================================"
-;  (fact "non-string" (base64->v nil) => (throws AssertionError))
-;  (fact "Zg==" (base64->v "Zg==") => [102])
-;  (fact "Zm8=" (base64->v "Zm8=") => [102 111])
-;  (fact "Zm9v" (base64->v "Zm9v") => [102 111 111])
-;  (fact "Zm9vYg==" (base64->v "Zm9vYg==") => [102 111 111 98])
-;  (fact "Zm9vYmE=" (base64->v "Zm9vYmE=") => [102 111 111 98 97])
-;  (fact "Zm9vYmFy" (base64->v "Zm9vYmFy") => [102 111 111 98 97 114])
-;  (fact "SmFzb24gR3JhbnQgT3ppYXM=" (base64->v "SmFzb24gR3JhbnQgT3ppYXM=") =>
-;        [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]))
-;
-;(facts
-;  "(v->base64url v)\n========================================"
-;  (fact "non-vector" (v->base64url nil) => (throws AssertionError))
-;  (fact "empty string" (v->base64url []) => "")
-;  (fact "f" (v->base64url [102]) => "Zg==")
-;  (fact "fo" (v->base64url [102 111]) => "Zm8=")
-;  (fact "foo" (v->base64url [102 111 111]) => "Zm9v")
-;  (fact "foob" (v->base64url [102 111 111 98]) => "Zm9vYg==")
-;  (fact "fooba" (v->base64url [102 111 111 98 97]) => "Zm9vYmE=")
-;  (fact "foobar" (v->base64url [102 111 111 98 97 114]) => "Zm9vYmFy")
-;  (fact "[251 240]" (v->base64url [251 240 1]) => "-_AB")
-;  (fact "Jason Grant Ozias"
-;        (v->base64url (vec (.getBytes "Jason Grant Ozias"))) =>
-;        "SmFzb24gR3JhbnQgT3ppYXM="))
-;(facts
-;  "(base64url->v s)\n========================================"
-;  (fact "non-string" (base64url->v nil) => (throws AssertionError))
-;  (fact "Zg==" (base64url->v "Zg==") => [102])
-;  (fact "Zm8=" (base64url->v "Zm8=") => [102 111])
-;  (fact "Zm9v" (base64url->v "Zm9v") => [102 111 111])
-;  (fact "Zm9vYg==" (base64url->v "Zm9vYg==") => [102 111 111 98])
-;  (fact "Zm9vYmE=" (base64url->v "Zm9vYmE=") => [102 111 111 98 97])
-;  (fact "Zm9vYmFy" (base64url->v "Zm9vYmFy") => [102 111 111 98 97 114])
-;  (fact "-_AB" (base64url->v "-_AB") => [251 240 1])
-;  (fact "SmFzb24gR3JhbnQgT3ppYXM="
-;        (base64url->v "SmFzb24gR3JhbnQgT3ppYXM=") =>
-;        [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]))
-;
-;(facts
-;  "(v->base32 v)\n========================================"
-;  (fact "non-vector" (v->base32 nil) => (throws AssertionError))
-;  (fact "empty string" (v->base32 []) => "")
-;  (fact "f" (v->base32 [102]) => "MY======")
-;  (fact "fo" (v->base32 [102 111]) => "MZXQ====")
-;  (fact "foo" (v->base32 [102 111 111]) => "MZXW6===")
-;  (fact "foob" (v->base32 [102 111 111 98]) => "MZXW6YQ=")
-;  (fact "fooba" (v->base32 [102 111 111 98 97]) => "MZXW6YTB")
-;  (fact "foobar" (v->base32 [102 111 111 98 97 114]) => "MZXW6YTBOI======")
-;  (fact "Jason Grant Ozias"
-;        (v->base32 (vec (.getBytes "Jason Grant Ozias"))) =>
-;        "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="))
-;(facts
-;  "(base32->v s)\n========================================"
-;  (fact "non-string" (base32->v nil) => (throws AssertionError))
-;  (fact "MY======" (base32->v "MY======") => [102])
-;  (fact "MZXQ====" (base32->v "MZXQ====") => [102 111])
-;  (fact "MZXW6===" (base32->v "MZXW6===") => [102 111 111])
-;  (fact "MZXW6YQ=" (base32->v "MZXW6YQ=") => [102 111 111 98])
-;  (fact "MZXW6YTB" (base32->v "MZXW6YTB") => [102 111 111 98 97])
-;  (fact "MZXW6YTBOI======"
-;        (base32->v "MZXW6YTBOI======") => [102 111 111 98 97 114])
-;  (fact "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="
-;        (base32->v "JJQXG33OEBDXEYLOOQQE66TJMFZQ====") =>
-;        [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]))
-;
-;(facts
-;  "(v->base32hex v)\n========================================"
-;  (fact "non-vector" (v->base32hex nil) => (throws AssertionError))
-;  (fact "empty string" (v->base32hex []) => "")
-;  (fact "f" (v->base32hex [102]) => "CO======")
-;  (fact "fo" (v->base32hex [102 111]) => "CPNG====")
-;  (fact "foo" (v->base32hex [102 111 111]) => "CPNMU===")
-;  (fact "foob" (v->base32hex [102 111 111 98]) => "CPNMUOG=")
-;  (fact "fooba" (v->base32hex [102 111 111 98 97]) => "CPNMUOJ1")
-;  (fact "foobar" (v->base32hex [102 111 111 98 97 114]) => "CPNMUOJ1E8======")
-;  (fact "Jason Grant Ozias"
-;        (v->base32hex (vec (.getBytes "Jason Grant Ozias"))) =>
-;        "99GN6RRE413N4OBEEGG4UUJ9C5PG===="))
-;(facts
-;  "(base32hex->v s)\n========================================"
-;  (fact "non-string" (base32hex->v nil) => (throws AssertionError))
-;  (fact "CO======" (base32hex->v "CO======") => [102])
-;  (fact "CPNG====" (base32hex->v "CPNG====") => [102 111])
-;  (fact "CPNMU===" (base32hex->v "CPNMU===") => [102 111 111])
-;  (fact "CPNMUOG=" (base32hex->v "CPNMUOG=") => [102 111 111 98])
-;  (fact "CPNMUOJ1" (base32hex->v "CPNMUOJ1") => [102 111 111 98 97])
-;  (fact "CPNMUOJ1E8======"
-;        (base32hex->v "CPNMUOJ1E8======") => [102 111 111 98 97 114])
-;  (fact "99GN6RRE413N4OBEEGG4UUJ9C5PG===="
-;        (base32hex->v "99GN6RRE413N4OBEEGG4UUJ9C5PG====") =>
-;        [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]))
-;
-;(facts
-;  "(v->base16 v)\n========================================"
-;  (fact "non-vector" (v->base16 nil) => (throws AssertionError))
-;  (fact "empty string" (v->base16 []) => "")
-;  (fact "f" (v->base16 [102]) => "66")
-;  (fact "fo" (v->base16 [102 111]) => "666F")
-;  (fact "foo" (v->base16 [102 111 111]) => "666F6F")
-;  (fact "foob" (v->base16 [102 111 111 98]) => "666F6F62")
-;  (fact "fooba" (v->base16 [102 111 111 98 97]) => "666F6F6261")
-;  (fact "foobar" (v->base16 [102 111 111 98 97 114]) => "666F6F626172")
-;  (fact "Jason Grant Ozias"
-;        (v->base16 (vec (.getBytes "Jason Grant Ozias"))) =>
-;        "4A61736F6E204772616E74204F7A696173"))
-;(facts
-;  "(base16->v s)\n========================================"
-;  (fact "non-string" (base16->v nil) => (throws AssertionError))
-;  (fact "66" (base16->v "66") => [102])
-;  (fact "666F" (base16->v "666F") => [102 111])
-;  (fact "666F6F" (base16->v "666F6F") => [102 111 111])
-;  (fact "666F6F62" (base16->v "666F6F62") => [102 111 111 98])
-;  (fact "666F6F6261" (base16->v "666F6F6261") => [102 111 111 98 97])
-;  (fact "666F6F626172"
-;        (base16->v "666F6F626172") => [102 111 111 98 97 114])
-;  (fact "4A61736F6E204772616E74204F7A696173"
-;        (base16->v "4A61736F6E204772616E74204F7A696173") =>
-;        [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]))
-;
-;(facts
-;  "(output-encoder m bv & keys)\n========================================"
-;  (fact "v->str encryption"
-;        (output-encoder {:eoe :str} [102 111 111 98 97 114])
-;        => "foobar")
-;  (fact "v->str decryption"
-;        (output-encoder {:doe :str} [102 111 111 98 97 114] :encryption false)
-;        => "foobar")
-;  (fact "v->hex encryption"
-;        (output-encoder {:eoe :hex} [102 111 111 98 97 114])
-;        => "666f6f626172")
-;  (fact "v->hex decryption"
-;        (output-encoder {:doe :hex} [102 111 111 98 97 114] :encryption false)
-;        => "666f6f626172")
-;  (fact "v->base64 encryption"
-;        (output-encoder {:eoe :base64} [102 111 111 98 97 114])
-;        => "Zm9vYmFy")
-;  (fact "v->base64 decryption"
-;        (output-encoder {:doe :base64}
-;                        [102 111 111 98 97 114]
-;                        :encryption false)
-;        => "Zm9vYmFy")
-;  (fact "v->base64url encryption"
-;        (output-encoder {:eoe :base64url} [102 111 111 98 97 114])
-;        => "Zm9vYmFy")
-;  (fact "v->base64url decryption"
-;        (output-encoder {:doe :base64url}
-;                        [102 111 111 98 97 114]
-;                        :encryption false)
-;        => "Zm9vYmFy")
-;  (fact "v->base32 encryption"
-;        (output-encoder {:eoe :base32} [102 111 111 98 97 114])
-;        => "MZXW6YTBOI======")
-;  (fact "v->base32 decryption"
-;        (output-encoder {:doe :base32}
-;                        [102 111 111 98 97 114]
-;                        :encryption false)
-;        => "MZXW6YTBOI======")
-;  (fact "v->base32hex encryption"
-;        (output-encoder {:eoe :base32hex} [102 111 111 98 97 114])
-;        => "CPNMUOJ1E8======")
-;  (fact "v->base32hex decryption"
-;        (output-encoder {:doe :base32hex}
-;                        [102 111 111 98 97 114]
-;                        :encryption false)
-;        => "CPNMUOJ1E8======")
-;  (fact "v->base16 encryption"
-;        (output-encoder {:eoe :base16} [102 111 111 98 97 114])
-;        => "666F6F626172")
-;  (fact "v->base16 decryption"
-;        (output-encoder {:doe :base16}
-;                        [102 111 111 98 97 114]
-;                        :encryption false)
-;        => "666F6F626172"))
-;
-;(facts
-;  "(input-decoder m bv & keys)\n========================================"
-;  (fact "str->v encryption"
-;        (input-decoder {:eid :str} "foobar")
-;        => [102 111 111 98 97 114])
-;  (fact "str->v decryption"
-;        (input-decoder {:did :str} "foobar" :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "hex->v encryption"
-;        (input-decoder {:eid :hex} "666f6f626172")
-;        => [102 111 111 98 97 114])
-;  (fact "hex->v decryption"
-;        (input-decoder {:did :hex} "666f6f626172" :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "base64->v encryption"
-;        (input-decoder {:eid :base64} "Zm9vYmFy")
-;        => [102 111 111 98 97 114])
-;  (fact "base64->v decryption"
-;        (input-decoder {:did :base64}
-;                       "Zm9vYmFy"
-;                       :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "base64url->v encryption"
-;        (input-decoder {:eid :base64url} "Zm9vYmFy")
-;        => [102 111 111 98 97 114])
-;  (fact "base64url->v decryption"
-;        (input-decoder {:did :base64url}
-;                       "Zm9vYmFy"
-;                       :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "base32->v encryption"
-;        (input-decoder {:eid :base32} "MZXW6YTBOI======")
-;        => [102 111 111 98 97 114])
-;  (fact "base32->v decryption"
-;        (input-decoder {:did :base32}
-;                       "MZXW6YTBOI======"
-;                       :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "base32hex->v encryption"
-;        (input-decoder {:eid :base32hex} "CPNMUOJ1E8======")
-;        => [102 111 111 98 97 114])
-;  (fact "base32hex->v decryption"
-;        (input-decoder {:did :base32hex}
-;                       "CPNMUOJ1E8======"
-;                       :encryption false)
-;        => [102 111 111 98 97 114])
-;  (fact "base16->v encryption"
-;        (input-decoder {:eid :base16} "666F6F626172")
-;        => [102 111 111 98 97 114])
-;  (fact "base16->v decryption"
-;        (input-decoder {:did :base16}
-;                       "666F6F626172"
-;                       :encryption false)
-;        => [102 111 111 98 97 114]))
+  (context
+    "v->str"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->str nil)))
+    (it "should throw an AssertionError on an invalid byte (-1)"
+        (should-throw AssertionError (v->str [-1])))
+    (it "should throw an AssertionError on an invalid byte (256)"
+        (should-throw AssertionError (v->str [256])))
+    (it "should generate the string 'Jason'"
+        (should= "Jason" (v->str [74 97 115 111 110]))))
+  (context
+    "str->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (str->v nil)))
+    (it "should generate [74 97 115 111 110]"
+        (should= [74 97 115 111 110] (str->v "Jason"))))
+  (context
+    "v->base64"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->base64 nil)))
+    (it "should generate an empty string"
+        (should= "" (v->base64 [])))
+    (it "should generate 'Zg=='"
+        (should= "Zg==" (v->base64 [102])))
+    (it "should generate 'Zm8='"
+        (should= "Zm8=" (v->base64 [102 111])))
+    (it "should generate 'Zm9v'"
+        (should= "Zm9v" (v->base64 [102 111 111])))
+    (it "should generate 'Zm9vYg=='"
+        (should= "Zm9vYg==" (v->base64 [102 111 111 98])))
+    (it "should generate 'Zm9vYmE='"
+        (should= "Zm9vYmE=" (v->base64 [102 111 111 98 97])))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (v->base64 [102 111 111 98 97 114])))
+    (it "should generate 'SmFzb24gR3JhbnQgT3ppYXM='"
+        (should= "SmFzb24gR3JhbnQgT3ppYXM="
+                 (v->base64 (vec (.getBytes "Jason Grant Ozias"))))))
+  (context
+    "base64->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (base64->v nil)))
+    (it "should generate [102]"
+        (should= [102] (base64->v "Zg==")))
+    (it "should generate [102 111]"
+        (should= [102 111] (base64->v "Zm8=")))
+    (it "should generate [102 111 111]"
+        (should= [102 111 111] (base64->v "Zm9v")))
+    (it "should generate [102 111 111 98]"
+        (should= [102 111 111 98] (base64->v "Zm9vYg==")))
+    (it "should generate [102 111 111 98 97]"
+        (should= [102 111 111 98 97] (base64->v "Zm9vYmE=")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (base64->v "Zm9vYmFy")))
+    (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
+    97 115]"
+        (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+                 (base64->v "SmFzb24gR3JhbnQgT3ppYXM="))))
+  (context
+    "v->base64url"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->base64url nil)))
+    (it "should generate an empty string"
+        (should= "" (v->base64url [])))
+    (it "should generate 'Zg=='"
+        (should= "Zg==" (v->base64url [102])))
+    (it "should generate 'Zm8='"
+        (should= "Zm8=" (v->base64url [102 111])))
+    (it "should generate 'Zm9v'"
+        (should= "Zm9v" (v->base64url [102 111 111])))
+    (it "should generate 'Zm9vYg=='"
+        (should= "Zm9vYg==" (v->base64url [102 111 111 98])))
+    (it "should generate 'Zm9vYmE='"
+        (should= "Zm9vYmE=" (v->base64url [102 111 111 98 97])))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (v->base64url [102 111 111 98 97 114])))
+    (it "should generate 'SmFzb24gR3JhbnQgT3ppYXM='"
+        (should= "SmFzb24gR3JhbnQgT3ppYXM="
+                 (v->base64url (vec (.getBytes "Jason Grant Ozias"))))))
+  (context
+    "base64url->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (base64url->v nil)))
+    (it "should generate [102]"
+        (should= [102] (base64url->v "Zg==")))
+    (it "should generate [102 111]"
+        (should= [102 111] (base64url->v "Zm8=")))
+    (it "should generate [102 111 111]"
+        (should= [102 111 111] (base64url->v "Zm9v")))
+    (it "should generate [102 111 111 98]"
+        (should= [102 111 111 98] (base64url->v "Zm9vYg==")))
+    (it "should generate [102 111 111 98 97]"
+        (should= [102 111 111 98 97] (base64url->v "Zm9vYmE=")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (base64url->v "Zm9vYmFy")))
+    (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
+    97 115]"
+        (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+                 (base64url->v "SmFzb24gR3JhbnQgT3ppYXM="))))
+  (context
+    "v->base32"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->base32 nil)))
+    (it "should generate an empty string"
+        (should= "" (v->base32 [])))
+    (it "should generate 'MY======'"
+        (should= "MY======" (v->base32 [102])))
+    (it "should generate 'MZXQ===='"
+        (should= "MZXQ====" (v->base32 [102 111])))
+    (it "should generate 'MZXW6==='"
+        (should= "MZXW6===" (v->base32 [102 111 111])))
+    (it "should generate 'MZXW6YQ='"
+        (should= "MZXW6YQ=" (v->base32 [102 111 111 98])))
+    (it "should generate 'MZXW6YTB'"
+        (should= "MZXW6YTB" (v->base32 [102 111 111 98 97])))
+    (it "should generate 'MZXW6YTBOI======'"
+        (should= "MZXW6YTBOI======" (v->base32 [102 111 111 98 97 114])))
+    (it "should generate 'JJQXG33OEBDXEYLOOQQE66TJMFZQ===='"
+        (should= "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="
+                 (v->base32 (vec (.getBytes "Jason Grant Ozias"))))))
+  (context
+    "base32->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (base32->v nil)))
+    (it "should generate [102]"
+        (should= [102] (base32->v "MY======")))
+    (it "should generate [102 111]"
+        (should= [102 111] (base32->v "MZXQ====")))
+    (it "should generate [102 111 111]"
+        (should= [102 111 111] (base32->v "MZXW6===")))
+    (it "should generate [102 111 111 98]"
+        (should= [102 111 111 98] (base32->v "MZXW6YQ=")))
+    (it "should generate [102 111 111 98 97]"
+        (should= [102 111 111 98 97] (base32->v "MZXW6YTB")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (base32->v "MZXW6YTBOI======")))
+    (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
+    97 115]"
+        (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+                 (base32->v "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="))))
+  (context
+    "v->base32hex"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->base32hex nil)))
+    (it "should generate an empty string"
+        (should= "" (v->base32hex [])))
+    (it "should generate 'CO======'"
+        (should= "CO======" (v->base32hex [102])))
+    (it "should generate 'CPNG===='"
+        (should= "CPNG====" (v->base32hex [102 111])))
+    (it "should generate 'CPNMU==='"
+        (should= "CPNMU===" (v->base32hex [102 111 111])))
+    (it "should generate 'CPNMUOG='"
+        (should= "CPNMUOG=" (v->base32hex [102 111 111 98])))
+    (it "should generate 'CPNMUOJ1'"
+        (should= "CPNMUOJ1" (v->base32hex [102 111 111 98 97])))
+    (it "should generate 'CPNMUOJ1E8======'"
+        (should= "CPNMUOJ1E8======" (v->base32hex [102 111 111 98 97 114])))
+    (it "should generate '99GN6RRE413N4OBEEGG4UUJ9C5PG===='"
+        (should= "99GN6RRE413N4OBEEGG4UUJ9C5PG===="
+                 (v->base32hex (vec (.getBytes "Jason Grant Ozias"))))))
+  (context
+    "base32hex->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (base32hex->v nil)))
+    (it "should generate [102]"
+        (should= [102] (base32hex->v "CO======")))
+    (it "should generate [102 111]"
+        (should= [102 111] (base32hex->v "CPNG====")))
+    (it "should generate [102 111 111]"
+        (should= [102 111 111] (base32hex->v "CPNMU===")))
+    (it "should generate [102 111 111 98]"
+        (should= [102 111 111 98] (base32hex->v "CPNMUOG=")))
+    (it "should generate [102 111 111 98 97]"
+        (should= [102 111 111 98 97] (base32hex->v "CPNMUOJ1")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (base32hex->v "CPNMUOJ1E8======")))
+    (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
+    97 115]"
+        (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+                 (base32hex->v "99GN6RRE413N4OBEEGG4UUJ9C5PG===="))))
+  (context
+    "v->base16"
+    (it "should throw an AssertionError on a non-vector"
+        (should-throw AssertionError (v->base16 nil)))
+    (it "should generate an empty string"
+        (should= "" (v->base16 [])))
+    (it "should generate '66'"
+        (should= "66" (v->base16 [102])))
+    (it "should generate '666F'"
+        (should= "666F" (v->base16 [102 111])))
+    (it "should generate '666F6F'"
+        (should= "666F6F" (v->base16 [102 111 111])))
+    (it "should generate '666F6F62'"
+        (should= "666F6F62" (v->base16 [102 111 111 98])))
+    (it "should generate '666F6F6261'"
+        (should= "666F6F6261" (v->base16 [102 111 111 98 97])))
+    (it "should generate '666F6F626172'"
+        (should= "666F6F626172" (v->base16 [102 111 111 98 97 114])))
+    (it "should generate '4A61736F6E204772616E74204F7A696173'"
+        (should= "4A61736F6E204772616E74204F7A696173"
+                 (v->base16 (vec (.getBytes "Jason Grant Ozias"))))))
+  (context
+    "base16->v"
+    (it "should throw an AssertionError on a non-string"
+        (should-throw AssertionError (base16->v nil)))
+    (it "should generate [102]"
+        (should= [102] (base16->v "66")))
+    (it "should generate [102 111]"
+        (should= [102 111] (base16->v "666F")))
+    (it "should generate [102 111 111]"
+        (should= [102 111 111] (base16->v "666F6F")))
+    (it "should generate [102 111 111 98]"
+        (should= [102 111 111 98] (base16->v "666F6F62")))
+    (it "should generate [102 111 111 98 97]"
+        (should= [102 111 111 98 97] (base16->v "666F6F6261")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (base16->v "666F6F626172")))
+    (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
+    97 115]"
+        (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
+                 (base16->v "4A61736F6E204772616E74204F7A696173"))))
+  (context
+    "output-encoder"
+    (it "should generate 'foobar'"
+        (should= "foobar" (output-encoder {:eoe :str}
+                                          [102 111 111 98 97 114])))
+    (it "should generate 'foobar'"
+        (should= "foobar" (output-encoder {:doe :str}
+                                          [102 111 111 98 97 114]
+                                          :encryption false)))
+    (it "should generate '666f6f626172'"
+        (should= "666f6f626172" (output-encoder {:eoe :hex}
+                                                [102 111 111 98 97 114])))
+    (it "should generate '666f6f626172'"
+        (should= "666f6f626172" (output-encoder {:doe :hex}
+                                                [102 111 111 98 97 114]
+                                                :encryption false)))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (output-encoder {:eoe :base64}
+                                            [102 111 111 98 97 114])))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (output-encoder {:doe :base64}
+                                            [102 111 111 98 97 114]
+                                            :encryption false)))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (output-encoder {:eoe :base64url}
+                                            [102 111 111 98 97 114])))
+    (it "should generate 'Zm9vYmFy'"
+        (should= "Zm9vYmFy" (output-encoder {:doe :base64url}
+                                            [102 111 111 98 97 114]
+                                            :encryption false)))
+    (it "should generate 'MZXW6YTBOI======'"
+        (should= "MZXW6YTBOI======" (output-encoder {:eoe :base32}
+                                                    [102 111 111 98 97 114])))
+    (it "should generate 'MZXW6YTBOI======'"
+        (should= "MZXW6YTBOI======" (output-encoder {:doe :base32}
+                                                    [102 111 111 98 97 114]
+                                                    :encryption false)))
+    (it "should generate 'CPNMUOJ1E8======'"
+        (should= "CPNMUOJ1E8======" (output-encoder {:eoe :base32hex}
+                                                    [102 111 111 98 97 114])))
+    (it "should generate 'CPNMUOJ1E8======'"
+        (should= "CPNMUOJ1E8======" (output-encoder {:doe :base32hex}
+                                                    [102 111 111 98 97 114]
+                                                    :encryption false)))
+    (it "should generate '666F6F626172'"
+        (should= "666F6F626172" (output-encoder {:eoe :base16}
+                                                [102 111 111 98 97 114])))
+    (it "should generate '666F6F626172'"
+        (should= "666F6F626172" (output-encoder {:doe :base16}
+                                                [102 111 111 98 97 114]
+                                                :encryption false))))
+  (context
+    "input-decoder"
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :str}
+                                                        "foobar")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :str}
+                                                        "foobar"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :hex}
+                                                        "666f6f626172")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :hex}
+                                                        "666f6f626172"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :base64}
+                                                        "Zm9vYmFy")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :base64}
+                                                        "Zm9vYmFy"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :base64url}
+                                                        "Zm9vYmFy")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :base64url}
+                                                        "Zm9vYmFy"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :base32}
+                                                        "MZXW6YTBOI======")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :base32}
+                                                        "MZXW6YTBOI======"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :base32hex}
+                                                        "CPNMUOJ1E8======")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :base32hex}
+                                                        "CPNMUOJ1E8======"
+                                                        :encryption false)))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:eid :base16}
+                                                        "666F6F626172")))
+    (it "should generate [102 111 111 98 97 114]"
+        (should= [102 111 111 98 97 114] (input-decoder {:did :base16}
+                                                        "666F6F626172"
+                                                        :encryption false)))))
