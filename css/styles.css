@@ -60,22 +60,22 @@ a.list-group-item.active,[class*='-info'] {
 }
   
 #section1 {
-	background-color: #168ccc;
+	/*background-color: #168ccc;*/
     color:#dedeff;
 }
   
 #section2 {
-	background-color: #e5e5ef;
+	/*background-color: #e5e5ef;*/
     color:#686868;
 }
   
 #section3 {
-	background-color: #168ccc;
+	/*background-color: #168ccc;*/
     color:#ddd;
 }
 
 #section4 {
-	background-color: #fff;
+	/*background-color: #fff;*/
     color:#444;
 }
 
@@ -84,7 +84,7 @@ a.list-group-item.active,[class*='-info'] {
 }
 
 #section6 {
-	background-color: #168ccc;
+	/*background-color: #168ccc;*/
     color:#ddd;
 }
 
