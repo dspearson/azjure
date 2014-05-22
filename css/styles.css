@@ -16,13 +16,13 @@ html,body {
 }
 
 .icon-bar {
-	background-color:#fff;
+	background-color:#dedeff;
 }
 
 .navbar-trans {
 	/*background-color:#279ddd;*/
 	background-color: #000000;
-    color:#fff;
+    color:#dedeff;
 }
 
 .navbar-trans li>a:hover,.navbar-trans li>a:focus,.navbar-trans li.active {
@@ -58,7 +58,7 @@ section {
 
 a.list-group-item.active,[class*='-info'] {
 	background-color: #168ccc;
-    color:#fff;
+    color:#dedeff;
 }
   
 #section1 {
@@ -75,24 +75,29 @@ a.list-group-item.active,[class*='-info'] {
 #section3 {
 	/*background-color: #168ccc;*/
     /*color:#ddd;*/
+    color:#dedeff;
 }
 
 #section4 {
 	/*background-color: #fff;*/
     /*color:#444;*/
+    color:#dedeff;
 }
 
 #section5,#section7 {
     /*color:#f5f5f5;*/
+    color:#dedeff;
 }
 
 #section6 {
 	/*background-color: #168ccc;*/
     /*color:#ddd;*/
+    color:#dedeff;
 }
 
 footer {
 	background-color:#494949;
+	color:#dedeff;
     /*color:#ddd;*/
     min-height:100px;
     padding-top:20px;
