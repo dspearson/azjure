@@ -20,7 +20,8 @@ html,body {
 }
 
 .navbar-trans {
-	background-color:#279ddd;
+	/*background-color:#279ddd;*/
+	background-color: #000000;
     color:#fff;
 }
 
