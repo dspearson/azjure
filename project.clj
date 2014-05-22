@@ -4,7 +4,8 @@
   :license {:name "MIT"
             :url  "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/math.numeric-tower "0.0.4"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]
+                 [org.ozias.cljlibs/utils "0.1.7"]]
   :test-paths ["spec"]
   :profiles
   {:dev {:source-paths ["dev"]

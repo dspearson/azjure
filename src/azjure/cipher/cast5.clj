@@ -9,7 +9,8 @@
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
-            [azjure.libmod :refer :all]))
+            [azjure.libmod :refer :all]
+            [org.ozias.cljlibs.utils.core :refer [in?]]))
 
 (def ^{:private true
        :doc     "#### key-sizes
@@ -534,9 +535,9 @@ Evaluates to a vector of 4 32-bit words."
   serve as input material for the generate-subkey function."
   {:added "0.2.0"}
   [key]
-  (subvec 1 (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
-                 (take 8)
-                 (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))
+  (subvec (->> (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
+               (take 8)
+               (reduce #(conj %1 (gen-words (last %1) %2)) [key])) 1))
 
 (defn- generate-subkeysfn
   "### generate-subkeysfn
@@ -564,7 +565,7 @@ Evaluates to a vector of 4 32-bit words."
   Generate the key schedule"
   {:added "0.2.0"}
   [key]
-  {:pre [(vector? key) (and (> (count key) 4) (< (count key) 17))]}
+  {:pre [(vector? key) (in? key-sizes (* 8 (count key)))]}
   (->> (cycle [0])
        (take (- 16 (count key)))
        (reduce conj key)
@@ -669,8 +670,9 @@ Evaluates to a vector of 8 bytes (representing a 64-bit block)."
          (reduce into))))
 
 (defmethod initialize :cast5 [m]
-  (let [ks (key-schedule key)]
-    (conj m {:km (first ks) :kr (last ks) :rc (if (> (count key) 10) 16 12)})))
+  (let [ks (key-schedule (:key m))]
+    (conj m {:km (first ks) :kr (last ks)
+             :rc (if (> (count (:key m)) 10) 16 12)})))
 (defmethod keysizes-bits :cast5 [_] key-sizes)
 (defmethod blocksize-bits :cast5 [_] block-size)
 (defmethod encrypt-block :cast5 [m block]
