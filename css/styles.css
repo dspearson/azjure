@@ -31,7 +31,8 @@ html,body {
 }
 
 .navbar-trans a{
-    color:#fefefe;
+    color:#dedeff;
+    /*color:#fefefe;*/
 }
 
 .navbar-trans .form-control:focus {
@@ -106,10 +107,11 @@ footer {
 
 footer .nav>li>a {
     padding:3px;
-    color:#ccc;
+    color:#dedeff;
+    /* color:#ccc;*/
 }
 
 footer .nav>li>a:hover {
     background-color:transparent;
-	color:#fff;
+	color:#ffffff;
 }
