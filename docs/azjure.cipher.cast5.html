@@ -3037,7 +3037,8 @@ net.brehaut.ClojureTools = (function (SH) {
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
-            [azjure.libmod :refer :all]))</pre></td></tr><tr><td class="docs"><h4>key-sizes</h4>
+            [azjure.libmod :refer :all]
+            [org.ozias.cljlibs.utils.core :refer [in?]]))</pre></td></tr><tr><td class="docs"><h4>key-sizes</h4>
 
 <p>  CAST5 supports keys of 40 to 128 bits inclusive in 8-bit steps.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
@@ -3567,9 +3568,9 @@ unique rounds.</li>
 </td><td class="codes"><pre class="brush: clojure">(defn- expand-key
   {:added &quot;0.2.0&quot;}
   [key]
-  (subvec 1 (-&gt;&gt; (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
-                 (take 8)
-                 (reduce #(conj %1 (gen-words (last %1) %2)) [key]))))</pre></td></tr><tr><td class="docs"><h3>generate-subkeysfn</h3>
+  (subvec (-&gt;&gt; (cycle [[3 0 2 3 1 2] [1 2 0 1 3 0]])
+               (take 8)
+               (reduce #(conj %1 (gen-words (last %1) %2)) [key])) 1))</pre></td></tr><tr><td class="docs"><h3>generate-subkeysfn</h3>
 
 <p>  Generates 32 32-bit words that make up the key schedule defined at
   <a href="http://tools.ietf.org/html/rfc2144#section-2.4">Section 2.4</a></p>
@@ -3595,7 +3596,7 @@ unique rounds.</li>
 </td><td class="codes"><pre class="brush: clojure">(defn- key-schedule
   {:added &quot;0.2.0&quot;}
   [key]
-  {:pre [(vector? key) (and (&gt; (count key) 4) (&lt; (count key) 17))]}
+  {:pre [(vector? key) (in? key-sizes (* 8 (count key)))]}
   (-&gt;&gt; (cycle [0])
        (take (- 16 (count key)))
        (reduce conj key)
@@ -3694,8 +3695,9 @@ if you are decrypting the block.</li>
          (mapv word-bytes)
          (reduce into))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod initialize :cast5 [m]
-  (let [ks (key-schedule key)]
-    (conj m {:km (first ks) :kr (last ks) :rc (if (&gt; (count key) 10) 16 12)})))
+  (let [ks (key-schedule (:key m))]
+    (conj m {:km (first ks) :kr (last ks)
+             :rc (if (&gt; (count (:key m)) 10) 16 12)})))
 (defmethod keysizes-bits :cast5 [_] key-sizes)
 (defmethod blocksize-bits :cast5 [_] block-size)
 (defmethod encrypt-block :cast5 [m block]

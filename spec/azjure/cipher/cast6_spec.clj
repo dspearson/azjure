@@ -1,0 +1,73 @@
+(ns azjure.cipher.cast6-spec
+  (:require [azjure.libtest :refer :all]
+            [speclj.core :refer :all]))
+
+(def ^{:private true
+       :doc     "Test vectors as defined in the spec."}
+  test-vectors [[[0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+                  0x0a 0xf7 0x56 0x47 0xf2 0x9f 0x61 0x5d]
+                 [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+                  0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00]
+                 [0xc8 0x42 0xa0 0x89 0x72 0xb4 0x3d 0x20
+                  0x83 0x6c 0x91 0xd1 0xb7 0x53 0x0f 0x6b]]
+                [[0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+                  0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
+                  0xba 0xc7 0x7a 0x77 0x17 0x94 0x28 0x63]
+                 [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+                  0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00]
+                 [0x1b 0x38 0x6c 0x02 0x10 0xdc 0xad 0xcb
+                  0xdd 0x0e 0x41 0xaa 0x08 0xa7 0xa7 0xe8]]
+                [[0x23 0x42 0xbb 0x9e 0xfa 0x38 0x54 0x2c
+                  0xbe 0xd0 0xac 0x83 0x94 0x0a 0xc2 0x98
+                  0x8d 0x7c 0x47 0xce 0x26 0x49 0x08 0x46
+                  0x1c 0xc1 0xb5 0x13 0x7a 0xe6 0xb6 0x04]
+                 [0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+                  0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00]
+                 [0x4f 0x6a 0x20 0x38 0x28 0x68 0x97 0xb9
+                  0xc9 0x87 0x01 0x36 0x55 0x33 0x17 0xfa]]])
+
+(def ^{:private true
+       :doc     "Suite tests"}
+  test-suites [
+                ;[:ecb :iso7816 ct-64-bf-ecb-iso7186]
+                ;[:ecb :iso10126 ct-64-bf-ecb-base]
+                ;[:ecb :pkcs7 ct-64-bf-ecb-pkcs7]
+                ;[:ecb :x923 ct-64-bf-ecb-x923]
+                ;[:ecb :zero ct-64-bf-ecb-zero]
+                ;[:cbc :iso7816 ct-64-bf-cbc-iso7186]
+                ;[:cbc :iso10126 ct-64-bf-cbc-base]
+                ;[:cbc :pkcs7 ct-64-bf-cbc-pkcs7]
+                ;[:cbc :x923 ct-64-bf-cbc-x923]
+                ;[:cbc :zero ct-64-bf-cbc-zero]
+                ;[:pcbc :iso7816 ct-64-bf-pcbc-iso7186]
+                ;[:pcbc :iso10126 ct-64-bf-pcbc-base]
+                ;[:pcbc :pkcs7 ct-64-bf-pcbc-pkcs7]
+                ;[:pcbc :x923 ct-64-bf-pcbc-x923]
+                ;[:pcbc :zero ct-64-bf-pcbc-zero]
+                ;[:cfb :iso7816 ct-64-bf-cfb-iso7186]
+                ;[:cfb :iso10126 ct-64-bf-cfb-base]
+                ;[:cfb :pkcs7 ct-64-bf-cfb-pkcs7]
+                ;[:cfb :x923 ct-64-bf-cfb-x923]
+                ;[:cfb :zero ct-64-bf-cfb-zero]
+                ;[:ofb :iso7816 ct-64-bf-ofb-iso7186]
+                ;[:ofb :iso10126 ct-64-bf-ofb-base]
+                ;[:ofb :pkcs7 ct-64-bf-ofb-pkcs7]
+                ;[:ofb :x923 ct-64-bf-ofb-x923]
+                ;[:ofb :zero ct-64-bf-ofb-zero]
+                ;[:ctr :iso7816 ct-64-bf-ctr-iso7186]
+                ;[:ctr :iso10126 ct-64-bf-ctr-base]
+                ;[:ctr :pkcs7 ct-64-bf-ctr-pkcs7]
+                ;[:ctr :x923 ct-64-bf-ctr-x923]
+                ;[:ctr :zero ct-64-bf-ctr-zero]
+                ])
+
+(def ^{:private true
+       :doc     "Configuration Map"}
+  cm {:type :cast6 :eid :str :doe :str})
+
+(describe
+  "CAST6"
+  (check-blocksize cm 128)
+  (check-keysizes cm (range 128 257 32))
+  (check-test-vectors cm test-vectors)
+  (check-test-suites cm test-suites))

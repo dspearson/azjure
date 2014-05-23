@@ -6,6 +6,7 @@
                            [blockcipher :refer :all]
                            [blowfish :refer :all]
                            [cast5 :refer :all]
+                           [cast6 :refer :all]
                            [cipher :refer :all]
                            [twofish :refer :all])
             [speclj.core :refer :all]))
