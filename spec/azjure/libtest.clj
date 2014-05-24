@@ -9,7 +9,8 @@
                            [cast6 :refer :all]
                            [cipher :refer :all]
                            [tea :refer :all]
-                           [twofish :refer :all])
+                           [twofish :refer :all]
+                           [xtea :refer :all])
             [speclj.core :refer :all]))
 
 (def ^{:doc "64-bit vector of 0's"} zeros-64-bits (vec (take 8 (repeat 0))))
