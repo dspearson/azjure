@@ -9,6 +9,7 @@
                            [cast5 :refer :all]
                            [cast6 :refer :all]
                            [streamcipher :refer :all]
+                           [tea :refer :all]
                            [twofish :refer :all])
             [clojure.pprint :refer (pprint)]
             [clojure.repl :refer :all]

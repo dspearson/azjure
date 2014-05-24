@@ -8,6 +8,7 @@
                            [cast5 :refer :all]
                            [cast6 :refer :all]
                            [cipher :refer :all]
+                           [tea :refer :all]
                            [twofish :refer :all])
             [speclj.core :refer :all]))
 
@@ -39,7 +40,7 @@
 (defn check-blocksize
   "Check the blocksize"
   [cm x]
-  (it "should report a blocksize of 128 bits"
+  (it "should report valid blocksize bits"
       (should= x (blocksize-bits cm))))
 
 (defn check-keysizes
