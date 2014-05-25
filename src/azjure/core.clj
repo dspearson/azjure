@@ -11,6 +11,7 @@
   See the [azjure] [azjure] homepage for more detailed usage information."
   {:author "Jason Ozias"}
   (:require [azjure.cipher.cipher :refer :all]
+            [azjure.cipher.streamcipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]
             [azjure.padders :refer :all])
@@ -73,6 +74,20 @@
            (decrypt-blocks m)
            (unpad m))
       :encryption false)))
+
+(defn encrypted-stream
+  "### encrypted-stream
+  Use a stream cipher to generate an encrypted stream of bytes from the given
+  sequence `xs`.  The map `m` has the same format as decribed in the `encrypt`
+  documentation."
+  {:added "0.2.0"}
+  [xs m]
+  (let [m (initialize m)
+        _ (println m)]
+    (->> (input-decoder m xs)
+         (generate-keystream m)
+         (reduce into)
+         (output-encoder m))))
 
 (defn gen-key
   "### gen-key

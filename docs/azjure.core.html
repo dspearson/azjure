@@ -3037,6 +3037,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.core
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.cipher :refer :all]
+            [azjure.cipher.streamcipher :refer :all]
             [azjure.encoders :refer :all]
             [azjure.modes :refer :all]
             [azjure.padders :refer :all])
@@ -3099,7 +3100,20 @@ represents the IV you wish to use with the block chaining mode.</li>
       (-&gt;&gt; (input-decoder m x :encryption false)
            (decrypt-blocks m)
            (unpad m))
-      :encryption false)))</pre></td></tr><tr><td class="docs"><h3>gen-key</h3>
+      :encryption false)))</pre></td></tr><tr><td class="docs"><h3>encrypted-stream</h3>
+
+<p>  Use a stream cipher to generate an encrypted stream of bytes from the given
+  sequence <code>xs</code>.  The map <code>m</code> has the same format as decribed in the <code>encrypt</code>
+  documentation.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn encrypted-stream
+  {:added &quot;0.2.0&quot;}
+  [xs m]
+  (let [m (initialize m)
+        _ (println m)]
+    (-&gt;&gt; (input-decoder m xs)
+         (generate-keystream m)
+         (reduce into)
+         (output-encoder m))))</pre></td></tr><tr><td class="docs"><h3>gen-key</h3>
 
 <p>  Generate a key of length <code>x</code> bits.  <code>x</code> should be a positive multiple of 8.</p>
 

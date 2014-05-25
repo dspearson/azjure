@@ -49,256 +49,256 @@
   (context
     "v->hex"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->hex nil)))
+        (should-throw AssertionError (xs->hex nil)))
     (it "should throw an AssertionError on an invalid byte value (-1)"
-        (should-throw AssertionError (v->hex [-1 0 1])))
+        (should-throw AssertionError (xs->hex [-1 0 1])))
     (it "should throw an AssertionError on an invalid byte value (256)"
-        (should-throw AssertionError (v->hex [0 256 1])))
+        (should-throw AssertionError (xs->hex [0 256 1])))
     (it "should generate '01'"
-        (should= "01" (v->hex [1])))
+        (should= "01" (xs->hex [1])))
     (it "should generate 'ff'"
-        (should= "ff" (v->hex [255])))
+        (should= "ff" (xs->hex [255])))
     (it "should generate '01000000"
-        (should= "01000000" (v->hex [1 0 0 0])))
+        (should= "01000000" (xs->hex [1 0 0 0])))
     (it "should generate '10162d08'"
-        (should= "10162d08" (v->hex [16 22 45 8]))))
+        (should= "10162d08" (xs->hex [16 22 45 8]))))
   (context
     "hex->v"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (hex->v nil)))
+        (should-throw AssertionError (hex->xs nil)))
     (it "should be '[0]'"
-        (should= [0] (hex->v "0")))
+        (should= [0] (hex->xs "0")))
     (it "should be '[1 0]'"
-        (should= [1 0] (hex->v "100")))
+        (should= [1 0] (hex->xs "100")))
     (it "should be '[1 255]'"
-        (should= [1 255] (hex->v "1ff")))
+        (should= [1 255] (hex->xs "1ff")))
     (it "should be '[0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]'"
         (should= [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]
-                 (hex->v "123456789abcdef")))
+                 (hex->xs "123456789abcdef")))
     (it "should be '[0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]'"
         (should= [0x01 0x23 0x45 0x67 0x89 0xAB 0xCD 0xEF]
-                 (hex->v "0123456789abcdef"))))
+                 (hex->xs "0123456789abcdef"))))
   (context
     "v->str"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->str nil)))
+        (should-throw AssertionError (xs->str nil)))
     (it "should throw an AssertionError on an invalid byte (-1)"
-        (should-throw AssertionError (v->str [-1])))
+        (should-throw AssertionError (xs->str [-1])))
     (it "should throw an AssertionError on an invalid byte (256)"
-        (should-throw AssertionError (v->str [256])))
+        (should-throw AssertionError (xs->str [256])))
     (it "should generate the string 'Jason'"
-        (should= "Jason" (v->str [74 97 115 111 110]))))
+        (should= "Jason" (xs->str [74 97 115 111 110]))))
   (context
     "str->v"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (str->v nil)))
+        (should-throw AssertionError (str->xs nil)))
     (it "should generate [74 97 115 111 110]"
-        (should= [74 97 115 111 110] (str->v "Jason"))))
+        (should= [74 97 115 111 110] (str->xs "Jason"))))
   (context
-    "v->base64"
+    "xs->base64"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->base64 nil)))
+        (should-throw AssertionError (xs->base64 nil)))
     (it "should generate an empty string"
-        (should= "" (v->base64 [])))
+        (should= "" (xs->base64 [])))
     (it "should generate 'Zg=='"
-        (should= "Zg==" (v->base64 [102])))
+        (should= "Zg==" (xs->base64 [102])))
     (it "should generate 'Zm8='"
-        (should= "Zm8=" (v->base64 [102 111])))
+        (should= "Zm8=" (xs->base64 [102 111])))
     (it "should generate 'Zm9v'"
-        (should= "Zm9v" (v->base64 [102 111 111])))
+        (should= "Zm9v" (xs->base64 [102 111 111])))
     (it "should generate 'Zm9vYg=='"
-        (should= "Zm9vYg==" (v->base64 [102 111 111 98])))
+        (should= "Zm9vYg==" (xs->base64 [102 111 111 98])))
     (it "should generate 'Zm9vYmE='"
-        (should= "Zm9vYmE=" (v->base64 [102 111 111 98 97])))
+        (should= "Zm9vYmE=" (xs->base64 [102 111 111 98 97])))
     (it "should generate 'Zm9vYmFy'"
-        (should= "Zm9vYmFy" (v->base64 [102 111 111 98 97 114])))
+        (should= "Zm9vYmFy" (xs->base64 [102 111 111 98 97 114])))
     (it "should generate 'SmFzb24gR3JhbnQgT3ppYXM='"
         (should= "SmFzb24gR3JhbnQgT3ppYXM="
-                 (v->base64 (vec (.getBytes "Jason Grant Ozias"))))))
+                 (xs->base64 (vec (.getBytes "Jason Grant Ozias"))))))
   (context
-    "base64->v"
+    "base64->xs"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (base64->v nil)))
+        (should-throw AssertionError (base64->xs nil)))
     (it "should generate [102]"
-        (should= [102] (base64->v "Zg==")))
+        (should= [102] (base64->xs "Zg==")))
     (it "should generate [102 111]"
-        (should= [102 111] (base64->v "Zm8=")))
+        (should= [102 111] (base64->xs "Zm8=")))
     (it "should generate [102 111 111]"
-        (should= [102 111 111] (base64->v "Zm9v")))
+        (should= [102 111 111] (base64->xs "Zm9v")))
     (it "should generate [102 111 111 98]"
-        (should= [102 111 111 98] (base64->v "Zm9vYg==")))
+        (should= [102 111 111 98] (base64->xs "Zm9vYg==")))
     (it "should generate [102 111 111 98 97]"
-        (should= [102 111 111 98 97] (base64->v "Zm9vYmE=")))
+        (should= [102 111 111 98 97] (base64->xs "Zm9vYmE=")))
     (it "should generate [102 111 111 98 97 114]"
-        (should= [102 111 111 98 97 114] (base64->v "Zm9vYmFy")))
+        (should= [102 111 111 98 97 114] (base64->xs "Zm9vYmFy")))
     (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
     97 115]"
         (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
-                 (base64->v "SmFzb24gR3JhbnQgT3ppYXM="))))
+                 (base64->xs "SmFzb24gR3JhbnQgT3ppYXM="))))
   (context
-    "v->base64url"
+    "xs->base64url"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->base64url nil)))
+        (should-throw AssertionError (xs->base64url nil)))
     (it "should generate an empty string"
-        (should= "" (v->base64url [])))
+        (should= "" (xs->base64url [])))
     (it "should generate 'Zg=='"
-        (should= "Zg==" (v->base64url [102])))
+        (should= "Zg==" (xs->base64url [102])))
     (it "should generate 'Zm8='"
-        (should= "Zm8=" (v->base64url [102 111])))
+        (should= "Zm8=" (xs->base64url [102 111])))
     (it "should generate 'Zm9v'"
-        (should= "Zm9v" (v->base64url [102 111 111])))
+        (should= "Zm9v" (xs->base64url [102 111 111])))
     (it "should generate 'Zm9vYg=='"
-        (should= "Zm9vYg==" (v->base64url [102 111 111 98])))
+        (should= "Zm9vYg==" (xs->base64url [102 111 111 98])))
     (it "should generate 'Zm9vYmE='"
-        (should= "Zm9vYmE=" (v->base64url [102 111 111 98 97])))
+        (should= "Zm9vYmE=" (xs->base64url [102 111 111 98 97])))
     (it "should generate 'Zm9vYmFy'"
-        (should= "Zm9vYmFy" (v->base64url [102 111 111 98 97 114])))
+        (should= "Zm9vYmFy" (xs->base64url [102 111 111 98 97 114])))
     (it "should generate 'SmFzb24gR3JhbnQgT3ppYXM='"
         (should= "SmFzb24gR3JhbnQgT3ppYXM="
-                 (v->base64url (vec (.getBytes "Jason Grant Ozias"))))))
+                 (xs->base64url (vec (.getBytes "Jason Grant Ozias"))))))
   (context
     "base64url->v"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (base64url->v nil)))
+        (should-throw AssertionError (base64url->xs nil)))
     (it "should generate [102]"
-        (should= [102] (base64url->v "Zg==")))
+        (should= [102] (base64url->xs "Zg==")))
     (it "should generate [102 111]"
-        (should= [102 111] (base64url->v "Zm8=")))
+        (should= [102 111] (base64url->xs "Zm8=")))
     (it "should generate [102 111 111]"
-        (should= [102 111 111] (base64url->v "Zm9v")))
+        (should= [102 111 111] (base64url->xs "Zm9v")))
     (it "should generate [102 111 111 98]"
-        (should= [102 111 111 98] (base64url->v "Zm9vYg==")))
+        (should= [102 111 111 98] (base64url->xs "Zm9vYg==")))
     (it "should generate [102 111 111 98 97]"
-        (should= [102 111 111 98 97] (base64url->v "Zm9vYmE=")))
+        (should= [102 111 111 98 97] (base64url->xs "Zm9vYmE=")))
     (it "should generate [102 111 111 98 97 114]"
-        (should= [102 111 111 98 97 114] (base64url->v "Zm9vYmFy")))
+        (should= [102 111 111 98 97 114] (base64url->xs "Zm9vYmFy")))
     (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
     97 115]"
         (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
-                 (base64url->v "SmFzb24gR3JhbnQgT3ppYXM="))))
+                 (base64url->xs "SmFzb24gR3JhbnQgT3ppYXM="))))
   (context
-    "v->base32"
+    "xs->base32"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->base32 nil)))
+        (should-throw AssertionError (xs->base32 nil)))
     (it "should generate an empty string"
-        (should= "" (v->base32 [])))
+        (should= "" (xs->base32 [])))
     (it "should generate 'MY======'"
-        (should= "MY======" (v->base32 [102])))
+        (should= "MY======" (xs->base32 [102])))
     (it "should generate 'MZXQ===='"
-        (should= "MZXQ====" (v->base32 [102 111])))
+        (should= "MZXQ====" (xs->base32 [102 111])))
     (it "should generate 'MZXW6==='"
-        (should= "MZXW6===" (v->base32 [102 111 111])))
+        (should= "MZXW6===" (xs->base32 [102 111 111])))
     (it "should generate 'MZXW6YQ='"
-        (should= "MZXW6YQ=" (v->base32 [102 111 111 98])))
+        (should= "MZXW6YQ=" (xs->base32 [102 111 111 98])))
     (it "should generate 'MZXW6YTB'"
-        (should= "MZXW6YTB" (v->base32 [102 111 111 98 97])))
+        (should= "MZXW6YTB" (xs->base32 [102 111 111 98 97])))
     (it "should generate 'MZXW6YTBOI======'"
-        (should= "MZXW6YTBOI======" (v->base32 [102 111 111 98 97 114])))
+        (should= "MZXW6YTBOI======" (xs->base32 [102 111 111 98 97 114])))
     (it "should generate 'JJQXG33OEBDXEYLOOQQE66TJMFZQ===='"
         (should= "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="
-                 (v->base32 (vec (.getBytes "Jason Grant Ozias"))))))
+                 (xs->base32 (vec (.getBytes "Jason Grant Ozias"))))))
   (context
-    "base32->v"
+    "base32->xs"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (base32->v nil)))
+        (should-throw AssertionError (base32->xs nil)))
     (it "should generate [102]"
-        (should= [102] (base32->v "MY======")))
+        (should= [102] (base32->xs "MY======")))
     (it "should generate [102 111]"
-        (should= [102 111] (base32->v "MZXQ====")))
+        (should= [102 111] (base32->xs "MZXQ====")))
     (it "should generate [102 111 111]"
-        (should= [102 111 111] (base32->v "MZXW6===")))
+        (should= [102 111 111] (base32->xs "MZXW6===")))
     (it "should generate [102 111 111 98]"
-        (should= [102 111 111 98] (base32->v "MZXW6YQ=")))
+        (should= [102 111 111 98] (base32->xs "MZXW6YQ=")))
     (it "should generate [102 111 111 98 97]"
-        (should= [102 111 111 98 97] (base32->v "MZXW6YTB")))
+        (should= [102 111 111 98 97] (base32->xs "MZXW6YTB")))
     (it "should generate [102 111 111 98 97 114]"
-        (should= [102 111 111 98 97 114] (base32->v "MZXW6YTBOI======")))
+        (should= [102 111 111 98 97 114] (base32->xs "MZXW6YTBOI======")))
     (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
     97 115]"
         (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
-                 (base32->v "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="))))
+                 (base32->xs "JJQXG33OEBDXEYLOOQQE66TJMFZQ===="))))
   (context
     "v->base32hex"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->base32hex nil)))
+        (should-throw AssertionError (xs->base32hex nil)))
     (it "should generate an empty string"
-        (should= "" (v->base32hex [])))
+        (should= "" (xs->base32hex [])))
     (it "should generate 'CO======'"
-        (should= "CO======" (v->base32hex [102])))
+        (should= "CO======" (xs->base32hex [102])))
     (it "should generate 'CPNG===='"
-        (should= "CPNG====" (v->base32hex [102 111])))
+        (should= "CPNG====" (xs->base32hex [102 111])))
     (it "should generate 'CPNMU==='"
-        (should= "CPNMU===" (v->base32hex [102 111 111])))
+        (should= "CPNMU===" (xs->base32hex [102 111 111])))
     (it "should generate 'CPNMUOG='"
-        (should= "CPNMUOG=" (v->base32hex [102 111 111 98])))
+        (should= "CPNMUOG=" (xs->base32hex [102 111 111 98])))
     (it "should generate 'CPNMUOJ1'"
-        (should= "CPNMUOJ1" (v->base32hex [102 111 111 98 97])))
+        (should= "CPNMUOJ1" (xs->base32hex [102 111 111 98 97])))
     (it "should generate 'CPNMUOJ1E8======'"
-        (should= "CPNMUOJ1E8======" (v->base32hex [102 111 111 98 97 114])))
+        (should= "CPNMUOJ1E8======" (xs->base32hex [102 111 111 98 97 114])))
     (it "should generate '99GN6RRE413N4OBEEGG4UUJ9C5PG===='"
         (should= "99GN6RRE413N4OBEEGG4UUJ9C5PG===="
-                 (v->base32hex (vec (.getBytes "Jason Grant Ozias"))))))
+                 (xs->base32hex (vec (.getBytes "Jason Grant Ozias"))))))
   (context
     "base32hex->v"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (base32hex->v nil)))
+        (should-throw AssertionError (base32hex->xs nil)))
     (it "should generate [102]"
-        (should= [102] (base32hex->v "CO======")))
+        (should= [102] (base32hex->xs "CO======")))
     (it "should generate [102 111]"
-        (should= [102 111] (base32hex->v "CPNG====")))
+        (should= [102 111] (base32hex->xs "CPNG====")))
     (it "should generate [102 111 111]"
-        (should= [102 111 111] (base32hex->v "CPNMU===")))
+        (should= [102 111 111] (base32hex->xs "CPNMU===")))
     (it "should generate [102 111 111 98]"
-        (should= [102 111 111 98] (base32hex->v "CPNMUOG=")))
+        (should= [102 111 111 98] (base32hex->xs "CPNMUOG=")))
     (it "should generate [102 111 111 98 97]"
-        (should= [102 111 111 98 97] (base32hex->v "CPNMUOJ1")))
+        (should= [102 111 111 98 97] (base32hex->xs "CPNMUOJ1")))
     (it "should generate [102 111 111 98 97 114]"
-        (should= [102 111 111 98 97 114] (base32hex->v "CPNMUOJ1E8======")))
+        (should= [102 111 111 98 97 114] (base32hex->xs "CPNMUOJ1E8======")))
     (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
     97 115]"
         (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
-                 (base32hex->v "99GN6RRE413N4OBEEGG4UUJ9C5PG===="))))
+                 (base32hex->xs "99GN6RRE413N4OBEEGG4UUJ9C5PG===="))))
   (context
     "v->base16"
     (it "should throw an AssertionError on a non-vector"
-        (should-throw AssertionError (v->base16 nil)))
+        (should-throw AssertionError (xs->base16 nil)))
     (it "should generate an empty string"
-        (should= "" (v->base16 [])))
+        (should= "" (xs->base16 [])))
     (it "should generate '66'"
-        (should= "66" (v->base16 [102])))
+        (should= "66" (xs->base16 [102])))
     (it "should generate '666F'"
-        (should= "666F" (v->base16 [102 111])))
+        (should= "666F" (xs->base16 [102 111])))
     (it "should generate '666F6F'"
-        (should= "666F6F" (v->base16 [102 111 111])))
+        (should= "666F6F" (xs->base16 [102 111 111])))
     (it "should generate '666F6F62'"
-        (should= "666F6F62" (v->base16 [102 111 111 98])))
+        (should= "666F6F62" (xs->base16 [102 111 111 98])))
     (it "should generate '666F6F6261'"
-        (should= "666F6F6261" (v->base16 [102 111 111 98 97])))
+        (should= "666F6F6261" (xs->base16 [102 111 111 98 97])))
     (it "should generate '666F6F626172'"
-        (should= "666F6F626172" (v->base16 [102 111 111 98 97 114])))
+        (should= "666F6F626172" (xs->base16 [102 111 111 98 97 114])))
     (it "should generate '4A61736F6E204772616E74204F7A696173'"
         (should= "4A61736F6E204772616E74204F7A696173"
-                 (v->base16 (vec (.getBytes "Jason Grant Ozias"))))))
+                 (xs->base16 (vec (.getBytes "Jason Grant Ozias"))))))
   (context
     "base16->v"
     (it "should throw an AssertionError on a non-string"
-        (should-throw AssertionError (base16->v nil)))
+        (should-throw AssertionError (base16->xs nil)))
     (it "should generate [102]"
-        (should= [102] (base16->v "66")))
+        (should= [102] (base16->xs "66")))
     (it "should generate [102 111]"
-        (should= [102 111] (base16->v "666F")))
+        (should= [102 111] (base16->xs "666F")))
     (it "should generate [102 111 111]"
-        (should= [102 111 111] (base16->v "666F6F")))
+        (should= [102 111 111] (base16->xs "666F6F")))
     (it "should generate [102 111 111 98]"
-        (should= [102 111 111 98] (base16->v "666F6F62")))
+        (should= [102 111 111 98] (base16->xs "666F6F62")))
     (it "should generate [102 111 111 98 97]"
-        (should= [102 111 111 98 97] (base16->v "666F6F6261")))
+        (should= [102 111 111 98 97] (base16->xs "666F6F6261")))
     (it "should generate [102 111 111 98 97 114]"
-        (should= [102 111 111 98 97 114] (base16->v "666F6F626172")))
+        (should= [102 111 111 98 97 114] (base16->xs "666F6F626172")))
     (it "should generate [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105
     97 115]"
         (should= [74 97 115 111 110 32 71 114 97 110 116 32 79 122 105 97 115]
-                 (base16->v "4A61736F6E204772616E74204F7A696173"))))
+                 (base16->xs "4A61736F6E204772616E74204F7A696173"))))
   (context
     "output-encoder"
     (it "should generate 'foobar'"
