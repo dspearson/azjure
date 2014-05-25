@@ -3110,7 +3110,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn- nonce-seq
   {:added &quot;0.2.0&quot;}
   [iv]
-  (map (partial xor (bytes-&gt;val iv)) (range)))</pre></td></tr><tr><td class="docs"><p>Prepend the given vector with 0's out to length n</p>
+  (map (partial xor (ubv-&gt;x iv)) (range)))</pre></td></tr><tr><td class="docs"><p>Prepend the given vector with 0's out to length n</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- expand
   {:added &quot;0.2.0&quot;}
   [bv n]
@@ -3119,7 +3119,7 @@ net.brehaut.ClojureTools = (function (SH) {
   {:added &quot;0.2.0&quot;}
   [n iv]
   (map #(expand % (- (count iv) (count %)))
-       (map val-&gt;bytes (take n (nonce-seq iv)))))</pre></td></tr><tr><td class="docs"><p>Encrypt/decrypt blocks in Counter (CTR) mode.</p>
+       (map x-&gt;ubv (take n (nonce-seq iv)))))</pre></td></tr><tr><td class="docs"><p>Encrypt/decrypt blocks in Counter (CTR) mode.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-blocks-ctr
   {:added &quot;0.2.0&quot;}
   [m bv]

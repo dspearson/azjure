@@ -3028,243 +3028,175 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.libbyte" name="azjure.libbyte"><h1 class="project-name">azjure.libbyte</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(ns azjure.libbyte
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.salsa20" name="azjure.cipher.salsa20"><h1 class="project-name">azjure.cipher.salsa20</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>Salsa20 Cipher</h2>
+
+<p>  Implemented to meet the spec at <a href="http://cr.yp.to/snuffle/spec.pdf">http://cy.yp.to/snuffle/spec.pdf</a></p>
+</td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.salsa20
   {:author &quot;Jason Ozias&quot;}
-  (:require [clojure.math.numeric-tower :refer [expt]])
-  (:import (clojure.lang BigInt)))</pre></td></tr><tr><td class="docs"><p>32-bit mask</p>
-</td><td class="codes"><pre class="brush: clojure">(def  mask32 0xFFFFFFFF)</pre></td></tr><tr><td class="docs"><p>Evaluates to true if every value in a sequence in a 0 or a 1</p>
-</td><td class="codes"><pre class="brush: clojure">(defn every-bit?
-  [xs]
-  {:added &quot;0.2.0&quot;}
-  (every? true? (map #(or (zero? %) (= 1 %)) xs)))</pre></td></tr><tr><td class="docs"><p>Evaluates to true if every value in a sequence is between 0 and 255
-  inclusive</p>
-</td><td class="codes"><pre class="brush: clojure">(defn every-byte?
-  [xs]
-  {:added &quot;0.2.0&quot;}
-  (every? true? (map #(and (&gt;= % 0) (&lt;= % 255)) xs)))</pre></td></tr><tr><td class="docs"><p>Get the last byte from a value</p>
-</td><td class="codes"><pre class="brush: clojure">(defmulti last-byte
-          {:arglists '([x])
-           :added    &quot;0.2.0&quot;}
-          class)</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod last-byte BigInt [^BigInt x]
-  (.longValue (.and (.toBigInteger x) (.toBigInteger (bigint 0xff)))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod last-byte BigInteger [^BigInteger x]
-  (.longValue (.and x (.toBigInteger (bigint 0xff)))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod last-byte Long [x]
-  (bit-and 0xff x))</pre></td></tr><tr><td class="docs"><p>bitwise shift a BigInteger x right y bits</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bit-shift-right-big
-  {:added &quot;0.2.0&quot;}
-  [^BigInteger x y]
-  (.shiftRight x y))</pre></td></tr><tr><td class="docs"><p>bitwise shift a BigInteger x left y bits</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bit-shift-left-big
-  {:added &quot;0.2.0&quot;}
-  [^BigInteger x y]
-  (.shiftLeft x y))</pre></td></tr><tr><td class="docs"><p>bitwise or BigInteger x and BigInteger y</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bit-or-big
-  {:added &quot;0.2.0&quot;}
-  [^BigInteger x ^BigInteger y]
-  (.or x y))</pre></td></tr><tr><td class="docs"><p>Determine which set of bit math functions to use.</p>
+  (:require [azjure.cipher.cipher :refer :all]
+            [azjure.cipher.streamcipher :refer :all]
+            [azjure.libbyte :refer :all]
+            [azjure.libmod :refer [+modw]]))</pre></td></tr><tr><td class="docs"><h4>key-sizes</h4>
 
-<p>  Java Long primitive types can only hold non-negative values between 0 and
-  2<sup>63<sup>-1 inclusive.  The largest vector of unsigned bytes in big-endian
-  format (MSB is leftmost) that is supported by Long math is
-  [127 x x x x x x x]. If the unsigned bytes are little-endian format (MSB is
-  rightmost), the last byte checked against 127 instead of the first.  Note that
-  longer vectors may still be processed as Longs if they are fille with 0's</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- long-or-bigint?
-  {:added &quot;0.2.0&quot;}
-  [ubv le]
-  (let [l (count ubv)
-        fns {:long   [bit-or bit-shift-left]
-             :bigint [bit-or-big
-                      #(bit-shift-left-big (BigInteger/valueOf %1) %2)]}]
-    (cond
-      (&lt; l 8) (:long fns)
-      (= l 8) (if (&lt; (if-not le (first ubv) (last ubv)) 128)
-                (:long fns)
-                (:bigint fns))
-      (&gt; l 8) (let [nonzeros (-&gt;&gt; (if le (subvec ubv 8) (drop-last 8 ubv))
-                                  (filter (complement zero?)))]
-                (if (seq nonzeros)
-                  (:bigint fns)
-                  (:long fns))))))</pre></td></tr><tr><td class="docs"><p>Convert a vector of unsigned bytes (0-255) to a value</p>
-</td><td class="codes"><pre class="brush: clojure">(defn ubv-&gt;x
-  {:added &quot;0.2.0&quot;}
-  [xv &amp; {:keys [le]}]
-  {:pre [(every-byte? xv)]}
-  (let [l (count xv)
-        [orfn shiftfn] (long-or-bigint? xv le)]
-    (-&gt;&gt; (if le (range 0 (* 8 l) 8) (range (* 8 (dec l)) -1 -8))
-         (map shiftfn xv)
-         (reduce orfn))))</pre></td></tr><tr><td class="docs"><p>Convert a value to a vector of bytes (0-255)</p>
-</td><td class="codes"><pre class="brush: clojure">(defmulti x-&gt;ubv
-          {:arglists '([x])
-           :added    &quot;0.2.0&quot;}
-          class)</pre></td></tr><tr><td class="docs"><p>Shift x right 8-bits and accumulate the last byte value in a vector.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- x-&gt;ubvfn
-  {:added &quot;0.2.0&quot;}
-  [x sfn]
-  (loop [curr x
-         acc []]
-    (cond (and (zero? curr) (empty? acc)) [0]
-          (zero? curr) (vec (reverse acc))
-          :else (recur (sfn curr 8) (conj acc (last-byte curr))))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod x-&gt;ubv BigInteger [^BigInteger x]
-  (x-&gt;ubvfn x bit-shift-right-big))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod x-&gt;ubv BigInt [^BigInt x]
-  (x-&gt;ubvfn (.toBigInteger x) bit-shift-right-big))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod x-&gt;ubv Long [x]
-  (x-&gt;ubvfn x unsigned-bit-shift-right))</pre></td></tr><tr><td class="docs"><p>Take a sequence of up to x-bytes and convert them into a sequence of exactly
-  x-bytes.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- as-xword
-  {:added &quot;0.2.0&quot;}
-  [xs x]
-  (-&gt;&gt; (repeat (- x (count xs)) 0)
-       (reduce conj (seq xs))
-       (vec)))</pre></td></tr><tr><td class="docs"><p>Take a sequence of up to 4-bytes and convert them into a sequence of exactly
-  4-bytes (a 32-bit word).</p>
-</td><td class="codes"><pre class="brush: clojure">(defn as-word
-  {:added &quot;0.2.0&quot;}
-  [xs]
-  {:pre [(&lt;= (count xs) 4)]
-   :post [(= 4 (count %))]}
-  (as-xword xs 4))</pre></td></tr><tr><td class="docs"><p>Take a sequence of up to 8-bytes and convert them into a sequence of exactly
-  8-bytes (a 64-bit dword).</p>
-</td><td class="codes"><pre class="brush: clojure">(defn as-dword
-  {:added &quot;0.2.0&quot;}
-  [xs]
-  {:pre [(&lt;= (count xs) 8)]
-   :post [(= 8 (count %))]}
-  (as-xword xs 8))</pre></td></tr><tr><td class="docs"><p>bitwise xor for different classes</p>
-</td><td class="codes"><pre class="brush: clojure">(defmulti xor
-          {:arglists '([x y])
-           :added    &quot;0.2.0&quot;}
-          (fn [x _] (class x)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod xor Long [x y] (bit-xor x y))
-(defmethod xor BigInteger [^BigInteger x y] (.xor x (.toBigInteger (bigint y))))</pre></td></tr><tr><td class="docs"><p>Returns a lazy sequence of [index, item] pairs, where items come
-  from 's' and indexes count up from zero.</p>
+<p>  Salsa20 supports keys of 128 or 256 bits.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :doc     }
+  key-sizes [128 256])</pre></td></tr><tr><td class="docs"><h4>iv-size</h4>
 
-<p>  (indexed '(a b c d))  =>  ([0 a] [1 b] [2 c] [3 d])</p>
-</td><td class="codes"><pre class="brush: clojure">(defn indexed
-  [s]
-  (map vector (iterate inc 0) s))</pre></td></tr><tr><td class="docs"><p>Returns a lazy sequence containing the positions at which pred
-   is true for items in coll.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn positions
-  [pred coll]
-  (for [[idx elt] (indexed coll) :when (pred elt)] idx))</pre></td></tr><tr><td class="docs"><p>Convert a byte (0-255) into a vector of bits</p>
-</td><td class="codes"><pre class="brush: clojure">(defn byte-&gt;bits
+<p>  Salsa20 supports an IV (nonce) size of 64-bits.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :doc     }
+  iv-size 64)</pre></td></tr><tr><td class="docs"><h4>keystream-size</h4>
+
+<p>  Salsa20 can generate 2^70 keystream bytes with the same key and nonce</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :doc     }
+  keystream-size &quot;2^70&quot;)</pre></td></tr><tr><td class="docs"><h4>sigma</h4>
+
+<p>  Used during Salsa20 expansion for 256-bit keys.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :doc     }
+  sigma [[0x65 0x78 0x70 0x61]
+         [0x6E 0x64 0x20 0x33]
+         [0x32 0x2D 0x62 0x79]
+         [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h4>tau</h4>
+
+<p>  Used during Salsa20 expansion for 128-bit keys.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :doc     }
+  tau [[0x65 0x78 0x70 0x61]
+       [0x6E 0x64 0x20 0x31]
+       [0x36 0x2D 0x62 0x79]
+       [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h3>quarter-round</h3>
+
+<p>  quarterround function as defined in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a>.</p>
+
+<p>  Takes a 4-word vector and evaluates to a 4-word vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- quarter-round
+  {:added &quot;0.2.0&quot;}
+  [[y0 y1 y2 y3]]
+  (let [z1 (bit-xor y1 (&lt;&lt;&lt; (+modw y0 y3) 7))
+        z2 (bit-xor y2 (&lt;&lt;&lt; (+modw z1 y0) 9))
+        z3 (bit-xor y3 (&lt;&lt;&lt; (+modw z2 z1) 13))
+        z0 (bit-xor y0 (&lt;&lt;&lt; (+modw z3 z2) 18))]
+    [z0 z1 z2 z3]))</pre></td></tr><tr><td class="docs"><h3>row-round</h3>
+
+<p>  rowround function as defined in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
+
+<p>  Takes a 16-word vector and evaluates to a 16-word vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- row-round
+  {:added &quot;0.2.0&quot;}
+  [[y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]]
+  (let [mx [[y0 y1 y2 y3]
+            [y5 y6 y7 y4]
+            [y10 y11 y8 y9]
+            [y15 y12 y13 y14]]
+        [[z0 z1 z2 z3]
+         [z5 z6 z7 z4]
+         [z10 z11 z8 z9]
+         [z15 z12 z13 z14]] (map quarter-round mx)]
+    [z0 z1 z2 z3 z4 z5 z6 z7 z8 z9 z10 z11 z12 z13 z14 z15]))</pre></td></tr><tr><td class="docs"><h3>column-round</h3>
+
+<p>  columnround function as defined in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
+
+<p>  Takes a 16-word vector and evaluates to a 16-word vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- column-round
+  {:added &quot;0.2.0&quot;}
+  [[x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15]]
+  (let [mx [[x0 x4 x8 x12]
+            [x5 x9 x13 x1]
+            [x10 x14 x2 x6]
+            [x15 x3 x7 x11]]
+        [[y0 y4 y8 y12]
+         [y5 y9 y13 y1]
+         [y10 y14 y2 y6]
+         [y15 y3 y7 y11]] (map quarter-round mx)]
+    [y0 y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12 y13 y14 y15]))</pre></td></tr><tr><td class="docs"><h3>double-round</h3>
+
+<p>  doubleround function as defined in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a></p>
+
+<p>  Takes a 16-word vector and evaluates to a 16-word vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- double-round
+  {:added &quot;0.2.0&quot;}
+  [xv]
+  (row-round (column-round xv)))</pre></td></tr><tr><td class="docs"><p>Generate the little endian form of a word (32-bit) value.</p>
+
+<p>  Evaluates to b<sub>0</sub> + 2<sup>8</sup>b<sub>1</sub> +
+  2<sup>16</sup>b<sub>2</sub> + 2<sup>24</sup>b<sub>3</sub></p>
+</td><td class="codes"><pre class="brush: clojure">(defn- little-endian
+  {:added &quot;0.2.0&quot;}
+  [bv]
+  (ubv-&gt;x bv :le true))</pre></td></tr><tr><td class="docs"><h3>salsa20-hash</h3>
+
+<p>  Calculate Salsa20(<em>x</em>) by performing double-round 10 times on the
+  little-endian form of the bytes, and adding that mod<sub>32</sub> with the
+  bytes.  The result is then converted back to a vector of words.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- salsa20-hash
+  {:added &quot;0.2.0&quot;}
   [x]
-  {:pre [(&gt;= x 0) (&lt;= x 255)]}
-  (vec (reverse (mapv #(if % 1 0) (mapv (partial bit-test x) (range 8))))))</pre></td></tr><tr><td class="docs"><p>Convert a vector of bits into a byte (0-255)</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bits-&gt;byte
+  (let [bytes (map little-endian (partition 4 x))]
+    (-&gt;&gt; (range 10)
+         (reduce (fn [x _] (double-round x)) bytes)
+         (mapv +modw bytes)
+         (mapv #(word-bytes % true))
+         (reduce into))))</pre></td></tr><tr><td class="docs"><h3>v</h3>
+
+<p>  Generate a lazy sequence of v's for Salsa20<sub>k</sub>(<em>v</em>) with the given
+  8-byte nonce.</p>
+
+<p>  Evaluates to a lazy sequence of 16-byte vectors.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- v
+  {:added &quot;0.2.0&quot;}
+  [nonce]
+  {:pre [(vector? nonce)
+         (= 8 (count nonce))
+         (every-byte? nonce)]}
+  (map into (repeat nonce) (map #(dword-bytes % true) (range))))</pre></td></tr><tr><td class="docs"><h3>usbv32</h3>
+
+<p>  Is the given vector 32 unsigned bytes long?</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- usbv32?
+  {:added &quot;0.2.0&quot;}
   [v]
-  {:pre [(= (count v) 8)
-         (every-bit? v)]}
-  (reduce bit-set 0 (positions #{1} (reverse v))))</pre></td></tr><tr><td class="docs"><p>Get the nth byte out of the given word.  n is a value from 1 to 4 where 1
-  represents the least significant byte and 4 represents the most significant
-  byte</p>
+  (and (every-byte? v) (= 32 (count v))))</pre></td></tr><tr><td class="docs"><h3>salsa20-expansion</h3>
 
-<p>  (get-byte 0x11223344 4) => 0x11</p>
-</td><td class="codes"><pre class="brush: clojure">(defn get-byte
-  [n x]
-  (let [shift (* 8 (dec n))
-        sftfn (if (zero? shift) x (bit-shift-right x shift))]
-    (bit-and sftfn 0xFF)))</pre></td></tr><tr><td class="docs"><p>Take a vector of 4 bytes (0-255) and create a 32-bit word value. If le is
-  true, the vector is assumed to be in little endian format.</p>
+<p>  Expand the 16 or 32-byte key <em>k</em> and the 16-byte vector <em>v</em> into a 64-byte
+  vector using sigma or tau depending on the key length</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- salsa20-expansion
+  {:added &quot;0.2.0&quot;}
+  [k v]
+  (-&gt;&gt; (if (usbv32? k)
+         (interleave sigma [(subvec k 0 16) v (subvec k 16) 0])
+         (interleave tau [k v k 0]))
+       (butlast)
+       (reduce into)))</pre></td></tr><tr><td class="docs"><h3>salsa20-kn</h3>
 
-<p>  (bytes-word [0x12 0xab 0x1f 0x3b]) => 0x12ab1f3b</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bytes-word
-  ([v le]
-   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
-     (reduce bit-or (map #(bit-shift-left (nth v %1) %2) (range 4) rng))))
-  ([v]
-   (bytes-word v false)))</pre></td></tr><tr><td class="docs"><p>Take a vector of 8 bytes (0-255) and create a 64-bit dword value.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bytes-dword
-  [v]
-  (apply bit-or
-         (map #(bit-shift-left (nth v %1) %2)
-              (range 8)
-              (range 56 -1 -8))))</pre></td></tr><tr><td class="docs"><p>Converts a word value to a vector of 4 bytes (0-255).  If le is true, the
-  conversion is made to little endian format.</p>
+<p>  Calculate Salsa20<sub><em>k</em></sub>(<em>n</em>) where <em>k</em> is a 16 or 32-byte key, and
+  <em>n</em> is a 16-byte vector.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- salsa20-kn
+  {:added &quot;0.2.0&quot;}
+  [k n]
+  (salsa20-hash (salsa20-expansion k n)))</pre></td></tr><tr><td class="docs"><h3>salsa20-encrypt</h3>
 
-<p>  (word-bytes 0x12ab1f3b) => [0x12 0xab 0x1f 0x3b]</p>
-</td><td class="codes"><pre class="brush: clojure">(defn word-bytes
-  ([word le]
-   (let [rng (if le (range 0 32 8) (range 24 -1 -8))]
-     (mapv #(last-byte (bit-shift-right word %)) rng)))
-  ([word]
-   (word-bytes word false)))</pre></td></tr><tr><td class="docs"><p>Converts a dword value to a vector of 8 bytes (0-255).  If le is true, the
-  conversion is made to little endian format.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn dword-bytes
-  ([dword le]
-   (let [rng (if le (range 0 64 8) (range 56 -1 -8))]
-     (mapv #(last-byte (bit-shift-right dword %)) rng)))
-  ([dword]
-   (dword-bytes dword false)))</pre></td></tr><tr><td class="docs"><p>Reverse the bytes in a word.</p>
-
-<p>  (reverse-bytes 0x01234567) => 0x67452301</p>
-</td><td class="codes"><pre class="brush: clojure">(defn reverse-bytes
-  [word]
-  (-&gt; #(last-byte (bit-shift-right word %1))
-      (mapv (range 0 32 8))
-      (bytes-word)))</pre></td></tr><tr><td class="docs"><p>Invert the shift</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- inv-shift
-  [shift bits]
-  (- bits shift))</pre></td></tr><tr><td class="docs"><p>Invert the shift</p>
-</td><td class="codes"><pre class="brush: clojure">(def  minv-shift (memoize inv-shift))</pre></td></tr><tr><td class="docs"><p>Circular left shift dispatch method</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- shift-dispatch
-  [word _ bits]
-  (cond
-    (or (instance? BigInteger word) (&gt; bits 32)) :a
-    :else :default))</pre></td></tr><tr><td class="docs"><p>Circular shift left</p>
-</td><td class="codes"><pre class="brush: clojure">(defmulti &lt;&lt;&lt;-mm  shift-dispatch)</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod &lt;&lt;&lt;-mm :a [word shift bits]
-  (let [biw (if (instance? BigInteger word) word (BigInteger. (str word)))
-        sft (mod shift bits)
-        mask (BigInteger. (str (dec (expt 2 bits))))]
-    (if (zero? sft)
-      word
-      (.or
-        (.and (.shiftLeft ^BigInteger biw sft) mask)
-        (.shiftRight ^BigInteger biw (minv-shift sft bits))))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmethod &lt;&lt;&lt;-mm :default [word shift bits]
-  (let [sft (mod shift bits)
-        mask (dec (expt 2 bits))]
-    (if (zero? sft)
-      word
-      (bit-or
-        (bit-and (bit-shift-left word sft) mask)
-        (bit-shift-right word (minv-shift sft bits))))))</pre></td></tr><tr><td class="docs"><p>Bitwise circular shift left.  Shifts a 32-bit word left by x bits, shifting
-  the leftmost bits into the rightmost positions.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn &lt;&lt;&lt;
-  ([word shift bits] (&lt;&lt;&lt;-mm word shift bits))
-  ([word shift] (&lt;&lt;&lt;-mm word shift 32)))</pre></td></tr><tr><td class="docs"><p>Bitwise circular shift right.  Shifts a 32-bit word right by x bits, shifting
-  the rightmost bits into the leftmost positions.</p>
-
-<p>  (>>> 0x12345678 8) => 0x78123456</p>
-</td><td class="codes"><pre class="brush: clojure">(defn &gt;&gt;&gt;
-  ([word shift bits]
-   (&lt;&lt;&lt; word (minv-shift shift bits)))
-  ([word shift]
-   (&gt;&gt;&gt; word shift 32)))</pre></td></tr><tr><td class="docs"><p>Shift a BigInteger x right by n bits.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- shift-right
-  [^BigInteger x n]
-  (.shiftRight x n))</pre></td></tr><tr><td class="docs"><p>Convert a BigInt to a vector of byte values.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- bi-&gt;bv
-  [^BigInt x]
-  (let [x (.toBigInteger x)
-        mask (BigInteger. &quot;FF&quot; 16)]
-    (mapv #(.and ^BigInteger (shift-right x %) mask) (range 56 -1 -8))))</pre></td></tr><tr><td class="docs"><p>Convert a value to a vector of byte values.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn x-&gt;bv
-  [x]
-  (if (instance? BigInt x)
-    (bi-&gt;bv x)
-    (mapv #(bit-and (bit-shift-right x %) 0xFF) (range 56 -1 -8))))</pre></td></tr><tr><td class="docs"><p>32-bit left shift</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bsl32
-  [x n]
-  (bit-and (bit-shift-left x n) mask32))</pre></td></tr><tr><td class="docs"><p>32-bit right shift</p>
-</td><td class="codes"><pre class="brush: clojure">(defn bsr32
-  [x n]
-  (bit-and (bit-shift-right x n) mask32))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+<p>  Encrypt the given sequence <em>xs</em> under the 16 or 32-byte key <em>k</em> and the given
+  8-byte nonce <em>n</em></p>
+</td><td class="codes"><pre class="brush: clojure">(defn- salsa20-encrypt
+  {:added &quot;0.2.0&quot;}
+  [xs k n]
+  (map #(map bit-xor %1 (salsa20-kn k %2)) (partition-all 64 xs) (v n)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod initialize :salsa20 [m] m)
+(defmethod keysizes-bits :salsa20 [_] key-sizes)
+(defmethod iv-size-bits :salsa20 [_] iv-size)
+(defmethod keystream-size-bytes :salsa20 [_] keystream-size)
+(defmethod generate-keystream :salsa20 [m xs]
+  (salsa20-encrypt xs (:key m) (:nonce m)))
+(comment
+  [211 159 13 115 76 55 82 183
+   3 117 222 37 191 187 234 136
+   49 237 179 48 1 106 178 219
+   175 199 166 48 86 16 179 207
+   31 240 32 63 15 83 93 161
+   116 147 48 113 238 55 204 36
+   79 201 235 79 3 81 156 47
+   203 26 244 243 88 118 104 54])</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

@@ -8,6 +8,8 @@
                            [cast5 :refer :all]
                            [cast6 :refer :all]
                            [cipher :refer :all]
+                           [salsa20 :refer :all]
+                           [streamcipher :refer :all]
                            [tea :refer :all]
                            [twofish :refer :all]
                            [xtea :refer :all])
@@ -49,6 +51,18 @@
   [cm s]
   (it "should report a valid range of keysizes"
       (should= s (keysizes-bits cm))))
+
+(defn check-iv-size-bits
+  "Check the IV (nonce) size supported by the given stream cipher"
+  [cm x]
+  (it "should report a valid IV (nonce) size"
+      (should= x (iv-size-bits cm))))
+
+(defn check-keystream-size-bytes
+  "Check the keystream size (in bytes) supported by the given stream cipher"
+  [cm x]
+  (it "should report a valid keystream size"
+      (should= x (keystream-size-bytes cm))))
 
 (defn check-test-vectors
   "Check the spec test vectors"

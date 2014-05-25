@@ -102,7 +102,7 @@
   "Generate a lazy sequence of nonces for a given IV."
   {:added "0.2.0"}
   [iv]
-  (map (partial xor (bytes->val iv)) (range)))
+  (map (partial xor (ubv->x iv)) (range)))
 
 (defn- expand
   "Prepend the given vector with 0's out to length n"
@@ -115,7 +115,7 @@
   {:added "0.2.0"}
   [n iv]
   (map #(expand % (- (count iv) (count %)))
-       (map val->bytes (take n (nonce-seq iv)))))
+       (map x->ubv (take n (nonce-seq iv)))))
 
 (defn- process-blocks-ctr
   "Encrypt/decrypt blocks in Counter (CTR) mode."

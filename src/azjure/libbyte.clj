@@ -9,7 +9,7 @@
   "Evaluates to true if every value in a sequence in a 0 or a 1"
   [xs]
   {:added "0.2.0"}
-  (every? true? (map #(or (zero? %)(= 1 %)) xs)))
+  (every? true? (map #(or (zero? %) (= 1 %)) xs)))
 
 (defn every-byte?
   "Evaluates to true if every value in a sequence is between 0 and 255
@@ -45,30 +45,56 @@
   [^BigInteger x y]
   (.shiftLeft x y))
 
-(defn or-big
+(defn bit-or-big
   "bitwise or BigInteger x and BigInteger y"
   {:added "0.2.0"}
   [^BigInteger x ^BigInteger y]
   (.or x y))
 
-(defn bytes->val
-  "Convert a vector of bytes (0-255) to a value"
-  {:added "0.2.0"}
-  [v]
-  {:pre [(every-byte? v)]}
-  (let [l (count v)]
-    (reduce or-big
-            (map #(bit-shift-left-big (.toBigInteger (bigint (nth v %1))) %2)
-                 (range l)
-                 (range (* 8 (dec l)) -1 -8)))))
+(defn- long-or-bigint?
+  "Determine which set of bit math functions to use.
 
-(defmulti val->bytes
+  Java Long primitive types can only hold non-negative values between 0 and
+  2<sup>63<sup>-1 inclusive.  The largest vector of unsigned bytes in big-endian
+  format (MSB is leftmost) that is supported by Long math is
+  [127 x x x x x x x]. If the unsigned bytes are little-endian format (MSB is
+  rightmost), the last byte checked against 127 instead of the first.  Note that
+  longer vectors may still be processed as Longs if they are fille with 0's"
+  {:added "0.2.0"}
+  [ubv le]
+  (let [l (count ubv)
+        fns {:long   [bit-or bit-shift-left]
+             :bigint [bit-or-big
+                      #(bit-shift-left-big (BigInteger/valueOf %1) %2)]}]
+    (cond
+      (< l 8) (:long fns)
+      (= l 8) (if (< (if-not le (first ubv) (last ubv)) 128)
+                (:long fns)
+                (:bigint fns))
+      (> l 8) (let [nonzeros (->> (if le (subvec ubv 8) (drop-last 8 ubv))
+                                  (filter (complement zero?)))]
+                (if (seq nonzeros)
+                  (:bigint fns)
+                  (:long fns))))))
+
+(defn ubv->x
+  "Convert a vector of unsigned bytes (0-255) to a value"
+  {:added "0.2.0"}
+  [xv & {:keys [le]}]
+  {:pre [(every-byte? xv)]}
+  (let [l (count xv)
+        [orfn shiftfn] (long-or-bigint? xv le)]
+    (->> (if le (range 0 (* 8 l) 8) (range (* 8 (dec l)) -1 -8))
+         (map shiftfn xv)
+         (reduce orfn))))
+
+(defmulti x->ubv
           "Convert a value to a vector of bytes (0-255)"
           {:arglists '([x])
            :added    "0.2.0"}
           class)
 
-(defn- val->bytesfn
+(defn- x->ubvfn
   "Shift x right 8-bits and accumulate the last byte value in a vector."
   {:added "0.2.0"}
   [x sfn]
@@ -78,14 +104,41 @@
           (zero? curr) (vec (reverse acc))
           :else (recur (sfn curr 8) (conj acc (last-byte curr))))))
 
-(defmethod val->bytes BigInteger [^BigInteger x]
-  (val->bytesfn x bit-shift-right-big))
+(defmethod x->ubv BigInteger [^BigInteger x]
+  (x->ubvfn x bit-shift-right-big))
 
-(defmethod val->bytes BigInt [^BigInt x]
-  (val->bytesfn (.toBigInteger x) bit-shift-right-big))
+(defmethod x->ubv BigInt [^BigInt x]
+  (x->ubvfn (.toBigInteger x) bit-shift-right-big))
 
-(defmethod val->bytes Long [x]
-  (val->bytesfn x unsigned-bit-shift-right))
+(defmethod x->ubv Long [x]
+  (x->ubvfn x unsigned-bit-shift-right))
+
+(defn- as-xword
+  "Take a sequence of up to x-bytes and convert them into a sequence of exactly
+  x-bytes."
+  {:added "0.2.0"}
+  [xs x]
+  (->> (repeat (- x (count xs)) 0)
+       (reduce conj (seq xs))
+       (vec)))
+
+(defn as-word
+  "Take a sequence of up to 4-bytes and convert them into a sequence of exactly
+  4-bytes (a 32-bit word)."
+  {:added "0.2.0"}
+  [xs]
+  {:pre [(<= (count xs) 4)]
+   :post [(= 4 (count %))]}
+  (as-xword xs 4))
+
+(defn as-dword
+  "Take a sequence of up to 8-bytes and convert them into a sequence of exactly
+  8-bytes (a 64-bit dword)."
+  {:added "0.2.0"}
+  [xs]
+  {:pre [(<= (count xs) 8)]
+   :post [(= 8 (count %))]}
+  (as-xword xs 8))
 
 (defmulti xor
           "bitwise xor for different classes"

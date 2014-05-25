@@ -3136,7 +3136,7 @@ net.brehaut.ClojureTools = (function (SH) {
                     2 #(bit-shift-left % 2)
                     3 identity)]
       (into ((b64-encode shiftfn (inc l) alphabet)
-             (.longValue ^BigInteger (bytes-&gt;val v)))
+             (ubv-&gt;x v))
             (repeat (- 3 l) \=)))))</pre></td></tr><tr><td class="docs"><p>Convert a vector of bytes (0-255) into a base64x encoded string.  The second
   argument is the base64 alphabet to use.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- v-&gt;base64x
@@ -3223,7 +3223,7 @@ net.brehaut.ClojureTools = (function (SH) {
                         4 [(fn [x] (bit-shift-left x 3)) 7]
                         5 [identity 8])]
       (into ((b32-encode b alphabet)
-             (shiftfn (.longValue ^BigInteger (bytes-&gt;val v))))
+             (shiftfn (ubv-&gt;x v)))
             (repeat (pad-count l) \=)))))</pre></td></tr><tr><td class="docs"><p>Convert a vector of bytes (0-255) into a base32x encoded string.  The second
   argument is the base32 alphabet to use.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- v-&gt;base32x
@@ -3249,7 +3249,7 @@ net.brehaut.ClojureTools = (function (SH) {
        (map #(remove (fn [x] (= -1 x)) %))
        (map b32-decode-shift)
        (mapv (partial apply bit-xor))
-       (mapv val-&gt;bytes)
+       (mapv x-&gt;ubv)
        (reduce into)
        (take-while #(not (zero? %)))
        (vec)))</pre></td></tr><tr><td class="docs"><p>Convert a vector of bytes (0-255) to a Base32 string</p>

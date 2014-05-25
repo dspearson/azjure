@@ -118,7 +118,7 @@
                     2 #(bit-shift-left % 2)
                     3 identity)]
       (into ((b64-encode shiftfn (inc l) alphabet)
-             (.longValue ^BigInteger (bytes->val v)))
+             (ubv->x v))
             (repeat (- 3 l) \=)))))
 
 (defn- v->base64x
@@ -227,7 +227,7 @@
                         4 [(fn [x] (bit-shift-left x 3)) 7]
                         5 [identity 8])]
       (into ((b32-encode b alphabet)
-             (shiftfn (.longValue ^BigInteger (bytes->val v))))
+             (shiftfn (ubv->x v)))
             (repeat (pad-count l) \=)))))
 
 (defn- v->base32x
@@ -259,7 +259,7 @@
        (map #(remove (fn [x] (= -1 x)) %))
        (map b32-decode-shift)
        (mapv (partial apply bit-xor))
-       (mapv val->bytes)
+       (mapv x->ubv)
        (reduce into)
        (take-while #(not (zero? %)))
        (vec)))

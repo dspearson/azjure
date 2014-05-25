@@ -1,6 +1,8 @@
 (ns user
   (:require (azjure [core :refer :all]
                     [encoders :refer :all]
+                    [libbyte :refer :all]
+                    [libmod :refer :all]
                     [padders :refer :all])
             (azjure.cipher [aes :refer :all]
                            [blockcipher :refer :all]
@@ -8,6 +10,7 @@
                            [cipher :refer :all]
                            [cast5 :refer :all]
                            [cast6 :refer :all]
+                           [salsa20 :refer :all]
                            [streamcipher :refer :all]
                            [tea :refer :all]
                            [twofish :refer :all])
