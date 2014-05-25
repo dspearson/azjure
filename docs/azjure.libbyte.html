@@ -3084,7 +3084,7 @@ net.brehaut.ClojureTools = (function (SH) {
       (= l 8) (if (&lt; (if-not le (first ubv) (last ubv)) 128)
                 (:long fns)
                 (:bigint fns))
-      (&gt; l 8) (let [nonzeros (filter (complement zero?)
+      (&gt; l 8) (let [nonzeros (remove zero?
                                      (if le (subvec ubv 8) (drop-last 8 ubv)))]
                 (if (seq nonzeros)
                   (:bigint fns)
@@ -3127,14 +3127,14 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn as-word
   {:added &quot;0.2.0&quot;}
   [xs]
-  {:pre [(&lt;= (count xs) 4)]
+  {:pre  [(&lt;= (count xs) 4)]
    :post [(= 4 (count %))]}
   (as-xword xs 4))</pre></td></tr><tr><td class="docs"><p>Take a sequence of up to 8-bytes and convert them into a sequence of exactly
   8-bytes (a 64-bit dword).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn as-dword
   {:added &quot;0.2.0&quot;}
   [xs]
-  {:pre [(&lt;= (count xs) 8)]
+  {:pre  [(&lt;= (count xs) 8)]
    :post [(= 8 (count %))]}
   (as-xword xs 8))</pre></td></tr><tr><td class="docs"><p>bitwise xor for different classes</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti xor

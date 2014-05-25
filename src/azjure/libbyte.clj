@@ -71,7 +71,7 @@
       (= l 8) (if (< (if-not le (first ubv) (last ubv)) 128)
                 (:long fns)
                 (:bigint fns))
-      (> l 8) (let [nonzeros (filter (complement zero?)
+      (> l 8) (let [nonzeros (remove zero?
                                      (if le (subvec ubv 8) (drop-last 8 ubv)))]
                 (if (seq nonzeros)
                   (:bigint fns)
@@ -127,7 +127,7 @@
   4-bytes (a 32-bit word)."
   {:added "0.2.0"}
   [xs]
-  {:pre [(<= (count xs) 4)]
+  {:pre  [(<= (count xs) 4)]
    :post [(= 4 (count %))]}
   (as-xword xs 4))
 
@@ -136,7 +136,7 @@
   8-bytes (a 64-bit dword)."
   {:added "0.2.0"}
   [xs]
-  {:pre [(<= (count xs) 8)]
+  {:pre  [(<= (count xs) 8)]
    :post [(= 8 (count %))]}
   (as-xword xs 8))
 
