@@ -71,8 +71,8 @@
       (= l 8) (if (< (if-not le (first ubv) (last ubv)) 128)
                 (:long fns)
                 (:bigint fns))
-      (> l 8) (let [nonzeros (->> (if le (subvec ubv 8) (drop-last 8 ubv))
-                                  (filter (complement zero?)))]
+      (> l 8) (let [nonzeros (filter (complement zero?)
+                                     (if le (subvec ubv 8) (drop-last 8 ubv)))]
                 (if (seq nonzeros)
                   (:bigint fns)
                   (:long fns))))))
