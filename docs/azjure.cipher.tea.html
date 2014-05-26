@@ -3029,7 +3029,12 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.tea" name="azjure.cipher.tea"><h1 class="project-name">azjure.cipher.tea</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>TEA Cipher</h2>
+
+<p>  Implemented to meet the spec at
+  <a href="http://citeseer.ist.psu.edu/viewdoc/download">http://citeseer.ist.psu.edu/viewdoc/download</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.tea
+  {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
@@ -3037,16 +3042,21 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  TEA supports 128-bit keys</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  key-sizes [128])</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
+       :added   &quot;0.2.0&quot;}
+  key-sizes
+  [128])</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
 
 <p>  TEA operates on 64-bit blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  block-size 64)</pre></td></tr><tr><td class="docs"><p>Golden ratio remainder.</p>
+       :added   &quot;0.2.0&quot;}
+  block-size
+  64)</pre></td></tr><tr><td class="docs"><h3>delta</h3>
+
+<p>  Golden ratio remainder.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc }
-  delta 0x9E3779B9)</pre></td></tr><tr><td class="docs"><h3>tea</h3>
+       :added &quot;0.2.0&quot;}
+  delta
+  0x9E3779B9)</pre></td></tr><tr><td class="docs"><h3>tea</h3>
 
 <p>  TEA encryption</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- tea
@@ -3080,14 +3090,14 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn- cipher
   {:added &quot;0.2.0&quot;}
   [bytes key enc]
-   {:pre [(vector? key)
-          (= (count bytes) 8)
-          (= (count key) 16)]}
-   (let [c-words (mapv bytes-word (partition 4 bytes))
-         key-words (mapv bytes-word (partition 4 key))
-         rng (if enc (range 32) (range 31 -1 -1))
-         roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
-     (reduce into (mapv word-bytes (reduce roundfn c-words rng)))))</pre></td></tr><tr><td class="docs">
+  {:pre [(vector? key)
+         (= (count bytes) 8)
+         (= (count key) 16)]}
+  (let [c-words (mapv bytes-word (partition 4 bytes))
+        key-words (mapv bytes-word (partition 4 key))
+        rng (if enc (range 32) (range 31 -1 -1))
+        roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
+    (reduce into (mapv word-bytes (reduce roundfn c-words rng)))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod initialize :tea [m] m)
 (defmethod keysizes-bits :tea [_] key-sizes)
 (defmethod blocksize-bits :tea [_] block-size)

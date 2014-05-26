@@ -1,59 +1,84 @@
+;; [xtea]: http://en.wikipedia.org/wiki/XTEA
+
 (ns azjure.cipher.xtea
+  "## XTEA Cipher
+
+  Implemented to meet the spec at [http://en.wikipedia.org/wiki/XTEA] [xtea]"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
             [azjure.libmod :refer :all]))
 
 (def ^{:private true
-       :doc     "#### key-sizes
-  XTEA supports 128-bit keys"}
-  key-sizes [128])
+       :added   "0.2.0"}
+  key-sizes
+  "#### key-sizes
+  XTEA supports 128-bit keys"
+  [128])
 
 (def ^{:private true
-       :doc     "#### block-size
-  XTEA operates on 64-bit blocks."}
-  block-size 64)
+       :added   "0.2.0"}
+  block-size
+  "#### block-size
+  XTEA operates on 64-bit blocks."
+  64)
 
-(def ^{:doc "Golden ratio remainder."}
-  delta 0x9E3779B9)
+(def ^{:private true
+       :added   "0.2.0"}
+  delta
+  "#### delta
+  Golden ratio remainder."
+  0x9E3779B9)
 
-;y+= (z<<4 ^ z>>5) + z ^ sum + k[sum&3],
-(defn- ^{:doc "XTEA y calculation"}
-  calc-y [key enc]
+(defn- calc-y
+  "### calc-y
+  XTEA y calculation"
+  {:added "0.2.0"}
+  [key enc]
   (fn [[y z sum]]
-    (let [addsubfn (if enc +modw -modw)]
-      ((if enc +modw -modw) y
-       (bit-xor
-         (+modw (bit-xor (bsl32 z 4) (bsr32 z 5)) z)
-         (+modw sum (nth key (bit-and sum 3))))))))
+    ((if enc +modw -modw) y
+     (bit-xor
+       (+modw (bit-xor (bsl32 z 4) (bsr32 z 5)) z)
+       (+modw sum (nth key (bit-and sum 3)))))))
 
-;z+= (y<<4 ^ y>>5) + y ^ sum + k[sum>>11 &3] ;
-(defn- ^{:doc "XTEA z calculation"}
-  calc-z [key enc]
+(defn- calc-z
+  "### calc-z
+  XTEA z calculation"
+  {:added "0.2.0"}
+  [key enc]
   (fn [[y z sum]]
     ((if enc +modw -modw) z
      (bit-xor
        (+modw (bit-xor (bsl32 y 4) (bsr32 y 5)) y)
        (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))
 
-(defn- ^{:doc "Encipher round"}
-  encipher-round [key]
+(defn- encipher-round
+  "### encipher-round
+  Encipher round"
+  {:added "0.2.0"}
+  [key]
   (fn [[y z] round]
     (let [yfn (calc-y key true)
           zfn (calc-z key true)
           ny (yfn [y z (*modw round delta)])]
       [ny (zfn [ny z (*modw (inc round) delta)])])))
 
-(defn- ^{:doc "Decipher round"}
-  decipher-round [key]
+(defn- decipher-round
+  "### decipher-round
+  Decipher round"
+  {:added "0.2.0"}
+  [key]
   (fn [[y z] round]
     (let [yfn (calc-y key false)
           zfn (calc-z key false)
           nz (zfn [y z (*modw (inc round) delta)])]
       [(yfn [y nz (*modw round delta)]) nz])))
 
-(defn- ^{:doc "TEA cipher algorithm"}
-  cipher
+(defn- cipher
+  "### cipher
+  XTEA cipher"
+  {:added "0.2.0"}
   [bytes key enc]
   {:pre [(vector? key)
          (= (count bytes) 8)

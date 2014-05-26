@@ -3029,7 +3029,11 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.xtea" name="azjure.cipher.xtea"><h1 class="project-name">azjure.cipher.xtea</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>XTEA Cipher</h2>
+
+<p>  Implemented to meet the spec at <a href="http://en.wikipedia.org/wiki/XTEA">http://en.wikipedia.org/wiki/XTEA</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.xtea
+  {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
@@ -3037,50 +3041,65 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  XTEA supports 128-bit keys</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  key-sizes [128])</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
+       :added   &quot;0.2.0&quot;}
+  key-sizes
+  [128])</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
 
 <p>  XTEA operates on 64-bit blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  block-size 64)</pre></td></tr><tr><td class="docs"><p>Golden ratio remainder.</p>
-</td><td class="codes"><pre class="brush: clojure">(def 
-  delta 0x9E3779B9)</pre></td></tr><tr><td class="docs"><p>XTEA y calculation</p>
+       :added   &quot;0.2.0&quot;}
+  block-size
+  64)</pre></td></tr><tr><td class="docs"><h4>delta</h4>
 
-<p>y+= (z&lt;&lt;4 ^ z>>5) + z ^ sum + k[sum&amp;3],</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-  calc-y [key enc]
+<p>  Golden ratio remainder.</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :added   &quot;0.2.0&quot;}
+  delta
+  0x9E3779B9)</pre></td></tr><tr><td class="docs"><h3>calc-y</h3>
+
+<p>  XTEA y calculation</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- calc-y
+  {:added &quot;0.2.0&quot;}
+  [key enc]
   (fn [[y z sum]]
-    (let [addsubfn (if enc +modw -modw)]
-      ((if enc +modw -modw) y
-       (bit-xor
-         (+modw (bit-xor (bsl32 z 4) (bsr32 z 5)) z)
-         (+modw sum (nth key (bit-and sum 3))))))))</pre></td></tr><tr><td class="docs"><p>XTEA z calculation</p>
+    ((if enc +modw -modw) y
+     (bit-xor
+       (+modw (bit-xor (bsl32 z 4) (bsr32 z 5)) z)
+       (+modw sum (nth key (bit-and sum 3)))))))</pre></td></tr><tr><td class="docs"><h3>calc-z</h3>
 
-<p>z+= (y&lt;&lt;4 ^ y>>5) + y ^ sum + k[sum>>11 &amp;3] ;</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-  calc-z [key enc]
+<p>  XTEA z calculation</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- calc-z
+  {:added &quot;0.2.0&quot;}
+  [key enc]
   (fn [[y z sum]]
     ((if enc +modw -modw) z
      (bit-xor
        (+modw (bit-xor (bsl32 y 4) (bsr32 y 5)) y)
-       (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))</pre></td></tr><tr><td class="docs"><p>Encipher round</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-  encipher-round [key]
+       (+modw sum (nth key (bit-and (bsr32 sum 11) 3)))))))</pre></td></tr><tr><td class="docs"><h3>encipher-round</h3>
+
+<p>  Encipher round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encipher-round
+  {:added &quot;0.2.0&quot;}
+  [key]
   (fn [[y z] round]
     (let [yfn (calc-y key true)
           zfn (calc-z key true)
           ny (yfn [y z (*modw round delta)])]
-      [ny (zfn [ny z (*modw (inc round) delta)])])))</pre></td></tr><tr><td class="docs"><p>Decipher round</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-  decipher-round [key]
+      [ny (zfn [ny z (*modw (inc round) delta)])])))</pre></td></tr><tr><td class="docs"><h3>decipher-round</h3>
+
+<p>  Decipher round</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decipher-round
+  {:added &quot;0.2.0&quot;}
+  [key]
   (fn [[y z] round]
     (let [yfn (calc-y key false)
           zfn (calc-z key false)
           nz (zfn [y z (*modw (inc round) delta)])]
-      [(yfn [y nz (*modw round delta)]) nz])))</pre></td></tr><tr><td class="docs"><p>TEA cipher algorithm</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- 
-  cipher
+      [(yfn [y nz (*modw round delta)]) nz])))</pre></td></tr><tr><td class="docs"><h3>cipher</h3>
+
+<p>  XTEA cipher</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- cipher
+  {:added &quot;0.2.0&quot;}
   [bytes key enc]
   {:pre [(vector? key)
          (= (count bytes) 8)

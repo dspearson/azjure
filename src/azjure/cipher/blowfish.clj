@@ -1,7 +1,9 @@
-(ns azjure.cipher.blowfish
-  "Blowfish Cipher
+;; [bf]: https://www.schneier.com/blowfish.html
 
-  Implement to meet the spec at https://www.schneier.com/blowfish.html"
+(ns azjure.cipher.blowfish
+  "## Blowfish Cipher
+
+  Implemented to meet the spec at [https://www.schneier.com/blowfish.html] [bf]"
   {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
@@ -9,23 +11,32 @@
             [azjure.libmod :refer :all]))
 
 (def ^{:private true
-       :doc     "Vector of valid key sizes in bits"}
-  key-sizes (vec (range 32 449)))
+       :added   "0.2.0"}
+  key-sizes
+  "#### key-sizes
+  Blowfish supports key sizes between 32 and 448-bits inclusive."
+  (vec (range 32 449)))
 
 (def ^{:private true
-       :doc     "Block size in bits"}
-  block-size 64)
+       :added   "0.2.0"}
+  block-size
+  "#### block-size
+  Blowfish operates on 64-bit blocks." 64)
 
 (def ^{:private true
-       :doc     "The initial values for the P-array"}
-  parr_init
+       :added   "0.2.0"}
+  parr-init
+  "#### parr-init
+  The initial values for the P-array"
   [0x243f6a88 0x85a308d3 0x13198a2e 0x03707344 0xa4093822 0x299f31d0 0x082efa98
    0xec4e6c89 0x452821e6 0x38d01377 0xbe5466cf 0x34e90c6c 0xc0ac29b7 0xc97c50dd
    0x3f84d5b5 0xb5470917 0x9216d5d9 0x8979fb1b])
 
 (def ^{:private true
-       :doc     "The initial values for the 1st sbox"}
-  sbox0_init
+       :added   "0.2.0"}
+  sbox0-init
+  "#### sbox0-init
+  The initial values for the 1st sbox"
   [0xd1310ba6 0x98dfb5ac 0x2ffd72db 0xd01adfb7 0xb8e1afed 0x6a267e96 0xba7c9045
    0xf12c7f99 0x24a19947 0xb3916cf7 0x0801f2e2 0x858efc16 0x636920d8 0x71574e69
    0xa458fea3 0xf4933d7e 0x0d95748f 0x728eb658 0x718bcd58 0x82154aee 0x7b54a41d
@@ -65,8 +76,10 @@
    0x53b02d5d 0xa99f8fa1 0x08ba4799 0x6e85076a])
 
 (def ^{:private true
-       :doc     "The initial values for the 2nd sbox"}
-  sbox1_init
+       :added   "0.2.0"}
+  sbox1-init
+  "#### sbox1-init
+  The initial values for the 2nd sbox"
   [0x4b7a70e9 0xb5b32944 0xdb75092e 0xc4192623 0xad6ea6b0 0x49a7df7d 0x9cee60b8
    0x8fedb266 0xecaa8c71 0x699a17ff 0x5664526c 0xc2b19ee1 0x193602a5 0x75094c29
    0xa0591340 0xe4183a3e 0x3f54989a 0x5b429d65 0x6b8fe4d6 0x99f73fd6 0xa1d29c07
@@ -106,8 +119,10 @@
    0x153e21e7 0x8fb03d4a 0xe6e39f2b 0xdb83adf7])
 
 (def ^{:private true
-       :doc     "The initial values for the 3rd sbox"}
-  sbox2_init
+       :added   "0.2.0"}
+  sbox2-init
+  "#### sbox2-init
+  The initial values for the 3rd sbox"
   [0xe93d5a68 0x948140f7 0xf64c261c 0x94692934 0x411520f7 0x7602d4f7 0xbcf46b2e
    0xd4a20068 0xd4082471 0x3320f46a 0x43b7d4b7 0x500061af 0x1e39f62e 0x97244546
    0x14214f74 0xbf8b8840 0x4d95fc1d 0x96b591af 0x70f4ddd3 0x66a02f45 0xbfbc09ec
@@ -147,8 +162,10 @@
    0xd79a3234 0x92638212 0x670efa8e 0x406000e0])
 
 (def ^{:private true
-       :doc     "The initial values for the 4th sbox"}
-  sbox3_init
+       :added   "0.2.0"}
+  sbox3-init
+  "#### sbox3-init
+  The initial values for the 4th sbox"
   [0x3a39ce37 0xd3faf5cf 0xabc27737 0x5ac52d1b 0x5cb0679e 0x4fa33742 0xd3822740
    0x99bc9bbe 0xd5118e9d 0xbf0f7315 0xd62d1c7e 0xc700c47b 0xb78c1b6b 0x21a19045
    0xb26eb1be 0x6a366eb4 0x5748ab2f 0xbc946e79 0xc6a376d2 0x6549c2c8 0x530ff8ee
@@ -188,13 +205,17 @@
    0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])
 
 (def ^{:private true
-       :doc     "The initial key sequence state"}
-  ks-init {:parr  parr_init
-           :sbox0 sbox0_init :sbox1 sbox1_init
-           :sbox2 sbox2_init :sbox3 sbox3_init})
+       :added   "0.2.0"}
+  ks-init
+  "#### ks-init
+  The initial key sequence state"
+  {:parr  parr-init
+   :sbox0 sbox0-init :sbox1 sbox1-init
+   :sbox2 sbox2-init :sbox3 sbox3-init})
 
 (defn- roundfn
-  "1. Get byte number 4 from the given word and lookup the
+  "### roundfn
+  1. Get byte number 4 from the given word and lookup the
   S-box value in sbox0 at that index.
   2. Get byte number 3 from the given word and lookup the
   S-box value in sbox1 at that index.
@@ -206,7 +227,7 @@
   S-box value in sbox3 at that index.
   7. Add mod 2<sup>32</sup> the results from 5. and 6.
 
-  Evaluates to a 32-bit word."
+Evaluates to a 32-bit word."
   {:added "0.2.0"}
   [word ks]
   (+modw
@@ -217,13 +238,14 @@
     (nth (:sbox3 ks) (get-byte 1 word))))
 
 (defn- feistel-round
-  "1. xor the left value with a value from the P-array.
+  "### feistel-round
+  1. xor the left value with a value from the P-array.
   2. xor the right value with the roundfn value of the new
   left value (l) just calculated.
   3. Swap the results (you can see this with r in the left spot
   and l in the right spot).
 
-  Evaluates to a vector of two 32-bit words."
+Evaluates to a vector of two 32-bit words."
   {:added "0.2.0"}
   [[left right ks] idx]
   (let [l (bit-xor left (nth (:parr ks) idx))
@@ -231,28 +253,26 @@
     [r l ks]))
 
 (defn- cipher
-  "The Blowfish cipher.
+  "### cipher
+  The Blowfish cipher.
 
   *[left right]* - A vector of two 32-bit words
   representing a 64-bit block.
 
   *enc* - True if encrypting, false if decrypting.
 
-  This function applies the feistel-round above for 16 rounds.
-  The result of the feistel rounds is then xor'd with either the
-  16th and 17th entries in the P-array if you are encrypting,
-  or the 1st and 0th entries if you are decrypting.  Note that
-  during encryption the range is 0 to 15.  During decryption
-  the range is 17 to 2 descending.  Also note, the xor operations
-  take the left value from the right slot (nth cro 1) and the
-  right value from the left slot (nth cro 0).  This has
-  the effect of reversing the last reverse from the feistel-round
-  function as per the spec.
+  This function applies the feistel-round above for 16 rounds. The result of the
+  feistel rounds is then xor'd with either the 16th and 17th entries in the
+  P-array if you are encrypting, or the 1st and 0th entries if you are
+  decrypting.  Note that during encryption the range is 0 to 15.  During
+  decryption the range is 17 to 2 descending.  Also note, the xor operations
+  take the left value from the right slot (nth cro 1) and the right value from
+  the left slot (nth cro 0).  This has the effect of reversing the last reverse
+  from the feistel-round function as per the spec.
 
-  Evaluates to a vector of two 32-bit words representing
-  the encrypted or decrypted 64-bit block."
-  {:added "0.2.0"
-   :doc-private true}
+  Evaluates to a vector of two 32-bit words representing the encrypted or
+  decrypted 64-bit block."
+  {:added       "0.2.0"}
   [[_ _ ks :as all] enc]
   (let [r (if enc (range 0 16) (range 17 1 -1))
         li (if enc 17 0)
@@ -262,14 +282,14 @@
      (bit-xor (nth cro 0) (nth (:parr ks) ri))]))
 
 (defn- encrypt-subkey-block
-  "Evaluates to a function over the given subkey.
+  "### encrypt-subkey-block
+  Evaluates to a function over the given subkey.
 
-  This function encrypts the given block with the Blowfish
-  cipher and sets the values starting at idx in the
-  subkey to the result.
+  This function encrypts the given block with the Blowfish cipher and sets the
+  values starting at idx in the subkey to the result.
 
-  Evaluates to the result of the Blowfish cipher on the block as
-  a vector of two 32-bit words."
+  Evaluates to the result of the Blowfish cipher on the block as a vector of two
+  32-bit words."
   {:added "0.2.0"}
   [subkey]
   (fn [[_ _ ks :as all] idx]
@@ -278,20 +298,20 @@
       (conj enc (assoc ks subkey nval)))))
 
 (defn- encrypt-subkey
-  "Encrypt the given subkey starting with the given block
-  as the seed.  Note that each call to encrypt-subkey-block
-  replaces two values in the subkey, so the range only includes
-  every other index in the subkey.
+  "### encrypt-subkey
+  Encrypt the given subkey starting with the given block as the seed.  Note that
+  each call to encrypt-subkey-block replaces two values in the subkey, so the
+  range only includes every other index in the subkey.
 
-  Evaluates to the last generated pair of 32-bit words in a
-  vector for the given subkey.  This is used as the seed for
-  the next subkey usually."
+  Evaluates to the last generated pair of 32-bit words in a vector for the given
+  subkey.  This is used as the seed for the next subkey usually."
   {:added "0.2.0"}
   [[_ _ ks :as all] subkey]
   (reduce (encrypt-subkey-block subkey) all (range 0 (count (subkey ks)) 2)))
 
 (defn- xor-parr-key
-  "XOR the P-array with the key.  The key is cycled and 576 bits are used for
+  "### xor-parr-key
+  XOR the P-array with the key.  The key is cycled and 576 bits are used for
   the XOR."
   {:added "0.2.0"}
   [key]
@@ -303,14 +323,16 @@
        (assoc ks-init :parr)))
 
 (defn- generate-subkeys
-  "Generate the subkeys for the given key."
+  "### generate-subkeys
+  Generate the subkeys for the given key."
   {:added "0.2.0"}
   [key]
   (let [ki (xor-parr-key key)]
     (last (reduce encrypt-subkey [0 0 ki] (keys ki)))))
 
 (defn- process-block
-  "Process a block for encryption or decryption.
+  "### process-block
+  Process a block for encryption or decryption.
 
   1. *block*: A vector of two 32-bit words representing a block.
   2. *key*: A vector of 4 to 56 bytes representing a
@@ -318,7 +340,7 @@
   3. *enc*: true if you are encrypting the block, false
   if you are decrypting the block.
 
-  Evaluates to a vector of two 32-bit words."
+Evaluates to a vector of two 32-bit words."
   {:added "0.2.0"}
   [block {:keys [enc] :as ks}]
   (let [block (mapv bytes-word (partition 4 block))]

@@ -24,15 +24,15 @@
 
   The map has the following format:
 
-      {:type type
-       :mode mode
-       :pad  padder
-       :eid  input-decoder
-       :eoe  output-encoder
-       :did  input-decoder
-       :doe  output-encoder
-       :key  []
-       :iv   []}
+    {:type :typekw
+     :mode :modekw
+     :pad  :padderkw
+     :eid  :input-decoderkw
+     :eoe  :output-encoderkw
+     :did  :input-decoderkw
+     :doe  :output-encoderkw
+     :key  []
+     :iv   []}
 
   * **type** - A keyword that identifies the cipher you wish to use. See
   [azjure.cipher.cipher] [cipher] for supported values.
@@ -51,7 +51,21 @@
   * **key** - A vector of unsigned bytes (0-255) of the appropriate length that
   represents the key you wish to use with the cipher.
   * **iv** - A vector of unsigned bytes (0-255) of the appropriate length that
-  represents the IV you wish to use with the block chaining mode."
+  represents the IV you wish to use with the block chaining mode.
+
+#### Example
+
+    {:type :aes :mode :ctr :pad :x923
+     :eid  :str :eoe :hex
+     :did  :hex :doe :str
+     :key  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+     :iv   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]}
+
+  For the example above, this represents the AES cipher, used in Counter mode,
+  with ANSI X.923 padding.  The encryption input is expected to be a string, and
+  encryption will output a hex string.  For decryption, the input is expected to
+  be a hex string, and the output will be encoded as a string.  The key and iv
+  are vectors of 128-bits of 0."
   {:added "0.2.0"}
   [x m]
   (let [m (initialize m)]

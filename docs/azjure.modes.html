@@ -3028,17 +3028,35 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.modes" name="azjure.modes"><h1 class="project-name">azjure.modes</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.modes" name="azjure.modes"><h1 class="project-name">azjure.modes</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Modes</h2>
+
+<p>  Block Cipher Mode multimethod definitions</p>
+
+<p>  All modes define defmethods for these multimethods.</p>
+
+<p>  The currently supported mode keywords for use in the configuration map
+  are:</p>
+
+<pre><code>:ecb - Electronic Code Book
+:cbc - Cipher-Block Chaining
+:cfb - Cipher Feedback
+:ofb - Output Feedback
+:ctr - Counter
+</code></pre>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.modes
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.blockcipher :refer :all]
-            [azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><p>Encrypt a vector of bytes padded to a multiple of the block size of
-    the cipher.  All block modes should implement this method.</p>
+            [azjure.libbyte :refer :all]))</pre></td></tr><tr><td class="docs"><h3>encrypt-blocks</h3>
+
+<p>  Encrypt a vector of bytes padded to a multiple of the block size of
+  the cipher.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti encrypt-blocks
           {:arglists '([m bv])
            :added    &quot;0.2.0&quot;}
-          :mode)</pre></td></tr><tr><td class="docs"><p>Decrypt a vector of bytes padded to a multiple of the block size of
-    the cipher.  All block modes should implement this method.</p>
+          :mode)</pre></td></tr><tr><td class="docs"><h3>decrypt-blocks</h3>
+
+<p>  Decrypt a vector of bytes padded to a multiple of the block size of
+  the cipher.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti decrypt-blocks
           {:arglists '([m bv])
            :added    &quot;0.2.0&quot;}
@@ -3065,7 +3083,9 @@ net.brehaut.ClojureTools = (function (SH) {
        (conj (partition (bytes-per-block m) bv))
        (map (partial encrypt-block m))
        (reduce into)
-       (mapv bit-xor bv)))</pre></td></tr><tr><td class="docs"><p>Encrypt/Decrypt blocks in ECB mode</p>
+       (mapv bit-xor bv)))</pre></td></tr><tr><td class="docs"><h3>process-blocks-ecb</h3>
+
+<p>  Encrypt/Decrypt blocks in ECB mode</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-blocks-ecb
   {:added &quot;0.2.0&quot;}
   [m bv encrypting]
@@ -3073,7 +3093,9 @@ net.brehaut.ClojureTools = (function (SH) {
        (mapv (partial (if encrypting encrypt-block decrypt-block) m))
        (reduce into)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod encrypt-blocks :ecb [m bv] (process-blocks-ecb m bv true))
-(defmethod decrypt-blocks :ecb [m bv] (process-blocks-ecb m bv false))</pre></td></tr><tr><td class="docs"><p>Encrypt/Decrypt blocks in OFB mode</p>
+(defmethod decrypt-blocks :ecb [m bv] (process-blocks-ecb m bv false))</pre></td></tr><tr><td class="docs"><h3>process-blocks-ofb</h3>
+
+<p>  Encrypt/Decrypt blocks in OFB mode</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-blocks-ofb
   {:added &quot;0.2.0&quot;}
   [m bv]
@@ -3083,21 +3105,27 @@ net.brehaut.ClojureTools = (function (SH) {
        (reduce into)
        (mapv bit-xor bv)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod encrypt-blocks :ofb [m bv] (process-blocks-ofb m bv))
-(defmethod decrypt-blocks :ofb [m bv] (process-blocks-ofb m bv))</pre></td></tr><tr><td class="docs"><p>Encrypt a block in PCBC mode</p>
+(defmethod decrypt-blocks :ofb [m bv] (process-blocks-ofb m bv))</pre></td></tr><tr><td class="docs"><h3>encrypt-block-pcbc</h3>
+
+<p>  Encrypt a block in PCBC mode</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encrypt-block-pcbc
   {:added &quot;0.2.0&quot;}
   [m]
   (fn [[iv ct] block]
     (let [encrypted (encrypt-block m (mapv bit-xor iv block))
           ciphertext (reduce conj ct encrypted)]
-      [(mapv bit-xor block encrypted) ciphertext])))</pre></td></tr><tr><td class="docs"><p>Decrypt a block in PCBC mode</p>
+      [(mapv bit-xor block encrypted) ciphertext])))</pre></td></tr><tr><td class="docs"><h3>decrypt-block-pcbc</h3>
+
+<p>  Decrypt a block in PCBC mode</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- decrypt-block-pcbc
   {:added &quot;0.2.0&quot;}
   [m]
   (fn [[iv pt] block]
     (let [decrypted (decrypt-block m block)
           plaintext (mapv bit-xor iv decrypted)]
-      [(mapv bit-xor block plaintext) (reduce conj pt plaintext)])))</pre></td></tr><tr><td class="docs"><p>Encrypt/decrypt blocks in PCBC mode</p>
+      [(mapv bit-xor block plaintext) (reduce conj pt plaintext)])))</pre></td></tr><tr><td class="docs"><h3>process-blocks-pcbc</h3>
+
+<p>  Encrypt/decrypt blocks in PCBC mode</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-blocks-pcbc
   {:added &quot;0.2.0&quot;}
   [m bv encrypting]
@@ -3106,20 +3134,28 @@ net.brehaut.ClojureTools = (function (SH) {
          (reduce efn [(:iv m) []])
          (last))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod encrypt-blocks :pcbc [m bv] (process-blocks-pcbc m bv true))
-(defmethod decrypt-blocks :pcbc [m bv] (process-blocks-pcbc m bv false))</pre></td></tr><tr><td class="docs"><p>Generate a lazy sequence of nonces for a given IV.</p>
+(defmethod decrypt-blocks :pcbc [m bv] (process-blocks-pcbc m bv false))</pre></td></tr><tr><td class="docs"><h3>nonce-seq</h3>
+
+<p>  Generate a lazy sequence of nonces for a given IV.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- nonce-seq
   {:added &quot;0.2.0&quot;}
   [iv]
-  (map (partial xor (ubv-&gt;x iv)) (range)))</pre></td></tr><tr><td class="docs"><p>Prepend the given vector with 0's out to length n</p>
+  (map (partial xor (ubv-&gt;x iv)) (range)))</pre></td></tr><tr><td class="docs"><h3>expand</h3>
+
+<p>  Prepend the given vector with 0's out to length <code>n</code></p>
 </td><td class="codes"><pre class="brush: clojure">(defn- expand
   {:added &quot;0.2.0&quot;}
   [bv n]
-  (into (vec (take n (repeat 0))) bv))</pre></td></tr><tr><td class="docs"><p>Grab n nonces from the nonce sequence for the given IV.</p>
+  (into (vec (take n (repeat 0))) bv))</pre></td></tr><tr><td class="docs"><h3>nonces</h3>
+
+<p>  Grab <code>n</code> nonces from the nonce sequence for the given IV.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- nonces
   {:added &quot;0.2.0&quot;}
   [n iv]
   (map #(expand % (- (count iv) (count %)))
-       (map x-&gt;ubv (take n (nonce-seq iv)))))</pre></td></tr><tr><td class="docs"><p>Encrypt/decrypt blocks in Counter (CTR) mode.</p>
+       (map x-&gt;ubv (take n (nonce-seq iv)))))</pre></td></tr><tr><td class="docs"><h3>process-blocks-ctr</h3>
+
+<p>  Encrypt/decrypt blocks in Counter (CTR) mode.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-blocks-ctr
   {:added &quot;0.2.0&quot;}
   [m bv]

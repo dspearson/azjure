@@ -3041,34 +3041,39 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Salsa20 supports keys of 128 or 256 bits.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  key-sizes [128 256])</pre></td></tr><tr><td class="docs"><h4>iv-size</h4>
+       :added   &quot;0.2.0&quot;}
+  key-sizes
+  [128 256])</pre></td></tr><tr><td class="docs"><h4>iv-size</h4>
 
 <p>  Salsa20 supports an IV (nonce) size of 64-bits.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  iv-size 64)</pre></td></tr><tr><td class="docs"><h4>keystream-size</h4>
+       :added   &quot;0.2.0&quot;}
+  iv-size
+  64)</pre></td></tr><tr><td class="docs"><h4>keystream-size</h4>
 
 <p>  Salsa20 can generate 2^70 keystream bytes with the same key and nonce</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  keystream-size &quot;2^70&quot;)</pre></td></tr><tr><td class="docs"><h4>sigma</h4>
+       :added   &quot;0.2.0&quot;}
+  keystream-size
+  &quot;2^70&quot;)</pre></td></tr><tr><td class="docs"><h4>sigma</h4>
 
 <p>  Used during Salsa20 expansion for 256-bit keys.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  sigma [[0x65 0x78 0x70 0x61]
-         [0x6E 0x64 0x20 0x33]
-         [0x32 0x2D 0x62 0x79]
-         [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h4>tau</h4>
+       :added   &quot;0.2.0&quot;}
+  sigma
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x33]
+   [0x32 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h4>tau</h4>
 
 <p>  Used during Salsa20 expansion for 128-bit keys.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  tau [[0x65 0x78 0x70 0x61]
-       [0x6E 0x64 0x20 0x31]
-       [0x36 0x2D 0x62 0x79]
-       [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h3>quarter-round</h3>
+       :added   &quot;0.2.0&quot;}
+  tau
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x31]
+   [0x36 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])</pre></td></tr><tr><td class="docs"><h3>quarter-round</h3>
 
 <p>  quarterround function as defined in <a href="http://cr.yp.to/snuffle/spec.pdf">Salsa20 Spec</a>.</p>
 

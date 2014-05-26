@@ -3038,15 +3038,14 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  The currently supported cipher type keywords for use in the configuration map
   are:</p>
 
-<ul>
-<li><code>:aes</code> - AES</li>
-<li><code>:bf</code> - Blowfish</li>
-<li><code>:cast5</code> - CAST5</li>
-<li><code>:tf</code> - Twofish</li>
-</ul>
-
-<p>Note that if no <code>:type</code> is supplied in the configuration map, <code>:aes</code> will be
-assumed.</p>
+<pre><code>:aes     - AES
+:bf      - Blowfish
+:cast6   - CAST6
+:salsa20 - Salsa20
+:tea     - TEA
+:tf      - Twofish
+:xtea    - XTEA
+</code></pre>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.cipher
   {:author &quot;Jason Ozias&quot;})</pre></td></tr><tr><td class="docs"><h3>initialize</h3>
 

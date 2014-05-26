@@ -1,28 +1,42 @@
 (ns azjure.padders
+  "## Padders
+  Block Cipher Pad multimethod definitions
+
+  All padders define defmethods for these multimethods.
+
+  The currently supported pad keywords for use in the configuration map
+  are:
+
+    :x923     - ANSI X.923 Padding
+    :iso7816  - ISO/IEC 7816-4 Padding
+    :iso10126 - ISO 10126 Padding
+    :pkcs7    - PKCS7 Padding
+    :zero     - Zero Padding"
   {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]))
 
 (defmulti pad
-          "Takes an initmap and a vector of bytes and pads it appropriately to
-  a multiple of the block size of the cipher.  All padding methods should
-  implement this method."
+          "### pad
+  Takes an initmap and a vector of bytes and pads it appropriately to a multiple
+  of the block size of the cipher."
           {:arglists '([m bv])
            :added    "0.2.0"}
           :pad)
 
 (defmulti unpad
-          "Takes a vector of bytes and unpads it.  All padding methods should
-   implement this method."
+          "### unpad
+  Takes a vector of bytes and unpads it."
           {:arglists '([m bv])
            :added    "0.2.0"}
           :pad)
 
 (defn- bytes-to-pad
-  "Calculate the remaining number of bytes to add to make a full block.
+  "### bytes-to-pad
+  Calculate the remaining number of bytes to add to make a full block.
 
-  (bytes-to-pad 15 16) => 1
-  (bytes-to-pad 16 16) => 0
-  (bytes-to-pad 17 16) => 15"
+    (bytes-to-pad 15 16) => 1
+    (bytes-to-pad 16 16) => 0
+    (bytes-to-pad 17 16) => 15"
   {:added "0.2.0"}
   [total-bytes bytes-per-block]
   (let [x (mod total-bytes bytes-per-block)]
@@ -68,7 +82,6 @@
     (if (every? #(= pc %) pad)
       (subvec bv 0 (- (count bv) pc))
       bv)))
-
 
 (defmethod pad :x923 [m bv]
   (let [btp (bytes-to-pad (count bv) (bytes-per-block m))]

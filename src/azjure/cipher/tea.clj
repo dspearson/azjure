@@ -1,22 +1,36 @@
+;; [tea]: http://citeseer.ist.psu.edu/viewdoc/download
+
 (ns azjure.cipher.tea
+  "## TEA Cipher
+
+  Implemented to meet the spec at
+  [http://citeseer.ist.psu.edu/viewdoc/download] [tea]"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
             [azjure.libmod :refer :all]))
 
 (def ^{:private true
-       :doc     "#### key-sizes
-  TEA supports 128-bit keys"}
-  key-sizes [128])
+       :added   "0.2.0"}
+  key-sizes
+  "#### key-sizes
+  TEA supports 128-bit keys"
+  [128])
 
 (def ^{:private true
-       :doc     "#### block-size
-  TEA operates on 64-bit blocks."}
-  block-size 64)
+       :added   "0.2.0"}
+  block-size
+  "#### block-size
+  TEA operates on 64-bit blocks."
+  64)
 
 (def ^{:private true
-       :doc "Golden ratio remainder."}
-  delta 0x9E3779B9)
+       :added "0.2.0"}
+  delta
+  "### delta
+  Golden ratio remainder."
+  0x9E3779B9)
 
 (defn- tea
   "### tea
@@ -54,14 +68,14 @@
   TEA cipher"
   {:added "0.2.0"}
   [bytes key enc]
-   {:pre [(vector? key)
-          (= (count bytes) 8)
-          (= (count key) 16)]}
-   (let [c-words (mapv bytes-word (partition 4 bytes))
-         key-words (mapv bytes-word (partition 4 key))
-         rng (if enc (range 32) (range 31 -1 -1))
-         roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
-     (reduce into (mapv word-bytes (reduce roundfn c-words rng)))))
+  {:pre [(vector? key)
+         (= (count bytes) 8)
+         (= (count key) 16)]}
+  (let [c-words (mapv bytes-word (partition 4 bytes))
+        key-words (mapv bytes-word (partition 4 key))
+        rng (if enc (range 32) (range 31 -1 -1))
+        roundfn (if enc (encipher-round key-words) (decipher-round key-words))]
+    (reduce into (mapv word-bytes (reduce roundfn c-words rng)))))
 
 (defmethod initialize :tea [m] m)
 (defmethod keysizes-bits :tea [_] key-sizes)

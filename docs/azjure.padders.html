@@ -3028,25 +3028,44 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.padders" name="azjure.padders"><h1 class="project-name">azjure.padders</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.padders" name="azjure.padders"><h1 class="project-name">azjure.padders</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Padders</h2>
+
+<p>  Block Cipher Pad multimethod definitions</p>
+
+<p>  All padders define defmethods for these multimethods.</p>
+
+<p>  The currently supported pad keywords for use in the configuration map
+  are:</p>
+
+<pre><code>:x923     - ANSI X.923 Padding
+:iso7816  - ISO/IEC 7816-4 Padding
+:iso10126 - ISO 10126 Padding
+:pkcs7    - PKCS7 Padding
+:zero     - Zero Padding
+</code></pre>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.padders
   {:author &quot;Jason Ozias&quot;}
-  (:require [azjure.cipher.blockcipher :refer :all]))</pre></td></tr><tr><td class="docs"><p>Takes an initmap and a vector of bytes and pads it appropriately to
-  a multiple of the block size of the cipher.  All padding methods should
-  implement this method.</p>
+  (:require [azjure.cipher.blockcipher :refer :all]))</pre></td></tr><tr><td class="docs"><h3>pad</h3>
+
+<p>  Takes an initmap and a vector of bytes and pads it appropriately to a multiple
+  of the block size of the cipher.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti pad
           {:arglists '([m bv])
            :added    &quot;0.2.0&quot;}
-          :pad)</pre></td></tr><tr><td class="docs"><p>Takes a vector of bytes and unpads it.  All padding methods should
-   implement this method.</p>
+          :pad)</pre></td></tr><tr><td class="docs"><h3>unpad</h3>
+
+<p>  Takes a vector of bytes and unpads it.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti unpad
           {:arglists '([m bv])
            :added    &quot;0.2.0&quot;}
-          :pad)</pre></td></tr><tr><td class="docs"><p>Calculate the remaining number of bytes to add to make a full block.</p>
+          :pad)</pre></td></tr><tr><td class="docs"><h3>bytes-to-pad</h3>
 
-<p>  (bytes-to-pad 15 16) => 1
-  (bytes-to-pad 16 16) => 0
-  (bytes-to-pad 17 16) => 15</p>
+<p>  Calculate the remaining number of bytes to add to make a full block.</p>
+
+<pre><code>(bytes-to-pad 15 16) =&gt; 1
+(bytes-to-pad 16 16) =&gt; 0
+(bytes-to-pad 17 16) =&gt; 15
+</code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defn- bytes-to-pad
   {:added &quot;0.2.0&quot;}
   [total-bytes bytes-per-block]

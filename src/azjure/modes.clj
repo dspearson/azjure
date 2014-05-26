@@ -1,18 +1,33 @@
 (ns azjure.modes
+  "## Modes
+  Block Cipher Mode multimethod definitions
+
+  All modes define defmethods for these multimethods.
+
+  The currently supported mode keywords for use in the configuration map
+  are:
+
+    :ecb - Electronic Code Book
+    :cbc - Cipher-Block Chaining
+    :cfb - Cipher Feedback
+    :ofb - Output Feedback
+    :ctr - Counter"
   {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.libbyte :refer :all]))
 
 (defmulti encrypt-blocks
-          "Encrypt a vector of bytes padded to a multiple of the block size of
-    the cipher.  All block modes should implement this method."
+          "### encrypt-blocks
+  Encrypt a vector of bytes padded to a multiple of the block size of
+  the cipher."
           {:arglists '([m bv])
            :added    "0.2.0"}
           :mode)
 
 (defmulti decrypt-blocks
-          "Decrypt a vector of bytes padded to a multiple of the block size of
-    the cipher.  All block modes should implement this method."
+          "### decrypt-blocks
+  Decrypt a vector of bytes padded to a multiple of the block size of
+  the cipher."
           {:arglists '([m bv])
            :added    "0.2.0"}
           :mode)
@@ -45,7 +60,8 @@
        (mapv bit-xor bv)))
 
 (defn- process-blocks-ecb
-  "Encrypt/Decrypt blocks in ECB mode"
+  "### process-blocks-ecb
+  Encrypt/Decrypt blocks in ECB mode"
   {:added "0.2.0"}
   [m bv encrypting]
   (->> (partition (bytes-per-block m) bv)
@@ -56,7 +72,8 @@
 (defmethod decrypt-blocks :ecb [m bv] (process-blocks-ecb m bv false))
 
 (defn- process-blocks-ofb
-  "Encrypt/Decrypt blocks in OFB mode"
+  "### process-blocks-ofb
+  Encrypt/Decrypt blocks in OFB mode"
   {:added "0.2.0"}
   [m bv]
   (->> (conj (partition (bytes-per-block m) bv) (:iv m))
@@ -69,7 +86,8 @@
 (defmethod decrypt-blocks :ofb [m bv] (process-blocks-ofb m bv))
 
 (defn- encrypt-block-pcbc
-  "Encrypt a block in PCBC mode"
+  "### encrypt-block-pcbc
+  Encrypt a block in PCBC mode"
   {:added "0.2.0"}
   [m]
   (fn [[iv ct] block]
@@ -78,7 +96,8 @@
       [(mapv bit-xor block encrypted) ciphertext])))
 
 (defn- decrypt-block-pcbc
-  "Decrypt a block in PCBC mode"
+  "### decrypt-block-pcbc
+  Decrypt a block in PCBC mode"
   {:added "0.2.0"}
   [m]
   (fn [[iv pt] block]
@@ -87,7 +106,8 @@
       [(mapv bit-xor block plaintext) (reduce conj pt plaintext)])))
 
 (defn- process-blocks-pcbc
-  "Encrypt/decrypt blocks in PCBC mode"
+  "### process-blocks-pcbc
+  Encrypt/decrypt blocks in PCBC mode"
   {:added "0.2.0"}
   [m bv encrypting]
   (let [efn (if encrypting (encrypt-block-pcbc m) (decrypt-block-pcbc m))]
@@ -99,26 +119,30 @@
 (defmethod decrypt-blocks :pcbc [m bv] (process-blocks-pcbc m bv false))
 
 (defn- nonce-seq
-  "Generate a lazy sequence of nonces for a given IV."
+  "### nonce-seq
+  Generate a lazy sequence of nonces for a given IV."
   {:added "0.2.0"}
   [iv]
   (map (partial xor (ubv->x iv)) (range)))
 
 (defn- expand
-  "Prepend the given vector with 0's out to length n"
+  "### expand
+  Prepend the given vector with 0's out to length `n`"
   {:added "0.2.0"}
   [bv n]
   (into (vec (take n (repeat 0))) bv))
 
 (defn- nonces
-  "Grab n nonces from the nonce sequence for the given IV."
+  "### nonces
+  Grab `n` nonces from the nonce sequence for the given IV."
   {:added "0.2.0"}
   [n iv]
   (map #(expand % (- (count iv) (count %)))
        (map x->ubv (take n (nonce-seq iv)))))
 
 (defn- process-blocks-ctr
-  "Encrypt/decrypt blocks in Counter (CTR) mode."
+  "### process-blocks-ctr
+  Encrypt/decrypt blocks in Counter (CTR) mode."
   {:added "0.2.0"}
   [m bv]
   (let [blocks (partition (bytes-per-block m) bv)]

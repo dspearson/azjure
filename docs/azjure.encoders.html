@@ -3031,6 +3031,23 @@ net.brehaut.ClojureTools = (function (SH) {
 </script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.encoders" name="azjure.encoders"><h1 class="project-name">azjure.encoders</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><h2>Encoders</h2>
 
 <p>  Various encoding/decoding functions.</p>
+
+<p>  The currently supported encoding/decoding keywords for use in the
+  configuration map are:</p>
+
+<pre><code>:str       - ASCII character encoding
+:hex       - hex encoding
+:base16    - Base16 encoding (similar to hex but
+             all uppercase letters)
+:base32    - Base32 encoding
+:base32hex - Base32 encoding with the hex alphabet
+:base64    - Base64 encoding
+:base64url - Base64 encoding with the URL safe
+             alphabet
+</code></pre>
+
+<p>Note that if no encoding/decoding keys are supplied in the configuration map
+bytes vectors are assumed as the default input/output type.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.encoders
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.libbyte :refer :all]
@@ -3039,40 +3056,38 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Mask values for base32 encoding</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
-  mask5 [0x000000001f 0x00000003e0 0x0000007c00 0x00000f8000
-         0x0001f00000 0x003e000000 0x07c0000000 0xf800000000])</pre></td></tr><tr><td class="docs"><h4>b32-alphabet</h4>
+       :added   &quot;0.2.0&quot;}
+  mask5
+  [0x000000001f 0x00000003e0 0x0000007c00 0x00000f8000
+   0x0001f00000 0x003e000000 0x07c0000000 0xf800000000])</pre></td></tr><tr><td class="docs"><h4>b32-alphabet</h4>
 
 <p>  The base32 alphabet string</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
-  b32-alphabet &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;)</pre></td></tr><tr><td class="docs"><h4>b32hex-alphabet</h4>
+       :added   &quot;0.2.0&quot;}
+  b32-alphabet
+  &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;)</pre></td></tr><tr><td class="docs"><h4>b32hex-alphabet</h4>
 
 <p>  The base32hex alphabet string</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
-  b32hex-alphabet &quot;0123456789ABCDEFGHIJKLMNOPQRSTUV&quot;)</pre></td></tr><tr><td class="docs"><h4>mask6</h4>
+       :added   &quot;0.2.0&quot;}
+  b32hex-alphabet
+  &quot;0123456789ABCDEFGHIJKLMNOPQRSTUV&quot;)</pre></td></tr><tr><td class="docs"><h4>mask6</h4>
 
 <p>  mask values for base64 encoding</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
-  mask6 [0x00003f 0x000fc0 0x03f000 0xfc0000])</pre></td></tr><tr><td class="docs"><h4>b64-alphabet</h4>
+       :added   &quot;0.2.0&quot;}
+  mask6
+  [0x00003f 0x000fc0 0x03f000 0xfc0000])</pre></td></tr><tr><td class="docs"><h4>b64-alphabet</h4>
 
 <p>  The base64 alphabet string</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
+       :added   &quot;0.2.0&quot;}
   b64-alphabet
   &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;)</pre></td></tr><tr><td class="docs"><h4>base64url</h4>
 
 <p>  The base64url alphabet string</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc 
-       :added &quot;0.2.0&quot;}
+       :added   &quot;0.2.0&quot;}
   b64url-alphabet
   &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_&quot;)</pre></td></tr><tr><td class="docs"><h3>x->hex</h3>
 
@@ -3080,8 +3095,8 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Values between 0-9 are padded with a <code>0</code> to 2 characters.</p>
 
-<pre><code> (x-&gt;hex 5) =&gt; "05"
- (x-&gt;hex 204) =&gt; "cc"
+<pre><code>(x-&gt;hex 5) =&gt; "05"
+(x-&gt;hex 204) =&gt; "cc"
 </code></pre>
 </td><td class="codes"><pre class="brush: clojure">(defmulti x-&gt;hex
           {:added &quot;0.2.0&quot;}
@@ -3131,7 +3146,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn xs-&gt;str
   {:added &quot;0.2.0&quot;}
   [xs]
-  {:pre [(not (nil? xs))(every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-byte? xs)]}
   (str/join (map char xs)))</pre></td></tr><tr><td class="docs"><h3>str->xs</h3>
 
 <p>  Convert a string to a sequence of unsigned bytes (0-255)</p>
@@ -3144,7 +3159,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Get the value of the nth 6-bits from x.  This is used during base64 encoding
   to extract 4 values from 3 bytes (24-bits).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- nth6bits
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [x n]
   {:pre [(&gt;= x 0) (&lt;= x 16777215)
          (&gt;= n 0) (&lt;= n 3)]}
@@ -3178,7 +3193,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Convert a sequence of unsigned bytes (0-255) into a base64x encoded string.
   The second argument is the base64 alphabet to use.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xs-&gt;base64x
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [xs alphabet]
   {:pre [(every-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
   (if (empty? xs)
@@ -3190,7 +3205,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Bit shifting used during the decoding of a base64x encoded string</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- b64-decode-shift
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [xs]
   (map bit-shift-left xs (range 18 (dec (* 6 (- 4 (count xs)))) -6)))</pre></td></tr><tr><td class="docs"><h3>base64x->xs</h3>
 
@@ -3244,7 +3259,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Get the value of the nth 5-bits from <em>xs</em>.  This is used during base32
   encoding to extract 8 values from 5 bytes (40-bits).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- nth5bits
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [xs n]
   {:pre [(&gt;= xs 0) (&lt;= xs 1099511627775)
          (&gt;= n 0) (&lt;= n 8)]}
@@ -3263,7 +3278,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Generate the pad count for Base32 encoding based on the length of the last
   set of bytes.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- pad-count
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [l]
   (/ (- 40 (.intValue ^Double (* (Math/ceil (/ (* 8 l) 5.0)) 5))) 5))</pre></td></tr><tr><td class="docs"><h3>b32-encode-bytes</h3>
 
@@ -3287,7 +3302,7 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Convert a sequence of unsigned bytes (0-255) into a base32x encoded string.
   The second argument is the base32 alphabet to use.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xs-&gt;base32x
-  {:added    &quot;0.2.0&quot;}
+  {:added &quot;0.2.0&quot;}
   [xs alphabet]
   {:pre [(vector? xs) (every-byte? xs)
          (string? alphabet) (= 32 (count alphabet))]}
@@ -3346,17 +3361,20 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Convert a sequence of unsigned bytes (0-255) to a Base16 string.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn xs-&gt;base16
+  {:added &quot;0.2.0&quot;}
   [xs]
   (.toUpperCase ^String (xs-&gt;hex xs)))</pre></td></tr><tr><td class="docs"><h3>base16->xs</h3>
 
 <p>  Convert a Base16 string to a sequence of unsigned bytes (0-255).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn base16-&gt;xs
+  {:added &quot;0.2.0&quot;}
   [s]
   {:pre [(string? s)]}
   (hex-&gt;xs s))</pre></td></tr><tr><td class="docs"><h3>encode-dispatcher</h3>
 
 <p>  Dispatcher for the output encoders</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encoder-dispatcher
+  {:added &quot;0.2.0&quot;}
   [m _ &amp; {:keys [encryption] :or {encryption true}}]
   (if encryption (:eoe m) (:doe m)))</pre></td></tr><tr><td class="docs"><h3>output-encoder</h3>
 
@@ -3375,6 +3393,7 @@ net.brehaut.ClojureTools = (function (SH) {
 
 <p>  Dispatcher for the input decoders</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- decoder-dispatcher
+  {:added &quot;0.2.0&quot;}
   [m _ &amp; {:keys [encryption] :or {encryption true}}]
   (if encryption (:eid m) (:did m)))</pre></td></tr><tr><td class="docs"><h3>input-decoder</h3>
 

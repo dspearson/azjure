@@ -1,49 +1,69 @@
 (ns azjure.encoders
   "## Encoders
 
-  Various encoding/decoding functions."
+  Various encoding/decoding functions.
+
+  The currently supported encoding/decoding keywords for use in the
+  configuration map are:
+
+    :str       - ASCII character encoding
+    :hex       - hex encoding
+    :base16    - Base16 encoding (similar to hex but
+                 all uppercase letters)
+    :base32    - Base32 encoding
+    :base32hex - Base32 encoding with the hex alphabet
+    :base64    - Base64 encoding
+    :base64url - Base64 encoding with the URL safe
+                 alphabet
+
+Note that if no encoding/decoding keys are supplied in the configuration map
+bytes vectors are assumed as the default input/output type."
   {:author "Jason Ozias"}
   (:require [azjure.libbyte :refer :all]
             [clojure.string :as str])
   (:import (clojure.lang BigInt)))
 
 (def ^{:private true
-       :doc "#### mask5
+       :added   "0.2.0"}
+  mask5
+  "#### mask5
   Mask values for base32 encoding"
-       :added "0.2.0"}
-  mask5 [0x000000001f 0x00000003e0 0x0000007c00 0x00000f8000
-         0x0001f00000 0x003e000000 0x07c0000000 0xf800000000])
+  [0x000000001f 0x00000003e0 0x0000007c00 0x00000f8000
+   0x0001f00000 0x003e000000 0x07c0000000 0xf800000000])
 
 (def ^{:private true
-       :doc "#### b32-alphabet
+       :added   "0.2.0"}
+  b32-alphabet
+  "#### b32-alphabet
   The base32 alphabet string"
-       :added "0.2.0"}
-  b32-alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
 
 (def ^{:private true
-       :doc "#### b32hex-alphabet
+       :added   "0.2.0"}
+  b32hex-alphabet
+  "#### b32hex-alphabet
   The base32hex alphabet string"
-       :added "0.2.0"}
-  b32hex-alphabet "0123456789ABCDEFGHIJKLMNOPQRSTUV")
+  "0123456789ABCDEFGHIJKLMNOPQRSTUV")
 
 (def ^{:private true
-       :doc "#### mask6
+       :added   "0.2.0"}
+  mask6
+  "#### mask6
   mask values for base64 encoding"
-       :added "0.2.0"}
-  mask6 [0x00003f 0x000fc0 0x03f000 0xfc0000])
+  [0x00003f 0x000fc0 0x03f000 0xfc0000])
 
 (def ^{:private true
-       :doc "#### b64-alphabet
-  The base64 alphabet string"
-       :added "0.2.0"}
+       :added   "0.2.0"}
   b64-alphabet
+  "#### b64-alphabet
+  The base64 alphabet string"
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
 
 (def ^{:private true
-       :doc "#### base64url
-  The base64url alphabet string"
-       :added "0.2.0"}
+       :added   "0.2.0"}
   b64url-alphabet
+  "#### base64url
+  The base64url alphabet string"
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
 
 (defmulti x->hex
@@ -52,8 +72,8 @@
 
   Values between 0-9 are padded with a `0` to 2 characters.
 
-     (x->hex 5) => \"05\"
-     (x->hex 204) => \"cc\""
+    (x->hex 5) => \"05\"
+    (x->hex 204) => \"cc\""
           {:added "0.2.0"}
           class)
 
@@ -110,7 +130,7 @@
   Convert a sequence of unsigned bytes (0-255) to a string"
   {:added "0.2.0"}
   [xs]
-  {:pre [(not (nil? xs))(every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-byte? xs)]}
   (str/join (map char xs)))
 
 (defn str->xs
@@ -125,7 +145,7 @@
   "### nth6bits
   Get the value of the nth 6-bits from x.  This is used during base64 encoding
   to extract 4 values from 3 bytes (24-bits)."
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [x n]
   {:pre [(>= x 0) (<= x 16777215)
          (>= n 0) (<= n 3)]}
@@ -162,7 +182,7 @@
   "### xs->base64x
   Convert a sequence of unsigned bytes (0-255) into a base64x encoded string.
   The second argument is the base64 alphabet to use."
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [xs alphabet]
   {:pre [(every-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
   (if (empty? xs)
@@ -175,7 +195,7 @@
 (defn- b64-decode-shift
   "### b64-decode-shift
   Bit shifting used during the decoding of a base64x encoded string"
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [xs]
   (map bit-shift-left xs (range 18 (dec (* 6 (- 4 (count xs)))) -6)))
 
@@ -235,7 +255,7 @@
   "### nth5bits
   Get the value of the nth 5-bits from *xs*.  This is used during base32
   encoding to extract 8 values from 5 bytes (40-bits)."
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [xs n]
   {:pre [(>= xs 0) (<= xs 1099511627775)
          (>= n 0) (<= n 8)]}
@@ -256,7 +276,7 @@
   "### pad-count
   Generate the pad count for Base32 encoding based on the length of the last
   set of bytes."
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [l]
   (/ (- 40 (.intValue ^Double (* (Math/ceil (/ (* 8 l) 5.0)) 5))) 5))
 
@@ -282,7 +302,7 @@
   "### xs->base32x
   Convert a sequence of unsigned bytes (0-255) into a base32x encoded string.
   The second argument is the base32 alphabet to use."
-  {:added    "0.2.0"}
+  {:added "0.2.0"}
   [xs alphabet]
   {:pre [(vector? xs) (every-byte? xs)
          (string? alphabet) (= 32 (count alphabet))]}
@@ -348,12 +368,14 @@
 (defn xs->base16
   "### xs->base16
   Convert a sequence of unsigned bytes (0-255) to a Base16 string."
+  {:added "0.2.0"}
   [xs]
   (.toUpperCase ^String (xs->hex xs)))
 
 (defn base16->xs
   "### base16->xs
   Convert a Base16 string to a sequence of unsigned bytes (0-255)."
+  {:added "0.2.0"}
   [s]
   {:pre [(string? s)]}
   (hex->xs s))
@@ -361,6 +383,7 @@
 (defn- encoder-dispatcher
   "### encode-dispatcher
   Dispatcher for the output encoders"
+  {:added "0.2.0"}
   [m _ & {:keys [encryption] :or {encryption true}}]
   (if encryption (:eoe m) (:doe m)))
 
@@ -382,6 +405,7 @@
 (defn- decoder-dispatcher
   "### decoder-dispatcher
   Dispatcher for the input decoders"
+  {:added "0.2.0"}
   [m _ & {:keys [encryption] :or {encryption true}}]
   (if encryption (:eid m) (:did m)))
 

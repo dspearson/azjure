@@ -8,6 +8,7 @@
   "## CAST6 Cipher
 
   Implemented to meet the spec at [rfc2612] [spec]"
+  {:author "Jason Ozias"}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
@@ -15,18 +16,24 @@
             [org.ozias.cljlibs.utils.core :refer [in?]]))
 
 (def ^{:private true
-       :doc     "#### key-sizes
-  CAST6 supports keys of 128 to 256 bits inclusive in 32-bit increments."}
-  key-sizes (vec (range 128 257 32)))
+       :added "0.2.0"}
+  key-sizes
+  "#### key-sizes
+  CAST6 supports keys of 128 to 256 bits inclusive in 32-bit increments."
+  (vec (range 128 257 32)))
 
 (def ^{:private true
-       :doc     "#### block-size
-  CAST6 operates on 128-bit blocks."}
-  block-size 128)
+       :added "0.2.0"}
+  block-size
+  "#### block-size
+  CAST6 operates on 128-bit blocks."
+  128)
 
 (def ^{:private true
-       :doc "S-Box 1"}
+       :added "0.2.0"}
   s1
+  "#### s1
+  S-Box 1"
   [0x30fb40d4 0x9fa0ff0b 0x6beccd2f 0x3f258c7a 0x1e213f2f 0x9c004dd3 0x6003e540
    0xcf9fc949 0xbfd4af27 0x88bbbdb5 0xe2034090 0x98d09675 0x6e63a0e0 0x15c361d2
    0xc2e7661d 0x22d4ff8e 0x28683b6f 0xc07fd059 0xff2379c8 0x775f50e2 0x43c340d3
@@ -66,8 +73,10 @@
    0x427b169c 0x5ac9f049 0xdd8f0f00 0x5c8165bf])
 
 (def ^{:private true
-       :doc "S-Box 2"}
+       :added "0.2.0"}
   s2
+  "#### s2
+  S-Box 2"
   [0x1f201094 0xef0ba75b 0x69e3cf7e 0x393f4380 0xfe61cf7a 0xeec5207a 0x55889c94
    0x72fc0651 0xada7ef79 0x4e1d7235 0xd55a63ce 0xde0436ba 0x99c430ef 0x5f0c0794
    0x18dcdb7d 0xa1d6eff3 0xa0b52f7b 0x59e83605 0xee15b094 0xe9ffd909 0xdc440086
@@ -107,8 +116,10 @@
    0x7160a539 0x73bfbe70 0x83877605 0x4523ecf1])
 
 (def ^{:private true
-       :doc "S-Box 3"}
+       :added "0.2.0"}
   s3
+  "#### s3
+  S-Box 3"
   [0x8defc240 0x25fa5d9f 0xeb903dbf 0xe810c907 0x47607fff 0x369fe44b 0x8c1fc644
    0xaececa90 0xbeb1f9bf 0xeefbcaea 0xe8cf1950 0x51df07ae 0x920e8806 0xf0ad0548
    0xe13c8d83 0x927010d5 0x11107d9f 0x07647db9 0xb2e3e4d4 0x3d4f285e 0xb9afa820
@@ -148,8 +159,10 @@
    0xdfef4636 0xa133c501 0xe9d3531c 0xee353783])
 
 (def ^{:private true
-       :doc "S-Box 4"}
+       :added "0.2.0"}
   s4
+  "#### s4
+  S-Box 4"
   [0x9db30420 0x1fb6e9de 0xa7be7bef 0xd273a298 0x4a4f7bdb 0x64ad8c57 0x85510443
    0xfa020ed1 0x7e287aff 0xe60fb663 0x095f35a1 0x79ebf120 0xfd059d43 0x6497b7b1
    0xf3641f63 0x241e4adf 0x28147f5f 0x4fa2b8cd 0xc9430040 0x0cc32220 0xfdd30b30
@@ -313,6 +326,7 @@
 (defn- xs->revv
   "### s->revv
   Reverse a sequence and put into a vector."
+  {:added "0.2.0"}
   [xs]
   (vec (reverse xs)))
 

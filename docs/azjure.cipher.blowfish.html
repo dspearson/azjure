@@ -3028,30 +3028,41 @@ net.brehaut.ClojureTools = (function (SH) {
     build_tree: build_tree
   };
 })(SyntaxHighlighter);
-</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.blowfish" name="azjure.cipher.blowfish"><h1 class="project-name">azjure.cipher.blowfish</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Blowfish Cipher</p>
+</script><title>azjure -- Marginalia</title></head><body><table><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#azjure.cipher.blowfish" name="azjure.cipher.blowfish"><h1 class="project-name">azjure.cipher.blowfish</h1><a class="toc-link" href="toc.html">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"></td></tr><tr><td class="docs"><h2>Blowfish Cipher</h2>
 
-<p>  Implement to meet the spec at https://www.schneier.com/blowfish.html</p>
+<p>  Implemented to meet the spec at <a href="https://www.schneier.com/blowfish.html">https://www.schneier.com/blowfish.html</a></p>
 </td><td class="codes"><pre class="brush: clojure">(ns azjure.cipher.blowfish
   {:author &quot;Jason Ozias&quot;}
   (:require [azjure.cipher.blockcipher :refer :all]
             [azjure.cipher.cipher :refer :all]
             [azjure.libbyte :refer :all]
-            [azjure.libmod :refer :all]))</pre></td></tr><tr><td class="docs"><p>Vector of valid key sizes in bits</p>
+            [azjure.libmod :refer :all]))</pre></td></tr><tr><td class="docs"><h4>key-sizes</h4>
+
+<p>  Blowfish supports key sizes between 32 and 448-bits inclusive.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  key-sizes (vec (range 32 449)))</pre></td></tr><tr><td class="docs"><p>Block size in bits</p>
+       :added   &quot;0.2.0&quot;}
+  key-sizes
+  (vec (range 32 449)))</pre></td></tr><tr><td class="docs"><h4>block-size</h4>
+
+<p>  Blowfish operates on 64-bit blocks.</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  block-size 64)</pre></td></tr><tr><td class="docs"><p>The initial values for the P-array</p>
+       :added   &quot;0.2.0&quot;}
+  block-size
+   64)</pre></td></tr><tr><td class="docs"><h4>parr-init</h4>
+
+<p>  The initial values for the P-array</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  parr_init
+       :added   &quot;0.2.0&quot;}
+  parr-init
   [0x243f6a88 0x85a308d3 0x13198a2e 0x03707344 0xa4093822 0x299f31d0 0x082efa98
    0xec4e6c89 0x452821e6 0x38d01377 0xbe5466cf 0x34e90c6c 0xc0ac29b7 0xc97c50dd
-   0x3f84d5b5 0xb5470917 0x9216d5d9 0x8979fb1b])</pre></td></tr><tr><td class="docs"><p>The initial values for the 1st sbox</p>
+   0x3f84d5b5 0xb5470917 0x9216d5d9 0x8979fb1b])</pre></td></tr><tr><td class="docs"><h4>sbox0-init</h4>
+
+<p>  The initial values for the 1st sbox</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  sbox0_init
+       :added   &quot;0.2.0&quot;}
+  sbox0-init
   [0xd1310ba6 0x98dfb5ac 0x2ffd72db 0xd01adfb7 0xb8e1afed 0x6a267e96 0xba7c9045
    0xf12c7f99 0x24a19947 0xb3916cf7 0x0801f2e2 0x858efc16 0x636920d8 0x71574e69
    0xa458fea3 0xf4933d7e 0x0d95748f 0x728eb658 0x718bcd58 0x82154aee 0x7b54a41d
@@ -3088,10 +3099,12 @@ net.brehaut.ClojureTools = (function (SH) {
    0x02e5b9c5 0x83260376 0x6295cfa9 0x11c81968 0x4e734a41 0xb3472dca 0x7b14a94a
    0x1b510052 0x9a532915 0xd60f573f 0xbc9bc6e4 0x2b60a476 0x81e67400 0x08ba6fb5
    0x571be91f 0xf296ec6b 0x2a0dd915 0xb6636521 0xe7b9f9b6 0xff34052e 0xc5855664
-   0x53b02d5d 0xa99f8fa1 0x08ba4799 0x6e85076a])</pre></td></tr><tr><td class="docs"><p>The initial values for the 2nd sbox</p>
+   0x53b02d5d 0xa99f8fa1 0x08ba4799 0x6e85076a])</pre></td></tr><tr><td class="docs"><h4>sbox1-init</h4>
+
+<p>  The initial values for the 2nd sbox</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  sbox1_init
+       :added   &quot;0.2.0&quot;}
+  sbox1-init
   [0x4b7a70e9 0xb5b32944 0xdb75092e 0xc4192623 0xad6ea6b0 0x49a7df7d 0x9cee60b8
    0x8fedb266 0xecaa8c71 0x699a17ff 0x5664526c 0xc2b19ee1 0x193602a5 0x75094c29
    0xa0591340 0xe4183a3e 0x3f54989a 0x5b429d65 0x6b8fe4d6 0x99f73fd6 0xa1d29c07
@@ -3128,10 +3141,12 @@ net.brehaut.ClojureTools = (function (SH) {
    0xce77326e 0xa6078084 0x19f8509e 0xe8efd855 0x61d99735 0xa969a7aa 0xc50c06c2
    0x5a04abfc 0x800bcadc 0x9e447a2e 0xc3453484 0xfdd56705 0x0e1e9ec9 0xdb73dbd3
    0x105588cd 0x675fda79 0xe3674340 0xc5c43465 0x713e38d8 0x3d28f89e 0xf16dff20
-   0x153e21e7 0x8fb03d4a 0xe6e39f2b 0xdb83adf7])</pre></td></tr><tr><td class="docs"><p>The initial values for the 3rd sbox</p>
+   0x153e21e7 0x8fb03d4a 0xe6e39f2b 0xdb83adf7])</pre></td></tr><tr><td class="docs"><h4>sbox2-init</h4>
+
+<p>  The initial values for the 3rd sbox</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  sbox2_init
+       :added   &quot;0.2.0&quot;}
+  sbox2-init
   [0xe93d5a68 0x948140f7 0xf64c261c 0x94692934 0x411520f7 0x7602d4f7 0xbcf46b2e
    0xd4a20068 0xd4082471 0x3320f46a 0x43b7d4b7 0x500061af 0x1e39f62e 0x97244546
    0x14214f74 0xbf8b8840 0x4d95fc1d 0x96b591af 0x70f4ddd3 0x66a02f45 0xbfbc09ec
@@ -3168,10 +3183,12 @@ net.brehaut.ClojureTools = (function (SH) {
    0xce591d76 0x6f05e409 0x4b7c0188 0x39720a3d 0x7c927c24 0x86e3725f 0x724d9db9
    0x1ac15bb4 0xd39eb8fc 0xed545578 0x08fca5b5 0xd83d7cd3 0x4dad0fc4 0x1e50ef5e
    0xb161e6f8 0xa28514d9 0x6c51133c 0x6fd5c7e7 0x56e14ec4 0x362abfce 0xddc6c837
-   0xd79a3234 0x92638212 0x670efa8e 0x406000e0])</pre></td></tr><tr><td class="docs"><p>The initial values for the 4th sbox</p>
+   0xd79a3234 0x92638212 0x670efa8e 0x406000e0])</pre></td></tr><tr><td class="docs"><h4>sbox3-init</h4>
+
+<p>  The initial values for the 4th sbox</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  sbox3_init
+       :added   &quot;0.2.0&quot;}
+  sbox3-init
   [0x3a39ce37 0xd3faf5cf 0xabc27737 0x5ac52d1b 0x5cb0679e 0x4fa33742 0xd3822740
    0x99bc9bbe 0xd5118e9d 0xbf0f7315 0xd62d1c7e 0xc700c47b 0xb78c1b6b 0x21a19045
    0xb26eb1be 0x6a366eb4 0x5748ab2f 0xbc946e79 0xc6a376d2 0x6549c2c8 0x530ff8ee
@@ -3208,16 +3225,20 @@ net.brehaut.ClojureTools = (function (SH) {
    0xcd769c2b 0x53113ec0 0x1640e3d3 0x38abbd60 0x2547adf0 0xba38209c 0xf746ce76
    0x77afa1c5 0x20756060 0x85cbfe4e 0x8ae88dd8 0x7aaaf9b0 0x4cf9aa7e 0x1948c25c
    0x02fb8a8c 0x01c36ae4 0xd6ebe1f9 0x90d4f869 0xa65cdea0 0x3f09252d 0xc208e69f
-   0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])</pre></td></tr><tr><td class="docs"><p>The initial key sequence state</p>
-</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
-       :doc     }
-  ks-init {:parr  parr_init
-           :sbox0 sbox0_init :sbox1 sbox1_init
-           :sbox2 sbox2_init :sbox3 sbox3_init})</pre></td></tr><tr><td class="docs"><ol>
-<li><p>Get byte number 4 from the given word and lookup the
-S-box value in sbox0 at that index.</p>
+   0xb74e6132 0xce77e25b 0x578fdfe3 0x3ac372e6])</pre></td></tr><tr><td class="docs"><h4>ks-init</h4>
 
-<ol><li>Get byte number 3 from the given word and lookup the
+<p>  The initial key sequence state</p>
+</td><td class="codes"><pre class="brush: clojure">(def ^{:private true
+       :added   &quot;0.2.0&quot;}
+  ks-init
+  {:parr  parr-init
+   :sbox0 sbox0-init :sbox1 sbox1-init
+   :sbox2 sbox2-init :sbox3 sbox3-init})</pre></td></tr><tr><td class="docs"><h3>roundfn</h3>
+
+<ol>
+<li>Get byte number 4 from the given word and lookup the
+S-box value in sbox0 at that index.</li>
+<li>Get byte number 3 from the given word and lookup the
 S-box value in sbox1 at that index.</li>
 <li>Add mod 2<sup>32</sup> the results from 1. and 2.</li>
 <li>Get byte number 2 from the given word and lookup the
@@ -3225,10 +3246,10 @@ S-box value in sbox2 at that index.</li>
 <li>xor the value found in 4. with the result of 3.</li>
 <li>Get byte number 1 from the given word and lookup the
 S-box value in sbox3 at that index.</li>
-<li>Add mod 2<sup>32</sup> the results from 5. and 6.</li></ol>
-
-<p>Evaluates to a 32-bit word.</p></li>
+<li>Add mod 2<sup>32</sup> the results from 5. and 6.</li>
 </ol>
+
+<p>Evaluates to a 32-bit word.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- roundfn
   {:added &quot;0.2.0&quot;}
   [word ks]
@@ -3237,76 +3258,79 @@ S-box value in sbox3 at that index.</li>
       (+modw (nth (:sbox0 ks) (get-byte 4 word))
              (nth (:sbox1 ks) (get-byte 3 word)))
       (nth (:sbox2 ks) (get-byte 2 word)))
-    (nth (:sbox3 ks) (get-byte 1 word))))</pre></td></tr><tr><td class="docs"><ol>
-<li><p>xor the left value with a value from the P-array.</p>
+    (nth (:sbox3 ks) (get-byte 1 word))))</pre></td></tr><tr><td class="docs"><h3>feistel-round</h3>
 
-<ol><li>xor the right value with the roundfn value of the new
+<ol>
+<li>xor the left value with a value from the P-array.</li>
+<li>xor the right value with the roundfn value of the new
 left value (l) just calculated.</li>
 <li>Swap the results (you can see this with r in the left spot
-and l in the right spot).</li></ol>
-
-<p>Evaluates to a vector of two 32-bit words.</p></li>
+and l in the right spot).</li>
 </ol>
+
+<p>Evaluates to a vector of two 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- feistel-round
   {:added &quot;0.2.0&quot;}
   [[left right ks] idx]
   (let [l (bit-xor left (nth (:parr ks) idx))
         r (bit-xor (roundfn l ks) right)]
-    [r l ks]))</pre></td></tr><tr><td class="docs"><p>The Blowfish cipher.</p>
+    [r l ks]))</pre></td></tr><tr><td class="docs"><h3>cipher</h3>
+
+<p>  The Blowfish cipher.</p>
 
 <p>  <em>[left right]</em> - A vector of two 32-bit words
   representing a 64-bit block.</p>
 
 <p>  <em>enc</em> - True if encrypting, false if decrypting.</p>
 
-<p>  This function applies the feistel-round above for 16 rounds.
-  The result of the feistel rounds is then xor'd with either the
-  16th and 17th entries in the P-array if you are encrypting,
-  or the 1st and 0th entries if you are decrypting.  Note that
-  during encryption the range is 0 to 15.  During decryption
-  the range is 17 to 2 descending.  Also note, the xor operations
-  take the left value from the right slot (nth cro 1) and the
-  right value from the left slot (nth cro 0).  This has
-  the effect of reversing the last reverse from the feistel-round
-  function as per the spec.</p>
+<p>  This function applies the feistel-round above for 16 rounds. The result of the
+  feistel rounds is then xor'd with either the 16th and 17th entries in the
+  P-array if you are encrypting, or the 1st and 0th entries if you are
+  decrypting.  Note that during encryption the range is 0 to 15.  During
+  decryption the range is 17 to 2 descending.  Also note, the xor operations
+  take the left value from the right slot (nth cro 1) and the right value from
+  the left slot (nth cro 0).  This has the effect of reversing the last reverse
+  from the feistel-round function as per the spec.</p>
 
-<p>  Evaluates to a vector of two 32-bit words representing
-  the encrypted or decrypted 64-bit block.</p>
+<p>  Evaluates to a vector of two 32-bit words representing the encrypted or
+  decrypted 64-bit block.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- cipher
-  {:added &quot;0.2.0&quot;
-   :doc-private true}
+  {:added       &quot;0.2.0&quot;}
   [[_ _ ks :as all] enc]
   (let [r (if enc (range 0 16) (range 17 1 -1))
         li (if enc 17 0)
         ri (if enc 16 1)
         cro (reduce feistel-round all r)]
     [(bit-xor (nth cro 1) (nth (:parr ks) li))
-     (bit-xor (nth cro 0) (nth (:parr ks) ri))]))</pre></td></tr><tr><td class="docs"><p>Evaluates to a function over the given subkey.</p>
+     (bit-xor (nth cro 0) (nth (:parr ks) ri))]))</pre></td></tr><tr><td class="docs"><h3>encrypt-subkey-block</h3>
 
-<p>  This function encrypts the given block with the Blowfish
-  cipher and sets the values starting at idx in the
-  subkey to the result.</p>
+<p>  Evaluates to a function over the given subkey.</p>
 
-<p>  Evaluates to the result of the Blowfish cipher on the block as
-  a vector of two 32-bit words.</p>
+<p>  This function encrypts the given block with the Blowfish cipher and sets the
+  values starting at idx in the subkey to the result.</p>
+
+<p>  Evaluates to the result of the Blowfish cipher on the block as a vector of two
+  32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encrypt-subkey-block
   {:added &quot;0.2.0&quot;}
   [subkey]
   (fn [[_ _ ks :as all] idx]
     (let [enc (cipher all true)
           nval (assoc (assoc (subkey ks) idx (first enc)) (inc idx) (last enc))]
-      (conj enc (assoc ks subkey nval)))))</pre></td></tr><tr><td class="docs"><p>Encrypt the given subkey starting with the given block
-  as the seed.  Note that each call to encrypt-subkey-block
-  replaces two values in the subkey, so the range only includes
-  every other index in the subkey.</p>
+      (conj enc (assoc ks subkey nval)))))</pre></td></tr><tr><td class="docs"><h3>encrypt-subkey</h3>
 
-<p>  Evaluates to the last generated pair of 32-bit words in a
-  vector for the given subkey.  This is used as the seed for
-  the next subkey usually.</p>
+<p>  Encrypt the given subkey starting with the given block as the seed.  Note that
+  each call to encrypt-subkey-block replaces two values in the subkey, so the
+  range only includes every other index in the subkey.</p>
+
+<p>  Evaluates to the last generated pair of 32-bit words in a vector for the given
+  subkey.  This is used as the seed for the next subkey usually.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- encrypt-subkey
   {:added &quot;0.2.0&quot;}
   [[_ _ ks :as all] subkey]
-  (reduce (encrypt-subkey-block subkey) all (range 0 (count (subkey ks)) 2)))</pre></td></tr><tr><td class="docs"><p>XOR the P-array with the key.  The key is cycled and 576 bits are used for
+  (reduce (encrypt-subkey-block subkey) all (range 0 (count (subkey ks)) 2)))</pre></td></tr><tr><td class="docs"><h3>xor-parr-key</h3>
+
+<p>  XOR the P-array with the key.  The key is cycled and 576 bits are used for
   the XOR.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xor-parr-key
   {:added &quot;0.2.0&quot;}
@@ -3316,22 +3340,26 @@ and l in the right spot).</li></ol>
        (partition 4)
        (mapv bytes-word)
        (mapv bit-xor (:parr ks-init))
-       (assoc ks-init :parr)))</pre></td></tr><tr><td class="docs"><p>Generate the subkeys for the given key.</p>
+       (assoc ks-init :parr)))</pre></td></tr><tr><td class="docs"><h3>generate-subkeys</h3>
+
+<p>  Generate the subkeys for the given key.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- generate-subkeys
   {:added &quot;0.2.0&quot;}
   [key]
   (let [ki (xor-parr-key key)]
-    (last (reduce encrypt-subkey [0 0 ki] (keys ki)))))</pre></td></tr><tr><td class="docs"><p>Process a block for encryption or decryption.</p>
+    (last (reduce encrypt-subkey [0 0 ki] (keys ki)))))</pre></td></tr><tr><td class="docs"><h3>process-block</h3>
+
+<p>  Process a block for encryption or decryption.</p>
 
 <ol>
 <li><em>block</em>: A vector of two 32-bit words representing a block.</li>
 <li><em>key</em>: A vector of 4 to 56 bytes representing a
 key of 32 to 448 bits in 8-bit intervals.</li>
-<li><p><em>enc</em>: true if you are encrypting the block, false
-if you are decrypting the block.</p>
-
-<p>Evaluates to a vector of two 32-bit words.</p></li>
+<li><em>enc</em>: true if you are encrypting the block, false
+if you are decrypting the block.</li>
 </ol>
+
+<p>Evaluates to a vector of two 32-bit words.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- process-block
   {:added &quot;0.2.0&quot;}
   [block {:keys [enc] :as ks}]

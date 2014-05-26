@@ -11,35 +11,45 @@
             [azjure.libmod :refer [+modw]]))
 
 (def ^{:private true
-       :doc     "#### key-sizes
-  Salsa20 supports keys of 128 or 256 bits."}
-  key-sizes [128 256])
+       :added   "0.2.0"}
+  key-sizes
+  "#### key-sizes
+  Salsa20 supports keys of 128 or 256 bits."
+  [128 256])
 
 (def ^{:private true
-       :doc     "#### iv-size
-  Salsa20 supports an IV (nonce) size of 64-bits."}
-  iv-size 64)
+       :added   "0.2.0"}
+  iv-size
+  "#### iv-size
+  Salsa20 supports an IV (nonce) size of 64-bits."
+  64)
 
 (def ^{:private true
-       :doc     "#### keystream-size
-  Salsa20 can generate 2^70 keystream bytes with the same key and nonce"}
-  keystream-size "2^70")
+       :added   "0.2.0"}
+  keystream-size
+  "#### keystream-size
+  Salsa20 can generate 2^70 keystream bytes with the same key and nonce"
+  "2^70")
 
 (def ^{:private true
-       :doc     "#### sigma
-  Used during Salsa20 expansion for 256-bit keys."}
-  sigma [[0x65 0x78 0x70 0x61]
-         [0x6E 0x64 0x20 0x33]
-         [0x32 0x2D 0x62 0x79]
-         [0x74 0x65 0x20 0x6B]])
+       :added   "0.2.0"}
+  sigma
+  "#### sigma
+  Used during Salsa20 expansion for 256-bit keys."
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x33]
+   [0x32 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])
 
 (def ^{:private true
-       :doc     "#### tau
-  Used during Salsa20 expansion for 128-bit keys."}
-  tau [[0x65 0x78 0x70 0x61]
-       [0x6E 0x64 0x20 0x31]
-       [0x36 0x2D 0x62 0x79]
-       [0x74 0x65 0x20 0x6B]])
+       :added   "0.2.0"}
+  tau
+  "#### tau
+  Used during Salsa20 expansion for 128-bit keys."
+  [[0x65 0x78 0x70 0x61]
+   [0x6E 0x64 0x20 0x31]
+   [0x36 0x2D 0x62 0x79]
+   [0x74 0x65 0x20 0x6B]])
 
 (defn- quarter-round
   "### quarter-round
