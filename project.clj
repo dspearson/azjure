@@ -23,7 +23,6 @@
                                      "slamhound" "src/,"
                                      "eastwood" "{:namespaces [:source-paths]},"
                                      "kibit,"
-                                     "check,"
                                      "bikeshed" "-v,"
                                      "spec"]
                         "most"      ["do" "clean," "doc," "chk," "package"]

@@ -3377,7 +3377,9 @@ net.brehaut.ClojureTools = (function (SH) {
 <p>  Generate 1024 (2<sup>8</sup> * 4) words to use during MDS multiplication</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- mdsfn
   []
-  (reduce mdsround [] (range 256)))</pre></td></tr><tr><td class="docs"><p>Memoization of mds</p>
+  (reduce mdsround [] (range 256)))</pre></td></tr><tr><td class="docs"><h3>mds</h3>
+
+<p>  Memoization of mds</p>
 </td><td class="codes"><pre class="brush: clojure">(def ^{:private true
        :added   &quot;0.2.0&quot;}
   mds

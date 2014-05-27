@@ -96,10 +96,10 @@
   documentation."
   {:added "0.2.0"}
   [xs m]
-  (let [m (initialize m)
-        _ (println m)]
+  (let [m (initialize m)]
     (->> (input-decoder m xs)
          (generate-keystream m)
+         (map vec)
          (reduce into)
          (output-encoder m))))
 
