@@ -9,7 +9,6 @@
   {:author "Jason Ozias"}
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.cipher.streamcipher :refer :all]
-            [azjure.encoders :refer :all]
             [azjure.libbyte :refer :all]
             [azjure.libmod :refer [+modw]]))
 
