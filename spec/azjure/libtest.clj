@@ -7,6 +7,7 @@
                            [blowfish :refer :all]
                            [cast5 :refer :all]
                            [cast6 :refer :all]
+                           [chacha :refer :all]
                            [cipher :refer :all]
                            [salsa20 :refer :all]
                            [streamcipher :refer :all]

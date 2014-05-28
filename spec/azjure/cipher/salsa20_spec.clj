@@ -6,9 +6,10 @@
             [clojure.java.io :as io]
             [speclj.core :refer :all]))
 
-;"https://raw.githubusercontent.com/alexwebr/salsa20/master/test_vectors.128")
+;"https://raw.githubusercontent.com/alexwebr/salsa20/master/test_vectors.128"
+;"https://raw.githubusercontent.com/alexwebr/salsa20/master/test_vectors.256"
 (def ^{:private true}
-  salsa20-test-vectors-text (io/file (io/resource "tv128.txt")))
+  salsa20-test-vectors-text (io/file (io/resource "s20_test_vectors_128.txt")))
 (def ^{:private true} sep '("====================="))
 
 (defn- parse-range [r]
