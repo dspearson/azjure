@@ -75,9 +75,9 @@
   (for [{:keys [key nonce subvecs]} (parse-tvs)]
     (context
       "test vectors"
-      (with s20pt (if (= (max-upper subvecs) 511) zeros-512 zeros-131072))
-      (with s20cm (initialize (assoc cm :key key :nonce nonce)))
-      (with ks (vec (encrypted-stream @s20pt @s20cm)))
+      (with-all s20pt (if (= (max-upper subvecs) 511) zeros-512 zeros-131072))
+      (with-all s20cm (initialize (assoc cm :key key :nonce nonce)))
+      (with-all ks (vec (encrypted-stream @s20pt @s20cm)))
 
       (for [{:keys [lower upper value]} subvecs]
         (context
