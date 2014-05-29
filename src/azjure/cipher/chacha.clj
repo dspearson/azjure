@@ -59,8 +59,8 @@
 
   Represents a vector of two values:
 
-    [w = (x + y mod 2<sup>32</sup>)
-     ((w ^ z) <<< shift)]"
+  > [w = (x + y mod 2<sup>32</sup>)
+  >  ((w ^ z) <<< shift)]"
   {:added "0.2.0"}
   [[a b c d] shift]
   (cond
@@ -108,16 +108,16 @@
 
   Evaluates to:
 
-    b<sub>0</sub> + 2<sup>8</sup>b<sub>1</sub> + 2<sup>16</sup>b<sub>2</sub> +
-    2<sup>24</sup>b<sub>3</sub>"
+  > b<sub>0</sub> + 2<sup>8</sup>b<sub>1</sub> + 2<sup>16</sup>b<sub>2</sub> +
+  > 2<sup>24</sup>b<sub>3</sub>"
   {:added "0.2.0"}
   [bv]
   (ubv->x bv :le true))
 
 (defn- chacha-hash
   "### chacha-hash
-  Calculate ChaCha(*x*) by performing double-round 4 times on the
-  little-endian form of the bytes, and adding that mod<sub>32</sub> with the
+  Calculate ChaCha(*x*) by performing double-round *r/2* times on the
+  little-endian form of the bytes, and adding that mod 2<sup>32</sup> with the
   bytes.  The result is then converted back to a vector of words."
   {:added "0.2.0"}
   [x r]
