@@ -14,6 +14,7 @@
                            [salsa20 :refer :all]
                            [streamcipher :refer :all]
                            [tea :refer :all]
+                           [trivium :refer :all]
                            [twofish :refer :all])
             [clojure.pprint :refer (pprint)]
             [clojure.repl :refer :all]
