@@ -112,6 +112,4 @@
               (should= value (subvec @ks1 lower (inc upper))))))
 
       (it "should decrypt to the proper cleartext"
-          (should= @s20pt1 (encrypted-stream @ks1 @s20cm1)))))
-
-  )
+          (should= @s20pt1 (encrypted-stream @ks1 @s20cm1))))))
