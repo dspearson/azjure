@@ -7,12 +7,12 @@
   The currently supported block cipher type keywords for use in the
   configuration map are:
 
-    :aes     - AES
-    :bf      - Blowfish
-    :cast6   - CAST6
-    :tea     - TEA
-    :tf      - Twofish
-    :xtea    - XTEA"
+    :aes      - AES
+    :blowfish - Blowfish
+    :cast6    - CAST6
+    :tea      - TEA
+    :twofish  - Twofish
+    :xtea     - XTEA"
   {:author "Jason Ozias"})
 
 (defmulti blocksize-bits

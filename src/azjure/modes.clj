@@ -9,6 +9,7 @@
 
     :ecb - Electronic Code Book
     :cbc - Cipher-Block Chaining
+    :pcbc - Propagating Cipher-Block Chaining
     :cfb - Cipher Feedback
     :ofb - Output Feedback
     :ctr - Counter"
