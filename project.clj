@@ -1,4 +1,4 @@
-(defproject azjure "0.2.0-SNAPSHOT"
+(defproject azjure "1.0.0-SNAPSHOT"
   :description "Encryption Library in Clojure"
   :url "https://github.com/CraZySacX/azjure"
   :license {:name "MIT"
