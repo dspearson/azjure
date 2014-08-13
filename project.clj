@@ -15,7 +15,7 @@
          :plugins      [[cider/cider-nrepl "0.7.0"]
                         [lein-marginalia "0.7.1"]
                         [org.ozias.plugins/lein-git-version "1.1.3"]
-                        [speclj "3.0.2"]]
+                        [speclj "3.1.0"]]
          :aliases      {"package"   ["do" "clean," "install"]
                         "slamhound" ["run" "-m" "slam.hound"]
                         "doc"       ["marg" "-m" "-v" "0.2.0"]
