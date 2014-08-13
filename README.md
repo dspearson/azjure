@@ -9,7 +9,7 @@ Encryption in Clojure
 ## Status
 [![Build Status](https://travis-ci.org/CraZySacX/azjure.svg?branch=master)](https://travis-ci.org/CraZySacX/azjure)
 
-## Usage
+## Project Setup
 Add the following in the dependencies section of your project.clj file
 
 ```Clojure
@@ -18,67 +18,59 @@ Add the following in the dependencies section of your project.clj file
                ...]
 ```
 
-### Block Ciphers
+### Block Cipher Usage (Quick)
 ```Clojure
-(:require (azjure [core :refer :all]
-                  [encoders :refer :all]
-                  [padders :refer :all])
-          (azjure.cipher [aes :refer :all]
-                         [blockcipher :refer :all]))
+(:require ...
+          [azjure.core :refer :all]
+          [azjure.cipher.aes :refer :all] ;Require the cipher(s) you wish to use
+          ...
+          )
 ```
 Encrypt
 
 ```Clojure
-;; Initialize the cipher (key should be a vector of unsigned bytes).
-(encrypt [0 0 0 0] {:type :aes :mode :ecb :pad zero
-                    :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-                    :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+;; Encrypt a vector of unsigned bytes
+(encrypt [0 0 0 0]
+         {:type :aes :mode :ecb :pad pkcs7
+          :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+          :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+;; Should evaluate to [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
 ```
 
 Decrypt
 
 ```Clojure
-;; Initialize the cipher (key should be a vector of unsigned bytes).
-(def initmap (cipher/initialize (->AES) {:key key}))
-;; Decrypt (ciphertext and iv should be vectors of unsigned bytes)
-(cs/decrypt (->AESCBCPKCS7) ciphertext iv initmap)
+;; Decrypt a vector of unsigned bytes
+(decrypt [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
+         {:type :aes :mode :ecb :pad :pkcs7
+          :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+          :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
+;; Should evaluate to [0 0 0 0]
 ```
 
-### Stream Ciphers
+### Stream Cipher Usage (Quick)
 
 ```Clojure
-(:require (org.azjure.cipher [cipher :as cipher]
-                             [streamcipher :as sc]
-                             [salsa20 :refer (->Salsa20]))
+(:require ...
+          [azjure.core :refer :all]
+          [azjure.cipher.salsa20 :refer :all] ;Require the ciphers(s) you wish to use
+          ...
+          )
 ```
 
 Encrypt
 
 ```Clojure
-;; Initialize the record to use
-(def s20 (->Salsa20))
-;; Initialize the cipher.  Note the map argument usually takes a map of the
-;; format {:key key :iv iv}.  In Salsa20's case it is {:key key :nonce nonce}.
-;; This will evaluate to a map to use during keystream generation
-(def initmap (cipher/initialize s20 {:key key :nonce nonce}))
-;; Generate keystream and encrypt
-(mapv bit-xor plaintext (sc/generate-keystream s20 initmap [0 (count plaintext)]))
+;; Generate keystream
 ```
 
 Decrypt
 
 ```Clojure
-;; Initialize the record to use
-(def s20 (->Salsa20))
-;; Initialize the cipher.  Note the map argument usually takes a map of the
-;; format {:key key :iv iv}.  In Salsa20's case it is {:key key :nonce nonce}.
-;; This will evaluate to a map to use during keystream generation
-(def initmap (cipher/initialize s20 {:key key :nonce nonce}))
-;; Generate keystream and encrypt
-(mapv bit-xor ciphertext (sc/generate-keystream s20 initmap [0 (count ciphertext)]))
+;; 
 ```
 
-See the [test directory](https://github.com/CraZySacX/azjure/tree/master/test/org/azjure/cipher) for examples
+See the [test directory](https://github.com/CraZySacX/azjure/tree/master/spec/azjure) for examples
 
 ## Supported Ciphers
 ### Block
