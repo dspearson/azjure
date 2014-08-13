@@ -30,7 +30,8 @@
        :added   "0.2.0"}
   keystream-size
   "#### keystream-size
-  ChaCha can generate 2<sup>70</sup> keystream bytes with the same key and nonce"
+  ChaCha can generate 2<sup>70</sup> keystream bytes with the same key and
+  nonce"
   "2^70")
 
 (def ^{:private true
