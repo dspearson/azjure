@@ -8,23 +8,25 @@ Add the following in the dependencies section of your project.clj file
 
 ```Clojure
 :dependencies [...
-               [org.azjure/azjure "0.1.1"]
+               [azjure "1.0.0-SNAPSHOT"]
                ...]
 ```
 
 ### Block Ciphers
 ```Clojure
-(:require [org.azjure.cryptsuite :as cs :refer (->AESCBCPKCS7)]
-          (org.azjure.cipher [cipher :as cipher]
-                             [aes :refer (->AES)])
+(:require (azjure [core :refer :all]
+                  [encoders :refer :all]
+                  [padders :refer :all])
+          (azjure.cipher [aes :refer :all]
+                         [blockcipher :refer :all]))
 ```
 Encrypt
 
 ```Clojure
 ;; Initialize the cipher (key should be a vector of unsigned bytes).
-(def initmap (cipher/initialize (->AES) {:key key}))
-;; Encrypt (plaintext and iv should be vectors of unsigned bytes)
-(cs/encrypt (->AESCBCPKCS7) plaintext iv initmap)
+(encrypt [0 0 0 0] {:type :aes :mode :ecb :pad zero
+                    :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+                    :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
 ```
 
 Decrypt
