@@ -3,6 +3,12 @@ azjure
 
 Cryptography implementations in Clojure
 
+## Version
+[![Clojars Project](http://clojars.org/azjure/latest-version.svg)](http://clojars.org/azjure)
+
+## Status
+[![Build Status](https://travis-ci.org/CraZySacX/azjure.svg?branch=master)](https://travis-ci.org/CraZySacX/azjure)
+
 ## Usage
 Add the following in the dependencies section of your project.clj file
 
