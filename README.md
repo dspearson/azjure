@@ -31,7 +31,7 @@ Encrypt
 ```Clojure
 ;; Encrypt a vector of unsigned bytes
 (encrypt [0 0 0 0]
-         {:type :aes :mode :ecb :pad pkcs7
+         {:type :aes :mode :ecb :pad :pkcs7
           :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
           :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
 ;; Should evaluate to [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
