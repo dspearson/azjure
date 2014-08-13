@@ -1,7 +1,7 @@
 azjure
 ======
 
-Cryptography implementations in Clojure
+Encryption in Clojure
 
 ## Version
 [![Clojars Project](http://clojars.org/azjure/latest-version.svg)](http://clojars.org/azjure)
