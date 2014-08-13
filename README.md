@@ -17,6 +17,41 @@ Add the following in the dependencies section of your project.clj file
                [azjure "1.0.0-SNAPSHOT"]
                ...]
 ```
+### Configuration Map
+Each function in the API uses map to configure the behavior of the encrypt/decrypt functions.
+
+The map has the following format:
+
+```clojure
+{:type :typekw
+ :mode :modekw
+ :pad  :padderkw
+ :eid  :input-decoderkw
+ :eoe  :output-encoderkw
+ :did  :input-decoderkw
+ :doe  :output-encoderkw
+ :key  []
+ :iv   []}
+```
+
+* **type** - A keyword that identifies the cipher you wish to use. See
+[cipher.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj) for supported values.
+* **mode** - A keyword that identifies the block chaining mode you wish to use.  See [modes.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/modes.clj) for supported values.
+* **pad** - A keyword that identifies the padder you wish to use. See [padders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/padders.clj) for supported values.
+* **eid** - A keyword that represents the encryption input decoder you wish to use. See
+[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
+* **eoe** - A keyword that represents the encryption output encoder you wish to use. See
+[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
+* **did** - A keyword that represents the decryption input decoder you wish to use.  See
+[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
+* **doe** - A keyword that represents the decryption output encoder you wish to use. See
+[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
+* **key** - A vector of unsigned bytes (0-255) of the appropriate length that
+represents the key you wish to use with the cipher.
+* **iv** - A vector of unsigned bytes (0-255) of the appropriate length that
+represents the IV you wish to use with the block chaining mode.
+* **nonce** - A vector of unsigned bytes (0-255) of the appropriate length that
+represents the nonce you with to use with the stream cipher.
 
 ### Block Cipher Usage (Quick)
 ```Clojure
@@ -30,8 +65,9 @@ Encrypt
 
 ```Clojure
 ;; Encrypt a vector of unsigned bytes
+;; Note that the keys shown below are the required keys for a block cipher
 (encrypt [0 0 0 0]
-         {:type :aes :mode :ecb :pad pkcs7
+         {:type :aes :mode :ecb :pad :pkcs7
           :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
           :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
 ;; Should evaluate to [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
@@ -62,6 +98,7 @@ Encrypt/Decrypt
 
 ```Clojure
 ;; Generate ciphertext
+;; Note that the keys shown below are the required keys for a stream cipher
 (encrypted-stream [0 0 0 0]
                   {:type :salsa20
                    :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
