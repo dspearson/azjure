@@ -1,4 +1,5 @@
-(ns demo)
+(ns demo
+  (:require [azjure.core :refer :all]))
 
 ; Convert a string to a vector of bytes
 (comment
