@@ -9,13 +9,14 @@
   The currently supported cipher type keywords for use in the configuration map
   are:
 
-    :aes     - AES
-    :bf      - Blowfish
-    :cast6   - CAST6
-    :salsa20 - Salsa20
-    :tea     - TEA
-    :tf      - Twofish
-    :xtea    - XTEA"
+    :aes      - AES
+    :blowfish - Blowfish
+    :cast6    - CAST6
+    :chacha   - ChaCha
+    :salsa20  - Salsa20
+    :tea      - TEA
+    :twofish  - Twofish
+    :xtea     - XTEA"
   {:author "Jason Ozias"})
 
 (defmulti initialize

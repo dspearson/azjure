@@ -5,7 +5,6 @@
             (azjure.cipher [aes :refer :all]
                            [blockcipher :refer :all]
                            [blowfish :refer :all]
-                           [cast5 :refer :all]
                            [cast6 :refer :all]
                            [chacha :refer :all]
                            [cipher :refer :all]

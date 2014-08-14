@@ -7,6 +7,7 @@
   The currently supported stream cipher type keywords for use in the
   configuration map are:
 
+    :chacha  - ChaCha
     :salsa20 - Salsa20"
   {:author "Jason Ozias"})
 
