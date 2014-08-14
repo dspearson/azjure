@@ -18,8 +18,8 @@
   [xs]
   (every? true? (map #(or (zero? %) (= 1 %)) xs)))
 
-(defn every-byte?
-  "### every-byte?
+(defn every-unsigned-byte?
+  "### every-unsigned-byte?
   Evaluates to true if every value in a sequence is between 0 and 255
   inclusive"
   {:added "0.2.0"}
@@ -95,7 +95,7 @@
   Convert a vector of unsigned bytes (0-255) to a value"
   {:added "0.2.0"}
   [xv & {:keys [le]}]
-  {:pre [(every-byte? xv)]}
+  {:pre [(every-unsigned-byte? xv)]}
   (let [l (count xv)
         [orfn shiftfn] (long-or-bigint? xv le)]
     (->> (if le (range 0 (* 8 l) 8) (range (* 8 (dec l)) -1 -8))

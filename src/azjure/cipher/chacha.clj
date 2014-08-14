@@ -139,7 +139,7 @@
   [nonce]
   {:pre [(vector? nonce)
          (= 8 (count nonce))
-         (every-byte? nonce)]}
+         (every-unsigned-byte? nonce)]}
   (map into (map #(dword-bytes % true) (range)) (repeat nonce)))
 
 (defn- usbv32?
@@ -147,7 +147,7 @@
   Is the given vector 32 unsigned bytes long?"
   {:added "0.2.0"}
   [v]
-  (and (every-byte? v) (= 32 (count v))))
+  (and (every-unsigned-byte? v) (= 32 (count v))))
 
 (defn- chacha-expansion
   "### chacha-expansion
