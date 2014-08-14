@@ -20,7 +20,7 @@
                         "slamhound" ["run" "-m" "slam.hound"]
                         "doc"       ["marg" "-m" "-v" "0.2.0"]
                         "chk"       ["do"
-                                     "archaic" "upgrade,"
+                                     "archaic" "-C" "upgrade,"
                                      "slamhound" "src/,"
                                      "eastwood" "{:namespaces [:source-paths]},"
                                      "kibit,"
