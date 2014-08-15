@@ -109,7 +109,7 @@ bytes vectors are assumed as the default input/output type."
   Convert a sequence of unsigned bytes (0-255) into a hex string."
   {:added "0.2.0"}
   [xs]
-  {:pre [(not (nil? xs)) (every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-unsigned-byte? xs)]}
   (->> xs (map x->hex) (apply str)))
 
 (defn hex->xs
@@ -130,7 +130,7 @@ bytes vectors are assumed as the default input/output type."
   Convert a sequence of unsigned bytes (0-255) to a string"
   {:added "0.2.0"}
   [xs]
-  {:pre [(not (nil? xs)) (every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-unsigned-byte? xs)]}
   (str/join (map char xs)))
 
 (defn str->xs
@@ -184,7 +184,7 @@ bytes vectors are assumed as the default input/output type."
   The second argument is the base64 alphabet to use."
   {:added "0.2.0"}
   [xs alphabet]
-  {:pre [(every-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
+  {:pre [(every-unsigned-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
   (if (empty? xs)
     ""
     (->> (partition-all 3 xs)
@@ -304,7 +304,7 @@ bytes vectors are assumed as the default input/output type."
   The second argument is the base32 alphabet to use."
   {:added "0.2.0"}
   [xs alphabet]
-  {:pre [(vector? xs) (every-byte? xs)
+  {:pre [(vector? xs) (every-unsigned-byte? xs)
          (string? alphabet) (= 32 (count alphabet))]}
   (if (empty? xs)
     ""

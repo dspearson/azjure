@@ -14,6 +14,7 @@
                            [streamcipher :refer :all]
                            [tea :refer :all]
                            [twofish :refer :all])
+            [demo :refer :all]
             [clojure.pprint :refer (pprint)]
             [clojure.repl :refer :all]
             [clojure.tools.namespace.repl :refer (refresh refresh-all)]
