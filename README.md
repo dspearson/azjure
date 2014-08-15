@@ -1,13 +1,28 @@
+[fips197]: http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+[blowfish]: https://www.schneier.com/paper-blowfish-fse.html
+[cast256]: http://tools.ietf.org/html/rfc2612
+[twofish]: http://www.schneier.com/paper-twofish-paper.pdf
+[tea]: http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf
+[xtea]: http://www.cix.co.uk/~klockstone/xtea.pdf
+[td]: https://github.com/CraZySacX/azjure/tree/master/spec/azjure
+[clojarssvg]: http://clojars.org/azjure/latest-version.svg
+[clojars]: http://clojars.org/azjure
+[travissvg]: https://travis-ci.org/CraZySacX/azjure.svg?branch=master
+[travis]: https://travis-ci.org/CraZySacX/azjure
+[cipher]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj
+[encoders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj
+[modes]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/modes.clj
+[padders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/padders.clj
 azjure
 ======
 
 Encryption in Clojure
 
 ## Version
-[![Clojars Project](http://clojars.org/azjure/latest-version.svg)](http://clojars.org/azjure)
+[![Clojars Project](clojarssvg)](clojars)
 
 ## Status
-[![Build Status](https://travis-ci.org/CraZySacX/azjure.svg?branch=master)](https://travis-ci.org/CraZySacX/azjure)
+[![Build Status](travissvg)](travis)
 
 ## Project Setup
 Add the following in the dependencies section of your project.clj file
@@ -18,7 +33,8 @@ Add the following in the dependencies section of your project.clj file
                ...]
 ```
 ### Configuration Map
-Each function in the API uses map to configure the behavior of the encrypt/decrypt functions.
+Each function in the API uses map to configure the behavior of the
+encrypt/decrypt functions.
 
 The map has the following format:
 
@@ -35,17 +51,19 @@ The map has the following format:
 ```
 
 * **type** - A keyword that identifies the cipher you wish to use. See
-[cipher.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj) for supported values.
-* **mode** - A keyword that identifies the block chaining mode you wish to use.  See [modes.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/modes.clj) for supported values.
-* **pad** - A keyword that identifies the padder you wish to use. See [padders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/padders.clj) for supported values.
-* **eid** - A keyword that represents the encryption input decoder you wish to use. See
-[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
-* **eoe** - A keyword that represents the encryption output encoder you wish to use. See
-[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
-* **did** - A keyword that represents the decryption input decoder you wish to use.  See
-[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
-* **doe** - A keyword that represents the decryption output encoder you wish to use. See
-[encoders.clj](https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj) for supported values.
+[cipher.clj](cipher) for supported values.
+* **mode** - A keyword that identifies the block chaining mode you wish to use.
+See [modes.clj](modes) for supported values.
+* **pad** - A keyword that identifies the padder you wish to use. See
+[padders.clj](padders) for supported values.
+* **eid** - A keyword that represents the encryption input decoder you wish to
+use. See [encoders.clj](encoders) for supported values.
+* **eoe** - A keyword that represents the encryption output encoder you wish to
+use. See [encoders.clj](encoders) for supported values.
+* **did** - A keyword that represents the decryption input decoder you wish to
+use. See [encoders.clj](encoders) for supported values.
+* **doe** - A keyword that represents the decryption output encoder you wish to
+use. See [encoders.clj](encoders) for supported values.
 * **key** - A vector of unsigned bytes (0-255) of the appropriate length that
 represents the key you wish to use with the cipher.
 * **iv** - A vector of unsigned bytes (0-255) of the appropriate length that
@@ -113,16 +131,16 @@ Encrypt/Decrypt
 ;; Should evaluate to [0 0 0 0]
 ```
 
-See the [test directory](https://github.com/CraZySacX/azjure/tree/master/spec/azjure) for examples
+See the [test directory](td) for examples
 
 ## Supported Ciphers
 ### Block
-1. Advanced Encryption Standard (AES) - [FIPS 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
-2. Blowfish (BF) - [Blowfish Spec](https://www.schneier.com/paper-blowfish-fse.html)
-3. CAST-256 (CAST6) - [CAST-256 RFC](http://tools.ietf.org/html/rfc2612)
-4. Twofish (TF) - [Twofish Spec](http://www.schneier.com/paper-twofish-paper.pdf)
-5. TEA (TEA) - [TEA Spec](http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf)
-6. XTEA (XTEA) - [XTEA Spec](http://www.cix.co.uk/~klockstone/xtea.pdf)
+1. Advanced Encryption Standard (AES) - [FIPS 197](fips197)
+2. Blowfish (BF) - [Blowfish Spec](blowfish)
+3. CAST-256 (CAST6) - [CAST-256 RFC](cast256)
+4. Twofish (TF) - [Twofish Spec](twofish)
+5. TEA (TEA) - [TEA Spec](tea)
+6. XTEA (XTEA) - [XTEA Spec](xtea)
 
 ### Block - In Progress
 1. CAST-128 (CAST5) - [CAST-128 RFC](http://tools.ietf.org/html/rfc2144)
@@ -155,13 +173,29 @@ descriptions
 3. Counter (CTR)
 
 ## Supported Padding
-Some cipher modes (ECB, CBC, PCBC) require that the input be padded with bytes until a 
-multiple of the cipher's blocksize.  The following padding methods are supported.
+Some cipher modes (ECB, CBC, PCBC) require that the input be padded with bytes
+until a multiple of the cipher's blocksize.  The following padding methods are
+supported.
 
-See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for descriptions
+See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for
+descriptions
 
 1. PKCS7
 2. Zero Byte
 3. ISO 10126
 4. ANSI X.923
 5. ISO/IEC 7816-4
+
+## Character Encoding/Decoding
+By default the API works with vectors of unsigned bytes.  However, there is
+built in support for converting to and from many common character encodings.
+
+The following encodings are supported:
+
+1. str       - ASCII character encoding
+2. hex       - hex encoding (0-9a-f)
+3. base16    - Base16 encoding (0-9A-F)
+4. base32    - Base32 encoding (A-Z2-7)
+5. base32hex - Base32 encoding with a hex alphabet (0-9A-V)
+6. base64    - Base64 encoding (A-Za-z0-9+/)
+7. base64url - Base64 encoding with the URL safe alphabet (A-Za-z0-9-_)
