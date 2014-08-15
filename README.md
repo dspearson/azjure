@@ -143,7 +143,7 @@ Encrypt/Decrypt
 ;; Should evaluate to [0 0 0 0]
 ```
 
-See the [examples](/README.md#examples) section below for more
+See the [examples](/docs/EXAMPLES.md) documentation for more
 extensive usage examples
 
 ## Supported Ciphers
@@ -212,5 +212,3 @@ The following encodings are supported:
 5. base32hex - Base32 encoding with a hex alphabet (0-9A-V)
 6. base64    - Base64 encoding (A-Za-z0-9+/)
 7. base64url - Base64 encoding with the URL safe alphabet (A-Za-z0-9-_)
-
-## Examples
