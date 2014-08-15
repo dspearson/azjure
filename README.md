@@ -143,7 +143,7 @@ Encrypt/Decrypt
 ;; Should evaluate to [0 0 0 0]
 ```
 
-See the [example](/README.md#Example) section below for more
+See the [examples](/README.md#examples) section below for more
 extensive usage examples
 
 ## Supported Ciphers
