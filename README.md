@@ -14,10 +14,10 @@
 [trivium]: http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf
 [clojars]: http://clojars.org/azjure
 [travis]: https://travis-ci.org/CraZySacX/azjure
-[cipher]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj
-[encoders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj
-[modes]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/modes.clj
-[padders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/padders.clj
+[cipher]: /src/azjure/cipher/cipher.clj
+[encoders]: /src/azjure/encoders.clj
+[modes]: /src/azjure/modes.clj
+[padders]: /src/azjure/padders.clj
 [mode]: http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
 [padding]: http://en.wikipedia.org/wiki/Padding_%28cryptography%29
 azjure
@@ -58,19 +58,19 @@ The map has the following format:
 ```
 
 * **type** - A keyword that identifies the cipher you wish to use. See
-[cipher.clj](cipher) for supported values.
+[cipher.clj][cipher] for supported values.
 * **mode** - A keyword that identifies the block chaining mode you wish to use.
-See [modes.clj](modes) for supported values.
+See [modes.clj][modes] for supported values.
 * **pad** - A keyword that identifies the padder you wish to use. See
-[padders.clj](padders) for supported values.
+[padders.clj][padders] for supported values.
 * **eid** - A keyword that represents the encryption input decoder you wish to
-use. See [encoders.clj](encoders) for supported values.
+use. See [encoders.clj][encoders] for supported values.
 * **eoe** - A keyword that represents the encryption output encoder you wish to
-use. See [encoders.clj](encoders) for supported values.
+use. See [encoders.clj][encoders] for supported values.
 * **did** - A keyword that represents the decryption input decoder you wish to
-use. See [encoders.clj](encoders) for supported values.
+use. See [encoders.clj][encoders] for supported values.
 * **doe** - A keyword that represents the decryption output encoder you wish to
-use. See [encoders.clj](encoders) for supported values.
+use. See [encoders.clj][encoders] for supported values.
 * **key** - A vector of unsigned bytes (0-255) of the appropriate length that
 represents the key you wish to use with the cipher.
 * **iv** - A vector of unsigned bytes (0-255) of the appropriate length that
@@ -148,31 +148,31 @@ extensive usage examples
 
 ## Supported Ciphers
 ### Block
-1. Advanced Encryption Standard (AES) - [FIPS 197](fips197)
-2. Blowfish (BF) - [Blowfish Spec](blowfish)
-3. CAST-256 (CAST6) - [CAST-256 RFC](cast256)
-4. Twofish (TF) - [Twofish Spec](twofish)
-5. TEA (TEA) - [TEA Spec](tea)
-6. XTEA (XTEA) - [XTEA Spec](xtea)
+1. Advanced Encryption Standard (AES) - [FIPS 197][fips197]
+2. Blowfish (BF) - [Blowfish Spec][blowfish]
+3. CAST-256 (CAST6) - [CAST-256 RFC][cast256]
+4. Twofish (TF) - [Twofish Spec][twofish]
+5. TEA (TEA) - [TEA Spec][tea]
+6. XTEA (XTEA) - [XTEA Spec][xtea]
 
 ### Block - In Progress
-1. CAST-128 (CAST5) - [CAST-128 RFC](cast128)
+1. CAST-128 (CAST5) - [CAST-128 RFC][cast128]
 
 ### Stream
-1. Salsa20 (Salsa20) - [Salsa20 Spec](salsa20)
-2. ChaCha (Chacha) - [ChaCha Spec](chacha)
+1. Salsa20 (Salsa20) - [Salsa20 Spec][salsa20]
+2. ChaCha (Chacha) - [ChaCha Spec][chacha]
 
 ### Stream - In Progress
-1. HC-128 (HC128) - [HC-128 Spec](hc128)
-2. HC-256 (HC256) - [HC-256 Spec](hc256)
-3. MICKEY2.0 (MICKEY2.0) - [MICKEY2.0 Spec](mickey2)
-4. Rabbit (Rabbit) - [Rabbit Spec](rabbit)
-5. Trivium (Trivium) - [Trivium Spec](trivium)
+1. HC-128 (HC128) - [HC-128 Spec][hc128]
+2. HC-256 (HC256) - [HC-256 Spec][hc256]
+3. MICKEY2.0 (MICKEY2.0) - [MICKEY2.0 Spec][mickey2]
+4. Rabbit (Rabbit) - [Rabbit Spec][rabbit]
+5. Trivium (Trivium) - [Trivium Spec][trivium]
 
 ## Supported Modes
 Cipher modes describe the method for encrypting multiple blocks with block ciphers.
 
-See [Mode of Operation](mode) for
+See [Mode of Operation][mode] for
 descriptions
 
 ### Block Only Modes
@@ -190,7 +190,7 @@ Some cipher modes (ECB, CBC, PCBC) require that the input be padded with bytes
 until a multiple of the cipher's blocksize.  The following padding methods are
 supported.
 
-See [Padding](padding) for
+See [Padding][padding] for
 descriptions
 
 1. PKCS7
