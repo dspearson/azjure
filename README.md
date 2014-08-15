@@ -4,25 +4,33 @@
 [twofish]: http://www.schneier.com/paper-twofish-paper.pdf
 [tea]: http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.45.281&rep=rep1&type=pdf
 [xtea]: http://www.cix.co.uk/~klockstone/xtea.pdf
+[cast128]: http://tools.ietf.org/html/rfc2144
+[salsa20]: http://cr.yp.to/snuffle/spec.pdf
+[chacha]: http://cr.yp.to/chacha/chacha-20080128.pdf
+[hc128]: http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf
+[hc256]: http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf
+[mickey2]: http://www.ecrypt.eu.org/stream/p3ciphers/mickey/mickey_p3.pdf
+[rabbit]: http://tools.ietf.org/rfc/rfc4503.txt
+[trivium]: http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf
 [td]: https://github.com/CraZySacX/azjure/tree/master/spec/azjure
-[clojarssvg]: http://clojars.org/azjure/latest-version.svg
 [clojars]: http://clojars.org/azjure
-[travissvg]: https://travis-ci.org/CraZySacX/azjure.svg?branch=master
 [travis]: https://travis-ci.org/CraZySacX/azjure
 [cipher]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj
 [encoders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/encoders.clj
 [modes]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/modes.clj
 [padders]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/padders.clj
+[mode]: http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+[padding]: http://en.wikipedia.org/wiki/Padding_%28cryptography%29
 azjure
 ======
 
 Encryption in Clojure
 
 ## Version
-[![Clojars Project](clojarssvg)](clojars)
+[![Clojars Project](http://clojars.org/azjure/latest-version.svg)](clojars)
 
 ## Status
-[![Build Status](travissvg)](travis)
+[![Build Status](https://travis-ci.org/CraZySacX/azjure.svg?branch=master)](travis)
 
 ## Project Setup
 Add the following in the dependencies section of your project.clj file
@@ -75,7 +83,8 @@ represents the nonce you with to use with the stream cipher.
 ```Clojure
 (:require ...
           [azjure.core :refer :all]
-          [azjure.cipher.aes :refer :all] ;Require the cipher(s) you wish to use
+          [azjure.cipher.aes :refer :all] 
+          ;Require all the cipher(s) you wish to use
           ...
           )
 ```
@@ -83,12 +92,14 @@ Encrypt
 
 ```Clojure
 ;; Encrypt a vector of unsigned bytes
-;; Note that the keys shown below are the required keys for a block cipher
+;; Note that the keys shown below are the required keys for a 
+;; block cipher
 (encrypt [0 0 0 0]
          {:type :aes :mode :ecb :pad :pkcs7
           :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
           :iv [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]})
-;; Should evaluate to [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
+;; Should evaluate to
+;; [223 80 151 26 46 117 190 64 134 255 95 229 221 229 165 35]
 ```
 
 Decrypt
@@ -107,7 +118,8 @@ Decrypt
 ```Clojure
 (:require ...
           [azjure.core :refer :all]
-          [azjure.cipher.salsa20 :refer :all] ;Require the ciphers(s) you wish to use
+          [azjure.cipher.salsa20 :refer :all]
+          ;Require all the ciphers(s) you wish to use
           ...
           )
 ```
@@ -116,7 +128,8 @@ Encrypt/Decrypt
 
 ```Clojure
 ;; Generate ciphertext
-;; Note that the keys shown below are the required keys for a stream cipher
+;; Note that the keys shown below are the required keys for
+;; a stream cipher
 (encrypted-stream [0 0 0 0]
                   {:type :salsa20
                    :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
@@ -143,23 +156,23 @@ See the [test directory](td) for examples
 6. XTEA (XTEA) - [XTEA Spec](xtea)
 
 ### Block - In Progress
-1. CAST-128 (CAST5) - [CAST-128 RFC](http://tools.ietf.org/html/rfc2144)
+1. CAST-128 (CAST5) - [CAST-128 RFC](cast128)
 
 ### Stream
-1. Salsa20 (Salsa20) - [Salsa20 Spec](http://cr.yp.to/snuffle/spec.pdf)
-2. ChaCha (Chacha) - [ChaCha Spec](http://cr.yp.to/chacha/chacha-20080128.pdf)
+1. Salsa20 (Salsa20) - [Salsa20 Spec](salsa20)
+2. ChaCha (Chacha) - [ChaCha Spec](chacha)
 
 ### Stream - In Progress
-1. HC-128 (HC128) - [HC-128 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
-2. HC-256 (HC256) - [HC-256 Spec](http://www3.ntu.edu.sg/home/wuhj/research/hc/hc256_fse.pdf)
-3. MICKEY2.0 (MICKEY2.0) - [MICKEY2.0 Spec](http://www.ecrypt.eu.org/stream/p3ciphers/mickey/mickey_p3.pdf)
-4. Rabbit (Rabbit) - [Rabbit Spec](http://tools.ietf.org/rfc/rfc4503.txt)
-5. Trivium (Trivium) - [Trivium Spec](http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf)
+1. HC-128 (HC128) - [HC-128 Spec](hc128)
+2. HC-256 (HC256) - [HC-256 Spec](hc256)
+3. MICKEY2.0 (MICKEY2.0) - [MICKEY2.0 Spec](mickey2)
+4. Rabbit (Rabbit) - [Rabbit Spec](rabbit)
+5. Trivium (Trivium) - [Trivium Spec](trivium)
 
 ## Supported Modes
 Cipher modes describe the method for encrypting multiple blocks with block ciphers.
 
-See [Mode of Operation](http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation) for
+See [Mode of Operation](mode) for
 descriptions
 
 ### Block Only Modes
@@ -177,7 +190,7 @@ Some cipher modes (ECB, CBC, PCBC) require that the input be padded with bytes
 until a multiple of the cipher's blocksize.  The following padding methods are
 supported.
 
-See [Padding](http://en.wikipedia.org/wiki/Padding_%28cryptography%29) for
+See [Padding](padding) for
 descriptions
 
 1. PKCS7
