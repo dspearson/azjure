@@ -12,7 +12,6 @@
 [mickey2]: http://www.ecrypt.eu.org/stream/p3ciphers/mickey/mickey_p3.pdf
 [rabbit]: http://tools.ietf.org/rfc/rfc4503.txt
 [trivium]: http://www.ecrypt.eu.org/stream/p3ciphers/trivium/trivium_p3.pdf
-[td]: https://github.com/CraZySacX/azjure/tree/master/spec/azjure
 [clojars]: http://clojars.org/azjure
 [travis]: https://travis-ci.org/CraZySacX/azjure
 [cipher]: https://github.com/CraZySacX/azjure/blob/master/src/azjure/cipher/cipher.clj
@@ -144,7 +143,8 @@ Encrypt/Decrypt
 ;; Should evaluate to [0 0 0 0]
 ```
 
-See the [test directory](td) for examples
+See the [example](/README.md#Example) section below for more
+extensive usage examples
 
 ## Supported Ciphers
 ### Block
@@ -212,3 +212,5 @@ The following encodings are supported:
 5. base32hex - Base32 encoding with a hex alphabet (0-9A-V)
 6. base64    - Base64 encoding (A-Za-z0-9+/)
 7. base64url - Base64 encoding with the URL safe alphabet (A-Za-z0-9-_)
+
+## Examples
