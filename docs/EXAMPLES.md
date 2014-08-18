@@ -15,8 +15,6 @@ input argument for the decrypt is the value the encrypt function evaluated to.
 
 #### AES/ECB/PKCS7
 ```clojure
-;; Note that the keys shown below are the required keys for a 
-;; block cipher
 (encrypt [0 0 0 0]
          {:type :aes :mode :ecb :pad :pkcs7
           :key [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
