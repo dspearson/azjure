@@ -10,7 +10,8 @@
           )
 ```
 ### Encrypt\Decrypt
-#### <cipher>/ECB/PKCS7
+Change the cipher keep the mode and padding the same
+
 #### AES/ECB/PKCS7
 ```clojure
 ;; Note that the keys shown below are the required keys for a 
