@@ -10,7 +10,8 @@
           )
 ```
 ### Encrypt\Decrypt
-Change the cipher keep the mode and padding the same
+Change the cipher keep the mode and padding the same.  In each example, the
+input argument for the decrypt is the value the encrypt function evaluated to.
 
 #### AES/ECB/PKCS7
 ```clojure
