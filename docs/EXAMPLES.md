@@ -1,7 +1,6 @@
-Examples
-========
-### Block Cipher Usage
-#### Namespace(s)
+# Examples
+## Block Cipher Usage
+### Namespace(s)
 ```clojure
 (:require ...
           [azjure.core :refer :all]
@@ -10,7 +9,8 @@ Examples
           ...
           )
 ```
-#### Encrypt\Decrypt
+### Encrypt\Decrypt
+#### <cipher>/ECB/PKCS7
 #### AES/ECB/PKCS7
 ```clojure
 ;; Note that the keys shown below are the required keys for a 
