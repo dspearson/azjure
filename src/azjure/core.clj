@@ -13,9 +13,9 @@
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.cipher.streamcipher :refer :all]
             [azjure.encoders :refer :all]
+            [azjure.libbyte :refer [every-unsigned-byte?]]
             [azjure.modes :refer :all]
-            [azjure.padders :refer :all]
-            [azjure.libbyte :refer (every-unsigned-byte?)])
+            [azjure.padders :refer :all])
   (:import (java.security SecureRandom)))
 
 (defn encrypt
