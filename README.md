@@ -143,6 +143,7 @@ Encrypt/Decrypt
 ;; Should evaluate to [0 0 0 0]
 ```
 
+## More Examples
 See the [examples](/docs/EXAMPLES.md) documentation for more
 extensive usage examples
 
