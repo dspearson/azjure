@@ -3127,7 +3127,7 @@ bytes vectors are assumed as the default input/output type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn xs-&gt;hex
   {:added &quot;0.2.0&quot;}
   [xs]
-  {:pre [(not (nil? xs)) (every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-unsigned-byte? xs)]}
   (-&gt;&gt; xs (map x-&gt;hex) (apply str)))</pre></td></tr><tr><td class="docs"><h3>hex->xs</h3>
 
 <p>  Convert a string of hex values into a sequence of bytes (0-255)</p>
@@ -3146,7 +3146,7 @@ bytes vectors are assumed as the default input/output type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn xs-&gt;str
   {:added &quot;0.2.0&quot;}
   [xs]
-  {:pre [(not (nil? xs)) (every-byte? xs)]}
+  {:pre [(not (nil? xs)) (every-unsigned-byte? xs)]}
   (str/join (map char xs)))</pre></td></tr><tr><td class="docs"><h3>str->xs</h3>
 
 <p>  Convert a string to a sequence of unsigned bytes (0-255)</p>
@@ -3195,7 +3195,7 @@ bytes vectors are assumed as the default input/output type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xs-&gt;base64x
   {:added &quot;0.2.0&quot;}
   [xs alphabet]
-  {:pre [(every-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
+  {:pre [(every-unsigned-byte? xs) (string? alphabet) (= 64 (count alphabet))]}
   (if (empty? xs)
     &quot;&quot;
     (-&gt;&gt; (partition-all 3 xs)
@@ -3304,7 +3304,7 @@ bytes vectors are assumed as the default input/output type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- xs-&gt;base32x
   {:added &quot;0.2.0&quot;}
   [xs alphabet]
-  {:pre [(vector? xs) (every-byte? xs)
+  {:pre [(vector? xs) (every-unsigned-byte? xs)
          (string? alphabet) (= 32 (count alphabet))]}
   (if (empty? xs)
     &quot;&quot;

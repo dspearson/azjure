@@ -3158,14 +3158,14 @@ net.brehaut.ClojureTools = (function (SH) {
   [nonce]
   {:pre [(vector? nonce)
          (= 8 (count nonce))
-         (every-byte? nonce)]}
+         (every-unsigned-byte? nonce)]}
   (map into (repeat nonce) (map #(dword-bytes % true) (range))))</pre></td></tr><tr><td class="docs"><h3>usbv32</h3>
 
 <p>  Is the given vector 32 unsigned bytes long?</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- usbv32?
   {:added &quot;0.2.0&quot;}
   [v]
-  (and (every-byte? v) (= 32 (count v))))</pre></td></tr><tr><td class="docs"><h3>salsa20-expansion</h3>
+  (and (every-unsigned-byte? v) (= 32 (count v))))</pre></td></tr><tr><td class="docs"><h3>salsa20-expansion</h3>
 
 <p>  Expand the 16 or 32-byte key <em>k</em> and the 16-byte vector <em>v</em> into a 64-byte
   vector using sigma or tau depending on the key length.</p>

@@ -141,7 +141,7 @@
   [nonce]
   {:pre [(vector? nonce)
          (= 8 (count nonce))
-         (every-byte? nonce)]}
+         (every-unsigned-byte? nonce)]}
   (map into (repeat nonce) (map #(dword-bytes % true) (range))))
 
 (defn- usbv32?
@@ -149,7 +149,7 @@
   Is the given vector 32 unsigned bytes long?"
   {:added "0.2.0"}
   [v]
-  (and (every-byte? v) (= 32 (count v))))
+  (and (every-unsigned-byte? v) (= 32 (count v))))
 
 (defn- salsa20-expansion
   "### salsa20-expansion

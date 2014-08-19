@@ -3045,11 +3045,11 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn every-bit?
   {:added &quot;0.2.0&quot;}
   [xs]
-  (every? true? (map #(or (zero? %) (= 1 %)) xs)))</pre></td></tr><tr><td class="docs"><h3>every-byte?</h3>
+  (every? true? (map #(or (zero? %) (= 1 %)) xs)))</pre></td></tr><tr><td class="docs"><h3>every-unsigned-byte?</h3>
 
 <p>  Evaluates to true if every value in a sequence is between 0 and 255
   inclusive</p>
-</td><td class="codes"><pre class="brush: clojure">(defn every-byte?
+</td><td class="codes"><pre class="brush: clojure">(defn every-unsigned-byte?
   {:added &quot;0.2.0&quot;}
   [xs]
   (every? true? (map #(and (&gt;= % 0) (&lt;= % 255)) xs)))</pre></td></tr><tr><td class="docs"><h3>last-byte</h3>
@@ -3114,7 +3114,7 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn ubv-&gt;x
   {:added &quot;0.2.0&quot;}
   [xv &amp; {:keys [le]}]
-  {:pre [(every-byte? xv)]}
+  {:pre [(every-unsigned-byte? xv)]}
   (let [l (count xv)
         [orfn shiftfn] (long-or-bigint? xv le)]
     (-&gt;&gt; (if le (range 0 (* 8 l) 8) (range (* 8 (dec l)) -1 -8))

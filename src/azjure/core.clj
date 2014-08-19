@@ -13,6 +13,7 @@
   (:require [azjure.cipher.cipher :refer :all]
             [azjure.cipher.streamcipher :refer :all]
             [azjure.encoders :refer :all]
+            [azjure.libbyte :refer [every-unsigned-byte?]]
             [azjure.modes :refer :all]
             [azjure.padders :refer :all])
   (:import (java.security SecureRandom)))
@@ -68,6 +69,11 @@
   are vectors of 128-bits of 0."
   {:added "0.2.0"}
   [x m]
+  {:pre [(map? m)
+         (contains? m :type) (contains? m :mode) (contains? m :pad)
+         (contains? m :key) (contains? m :iv)
+         (vector? (:key m)) (vector? (:iv m))
+         (every-unsigned-byte? (:key m)) (every-unsigned-byte? (:key m))]}
   (let [m (initialize m)]
     (->> (input-decoder m x)
          (pad m)
@@ -81,6 +87,11 @@
   documentation."
   {:added "0.2.0"}
   [x m]
+  {:pre [(map? m)
+         (contains? m :type) (contains? m :mode) (contains? m :pad)
+         (contains? m :key) (contains? m :iv)
+         (vector? (:key m)) (vector? (:iv m))
+         (every-unsigned-byte? (:key m)) (every-unsigned-byte? (:key m))]}
   (let [m (initialize m)]
     (output-encoder
       m
@@ -96,6 +107,10 @@
   documentation."
   {:added "0.2.0"}
   [xs m]
+  {:pre [(map? m)
+         (contains? m :type) (contains? m :key) (contains? m :nonce)
+         (vector? (:key m)) (vector? (:nonce m))
+         (every-unsigned-byte? (:key m)) (every-unsigned-byte? (:nonce m))]}
   (let [m (initialize m)]
     (->> (input-decoder m xs)
          (generate-keystream m)
